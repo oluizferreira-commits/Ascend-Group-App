@@ -1,0 +1,29 @@
+[
+  {
+    "_comment": "SYNTHETIC test fixture shaped like the FC 24/25 clubs/matches response. Not real data.",
+    "matchId": "900001",
+    "timestamp": 1795300000,
+    "clubs": {
+      "111": { "goals": "3", "details": { "name": "Ascend CF" } },
+      "222": { "goals": "1", "details": { "name": "Rival Teste" } }
+    },
+    "players": {
+      "111": {
+        "p1": { "playername": "TesteST", "goals": "2", "assists": "0", "shots": "5", "passesmade": "10", "passattempts": "14", "tacklesmade": "1", "rating": "8.70", "mom": "1", "redcards": "0", "pos": "forward" },
+        "p2": { "playername": "TesteCM", "goals": "1", "assists": "2", "shots": "1", "passesmade": "30", "passattempts": "28", "rating": "7.9", "mom": "0", "pos": "midfielder" },
+        "p3": { "playername": "SemCadastro", "goals": "0", "assists": "1", "rating": "6.5", "pos": "defender" }
+      },
+      "222": { "x": { "playername": "Adversario", "goals": "1" } }
+    }
+  },
+  {
+    "matchId": "900002",
+    "timestamp": 1795390000,
+    "clubs": {
+      "111": { "goals": "0", "details": { "name": "Ascend CF" } },
+      "333": { "goals": "0", "details": { "name": "Outro Rival" } }
+    },
+    "players": { "111": { "p1": { "playername": "TesteST", "goals": "0", "assists": "0", "rating": "6.1" } } }
+  },
+  { "matchId": "900003", "timestamp": 1795400000, "clubs": { "444": { "goals": "2" }, "555": { "goals": "2" } }, "players": {} }
+]

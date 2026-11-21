@@ -17,7 +17,6 @@ export const NAV: { section: string; items: NavItem[] }[] = [
     section: "Em construção",
     items: [
       { href: "#", label: "Escalações e táticas", icon: "clipboard", soon: "Fase 3" },
-      { href: "#", label: "Integração EA FC", icon: "refresh", soon: "Fase 4" },
       { href: "#", label: "Competições", icon: "medal", soon: "Fase 5" },
       { href: "#", label: "Calendário", icon: "calendar", soon: "Fase 5" },
       { href: "#", label: "Central de mídia", icon: "image", soon: "Fase 7" },
@@ -26,6 +25,7 @@ export const NAV: { section: string; items: NavItem[] }[] = [
   {
     section: "Administração",
     items: [
+      { href: "/app/integracao", label: "Integração EA FC", icon: "refresh", permission: "integration.manage" },
       { href: "/app/admin/usuarios", label: "Usuários e cargos", icon: "shield", permission: "users.manage" },
       { href: "/app/admin/temporadas", label: "Temporadas", icon: "calendar-range", permission: "seasons.manage" },
       { href: "/app/admin/avaliacao", label: "Critérios de avaliação", icon: "sliders", permission: "ratings.configure" },

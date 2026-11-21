@@ -1,0 +1,115 @@
+import "server-only";
+import { and, desc, eq } from "drizzle-orm";
+import { db, schema } from "@/db";
+import { eaGet, eaUrl, matchesUrl, EaBlockedError } from "@/integrations/ea-fc/client";
+import { importEaMatches, type ImportSummary } from "@/integrations/ea-fc/importer";
+import { EA_MATCH_TYPES, EA_PLATFORMS, eaMembersResponseSchema, type EaMatchType, type EaPlatform } from "@/integrations/ea-fc/types";
+
+export const PROVIDER = "ea_fc";
+/** Minimum spacing between server-side fetches for one club. */
+export const MIN_SYNC_INTERVAL_MS = 10 * 60_000;
+
+export async function getEaConfig(clubId: string) {
+  const [c] = await db.select({ platform: schema.clubs.eaPlatform, eaClubId: schema.clubs.eaClubId }).from(schema.clubs).where(eq(schema.clubs.id, clubId));
+  const platform = EA_PLATFORMS.includes(c?.platform as EaPlatform) ? (c!.platform as EaPlatform) : null;
+  return { platform, eaClubId: c?.eaClubId ?? null };
+}
+
+export async function listSyncLogs(clubId: string, limit = 30) {
+  return db.select().from(schema.synchronizationLogs)
+    .where(and(eq(schema.synchronizationLogs.clubId, clubId), eq(schema.synchronizationLogs.provider, PROVIDER)))
+    .orderBy(desc(schema.synchronizationLogs.startedAt)).limit(limit);
+}
+
+type Batch = { matchType: EaMatchType; payload: unknown };
+
+/**
+ * Runs an import with a synchronization log. Raw payloads are stored in the log
+ * so a run can be reprocessed later (e.g. after linking players).
+ */
+export async function runLoggedImport(opts: {
+  clubId: string; eaClubId: string; trigger: "manual" | "scheduled" | "file"; userId: string | null;
+  batches: Batch[] | (() => Promise<Batch[]>); origin: string;
+}) {
+  const [log] = await db.insert(schema.synchronizationLogs).values({
+    clubId: opts.clubId, provider: PROVIDER, trigger: opts.trigger, triggeredBy: opts.userId, details: { origin: opts.origin },
+  }).returning();
+  const totals: ImportSummary = { found: 0, created: 0, skipped: 0, statsAdded: 0, invalid: [], unmatchedPlayers: [] };
+  const errors: string[] = [];
+  let batches: Batch[] = [];
+  try {
+    batches = typeof opts.batches === "function" ? await opts.batches() : opts.batches;
+    for (const b of batches) {
+      try {
+        const r = await importEaMatches(db, { clubId: opts.clubId, eaClubId: opts.eaClubId, matchType: b.matchType, payload: b.payload });
+        totals.found += r.found; totals.created += r.created; totals.skipped += r.skipped; totals.statsAdded += r.statsAdded;
+        totals.invalid.push(...r.invalid);
+        for (const u of r.unmatchedPlayers) {
+          const ex = totals.unmatchedPlayers.find((x) => x.eaName.toLowerCase() === u.eaName.toLowerCase());
+          if (ex) { ex.matches += u.matches; ex.goals += u.goals; ex.assists += u.assists; } else totals.unmatchedPlayers.push({ ...u });
+        }
+      } catch (e) {
+        errors.push(`${b.matchType}: ${(e as Error).message}`);
+      }
+    }
+  } catch (e) {
+    errors.push((e as Error).message);
+  }
+  const status = errors.length === 0 ? "success" : totals.found > 0 ? "partial" : "failed";
+  const [done] = await db.update(schema.synchronizationLogs).set({
+    status, finishedAt: new Date(), itemsFound: totals.found, itemsCreated: totals.created, itemsSkipped: totals.skipped,
+    errorMessage: errors.length ? errors.join(" | ").slice(0, 2000) : null,
+    details: {
+      origin: opts.origin, statsAdded: totals.statsAdded, invalid: totals.invalid.slice(0, 50), unmatchedPlayers: totals.unmatchedPlayers,
+      blocked: errors.some((e) => e.includes("403")),
+      // Raw payloads (public match data only) kept for safe reprocessing.
+      batches: batches.map((b) => ({ matchType: b.matchType, payload: b.payload })),
+    },
+  }).where(eq(schema.synchronizationLogs.id, log.id)).returning();
+  return done;
+}
+
+export async function fetchAllMatchTypes(platform: EaPlatform, eaClubId: string): Promise<Batch[]> {
+  const out: Batch[] = [];
+  for (const t of EA_MATCH_TYPES) {
+    try {
+      out.push({ matchType: t, payload: await eaGet(matchesUrl(platform, eaClubId, t)) });
+    } catch (e) {
+      if (e instanceof EaBlockedError) throw e; // stop immediately — don't hammer a blocking CDN
+      throw new Error(`${t}: ${(e as Error).message}`);
+    }
+  }
+  return out;
+}
+
+export async function lastServerFetch(clubId: string) {
+  const logs = await listSyncLogs(clubId, 20);
+  return logs.find((l) => (l.details as { origin?: string }).origin === "server");
+}
+
+export type MemberSnapshot = { name: string; favoritePosition: string | null; proOverall: number | null; gamesPlayed: number | null; goals: number | null; assists: number | null };
+
+/** Stores the EA members list (public data) so staff can link/create players from it. */
+export async function storeMembersSnapshot(clubId: string, userId: string | null, payload: unknown, origin: string) {
+  const parsed = eaMembersResponseSchema.safeParse(payload);
+  if (!parsed.success) throw new Error("Formato de membros da EA não reconhecido. Envie a resposta do endpoint members/stats.");
+  const members: MemberSnapshot[] = parsed.data.members.map((m) => ({
+    name: m.name.trim().slice(0, 60), favoritePosition: m.favoritePosition ?? null, proOverall: m.proOverall ?? null,
+    gamesPlayed: m.gamesPlayed ?? null, goals: m.goals ?? null, assists: m.assists ?? null,
+  }));
+  const [log] = await db.insert(schema.synchronizationLogs).values({
+    clubId, provider: PROVIDER, trigger: origin === "server" ? "manual" : "file", status: "success", triggeredBy: userId,
+    finishedAt: new Date(), itemsFound: members.length, details: { origin: `members:${origin}`, members },
+  }).returning();
+  return log;
+}
+
+export async function fetchMembers(platform: EaPlatform, eaClubId: string) {
+  return eaGet(eaUrl("members/stats", { platform, clubId: eaClubId }));
+}
+
+export async function latestMembersSnapshot(clubId: string) {
+  const logs = await listSyncLogs(clubId, 50);
+  const log = logs.find((l) => String((l.details as { origin?: string }).origin ?? "").startsWith("members:"));
+  return log ? { at: log.startedAt, members: (log.details as { members: MemberSnapshot[] }).members } : null;
+}

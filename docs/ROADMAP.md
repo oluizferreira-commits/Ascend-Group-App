@@ -8,7 +8,7 @@ Legenda: ✅ pronto e testado · 🟡 parcial · ⏳ não iniciado
 - ✅ Autenticação (login, logout, recuperação e troca de senha, limite de tentativas)
 - ✅ 7 cargos, 25 permissões, verificação no servidor, auditoria imutável
 - ✅ Identidade visual (preto / bordô / dourado, Barlow Condensed + Inter)
-- 🟡 Escudo: componente pronto; **aguardando o arquivo original** em `public/brand/ascend-fc-crest.png`
+- ✅ Escudo oficial instalado (original preservado) e ícones do PWA gerados
 
 ## Fase 2 — Gestão do clube ✅
 - ✅ Painel: escudo, organização, temporada, divisão, posição, campanha, aproveitamento, próxima partida, últimos resultados
@@ -25,8 +25,12 @@ Legenda: ✅ pronto e testado · 🟡 parcial · ⏳ não iniciado
 - ⏳ Campo tático interativo, escalações, estratégias por adversário (tabelas `lineups`/`lineup_players`/`formations` prontas)
 - ⏳ Histórico de vencedores por temporada (premiações fechadas)
 
-## Fase 4 — Integração EA FC ⏳
-Pesquisa e plano em `EA_FC_INTEGRATION.md`. Tabela `synchronization_logs` e deduplicação (`matches_external_uq`) prontas.
+## Fase 4 — Integração EA FC ✅
+- ✅ Endpoints verificados com o FC 27 (Ascend CF, clubId 2292864)
+- ✅ Importador idempotente, vínculo por nome EA, reprocessamento, histórico de importações
+- ✅ Tela administrativa, sincronização manual, rota agendada (cron), agente local, importação de JSON
+- ✅ Importação do elenco da EA (criar/vincular jogadores)
+- ⏳ Atualizar divisão/posição da temporada automaticamente a partir da EA
 
 ## Fase 5 — Competições e calendário ⏳
 Tabelas `competitions`, `competition_teams`, `competition_fixtures`, view `standings` (testada) e `calendar_events` prontas.

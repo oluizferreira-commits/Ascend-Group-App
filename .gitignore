@@ -41,5 +41,3 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# generated brand derivatives are reproducible from the original crest
-/public/brand/generated/

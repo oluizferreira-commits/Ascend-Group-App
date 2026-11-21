@@ -26,14 +26,15 @@ npm run dev                   # http://localhost:3000
 
 ### Escudo oficial
 
-Copie o arquivo **original** do escudo para `public/brand/ascend-fc-crest.png`.
-O arquivo nunca é alterado; versões de exibição são geradas a partir dele:
+O arquivo original enviado pelo proprietário está em `public/brand/ascend-fc-crest-original.jpg` (intocado).
+`public/brand/ascend-fc-crest.png` é a conversão sem perdas (mesmos pixels) usada pela interface, e os ícones
+do PWA em `public/brand/generated/` são gerados a partir dela:
 
 ```bash
 npm run brand:assets          # gera ícones do PWA em public/brand/generated/
 ```
 
-Enquanto o arquivo não existir, a interface mostra um espaço reservado "ESCUDO" — nenhum brasão substituto é desenhado.
+Se o arquivo for removido, a interface mostra um espaço reservado "ESCUDO" — nenhum brasão substituto é desenhado.
 
 ## Variáveis de ambiente
 
@@ -44,7 +45,8 @@ Enquanto o arquivo não existir, a interface mostra um espaço reservado "ESCUDO
 | `BOOTSTRAP_PRESIDENT_EMAIL/NAME/PASSWORD` | no 1º setup | Cria a conta inicial do Presidente (senha ≥ 10 caracteres). |
 | `SMTP_HOST/PORT/USER/PASSWORD/FROM` | não | Envio de e-mails de recuperação de senha. Sem SMTP, em desenvolvimento o link aparece no console. |
 | `TEST_DATABASE_URL` | testes | Banco descartável para testes de integração (é apagado). |
-| `EA_FC_PLATFORM`, `EA_FC_CLUB_ID`, `SYNC_CRON_SECRET` | Fase 4 | Integração EA FC (ainda não implementada). |
+| `SYNC_CRON_SECRET` | para sync agendada | Token (≥ 24 caracteres) da rota `GET /api/integrations/ea-fc/sync`. |
+| `EA_SYNC_TOKEN` | para o agente local | Token (≥ 24 caracteres) da rota `POST /api/integrations/ea-fc/ingest`. |
 
 Nenhuma chave secreta é exposta ao navegador: não existe variável `NEXT_PUBLIC_*`.
 
@@ -83,5 +85,6 @@ mudam — confira antes de contratar. Nenhum serviço pago é exigido pelo códi
 
 ## Integração com EA FC
 
-Ainda não implementada (Fase 4). Pesquisa, riscos e plano em [docs/EA_FC_INTEGRATION.md](docs/EA_FC_INTEGRATION.md).
-Até lá, partidas e estatísticas são registradas manualmente pela súmula.
+Implementada e verificada com o FC 27 (clube **Ascend CF**, `clubId 2292864`, nova geração).
+Configure em **Administração → Integração EA FC**. Detalhes, riscos e agendamento em
+[docs/EA_FC_INTEGRATION.md](docs/EA_FC_INTEGRATION.md). O cadastro manual pela súmula continua disponível.
