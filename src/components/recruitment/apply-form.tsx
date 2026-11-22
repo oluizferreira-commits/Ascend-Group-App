@@ -146,7 +146,7 @@ export function ApplyForm() {
       </section>
 
       <FormMessage state={state} />
-      <SubmitButton className="w-full py-3 text-base" pendingText="Enviando…">Enviar proposta</SubmitButton>
+      <SubmitButton className="shine w-full py-3 text-base" pendingText="Enviando…">Enviar proposta</SubmitButton>
     </form>
   );
 }

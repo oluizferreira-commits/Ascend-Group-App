@@ -12,6 +12,11 @@ import { EmptyState, ResultPill, SectionTitle, StatTile } from "@/components/ui/
 import { DashboardHighlights } from "@/components/dashboard/highlights";
 import { AnnouncementCard } from "@/components/announcement-card";
 import { matchResult } from "@/lib/domain";
+import { NumberTicker } from "@/components/fx/number-ticker";
+import { TextReveal } from "@/components/fx/text-reveal";
+import { BorderBeam } from "@/components/fx/border-beam";
+import { ProgressRing } from "@/components/fx/progress-ring";
+import { Reveal, RevealItem, Stagger } from "@/components/fx/reveal";
 import { fmtDate, fmtPct, fmtWeekdayTime } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Painel" };
@@ -46,11 +51,12 @@ export default async function DashboardPage() {
       )}
       {/* Hero */}
       <section className="card-premium px-6 py-8 sm:px-10 sm:py-10">
+        <BorderBeam />
         <div className="relative flex flex-col items-center gap-8 text-center md:flex-row md:text-left">
           <Crest size={150} priority />
           <div className="flex-1">
             <p className="font-display text-xs font-semibold tracking-[0.35em] text-silver uppercase">{overview.org.name}</p>
-            <h1 className="mt-1 font-display text-6xl leading-none font-bold tracking-[0.04em] text-white uppercase sm:text-7xl">{overview.club.name}</h1>
+            <h1 className="mt-1 font-display text-6xl leading-none font-bold tracking-[0.04em] text-white uppercase sm:text-7xl"><TextReveal text={overview.club.name} /></h1>
             <p className="mt-3 font-display text-sm font-medium tracking-[0.4em] text-silver">{overview.org.motto}</p>
             {!season && ctx.permissions.has("seasons.manage") && (
               <Link href="/app/admin/temporadas" className="mt-4 inline-block text-sm text-accent-300 underline-offset-4 hover:underline">Cadastrar a temporada atual →</Link>
@@ -67,14 +73,17 @@ export default async function DashboardPage() {
       {/* Campaign */}
       <section aria-labelledby="campanha">
         <SectionTitle><span id="campanha">Campanha {season ? `· ${season.name}` : "· todas as partidas"}</span></SectionTitle>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          <StatTile label="Partidas" value={record.played} />
-          <StatTile label="Vitórias" value={record.wins} accent="win" />
-          <StatTile label="Empates" value={record.draws} accent="draw" />
-          <StatTile label="Derrotas" value={record.losses} accent="loss" />
-          <StatTile label="Aproveitamento" value={fmtPct(record.pointsPct)} accent="gold" sub="pontos / pontos disputados" />
-          <StatTile label="Gols" value={`${record.goalsFor}:${record.goalsAgainst}`} sub="pró : contra" />
-        </div>
+        <Stagger className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <RevealItem><StatTile label="Partidas" value={<NumberTicker value={record.played} />} /></RevealItem>
+          <RevealItem><StatTile label="Vitórias" value={<NumberTicker value={record.wins} />} accent="win" /></RevealItem>
+          <RevealItem><StatTile label="Empates" value={<NumberTicker value={record.draws} />} accent="draw" /></RevealItem>
+          <RevealItem><StatTile label="Derrotas" value={<NumberTicker value={record.losses} />} accent="loss" /></RevealItem>
+          <RevealItem className="relative">
+            <StatTile label="Aproveitamento" value={record.pointsPct == null ? fmtPct(null) : <NumberTicker value={record.pointsPct} decimals={1} suffix="%" />} accent="gold" sub="pontos / pontos disputados" />
+            <span className="pointer-events-none absolute top-3 right-3 opacity-90"><ProgressRing value={record.pointsPct} size={34} stroke={4} /></span>
+          </RevealItem>
+          <RevealItem><StatTile label="Gols" value={<><NumberTicker value={record.goalsFor} />:<NumberTicker value={record.goalsAgainst} /></>} sub="pró : contra" /></RevealItem>
+        </Stagger>
       </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -113,7 +122,7 @@ export default async function DashboardPage() {
         </section>
       </div>
 
-      <section aria-labelledby="destaques">
+      <Reveal><section aria-labelledby="destaques">
         <SectionTitle action={<Link href="/app/rankings" className="text-xs text-accent-400 hover:underline">Todos os rankings</Link>}>
           <span id="destaques">Destaques da temporada</span>
         </SectionTitle>
@@ -124,7 +133,7 @@ export default async function DashboardPage() {
           decisive={rankings.decisive.map((s) => entry(s)!)}
           threshold={rankings.threshold}
         />
-      </section>
+      </section></Reveal>
 
       <section aria-labelledby="avisos">
         <SectionTitle action={<Link href="/app/avisos" className="text-xs text-accent-400 hover:underline">Ver todos</Link>}>

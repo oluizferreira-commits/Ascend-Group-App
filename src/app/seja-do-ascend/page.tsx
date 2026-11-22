@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Crest } from "@/components/crest";
 import { ApplyForm } from "@/components/recruitment/apply-form";
+import { TextReveal } from "@/components/fx/text-reveal";
+import { Reveal } from "@/components/fx/reveal";
 
 export const metadata: Metadata = {
   title: "Seja do Ascend",
@@ -20,11 +22,11 @@ export default function ApplyPage() {
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-4 py-10 text-center">
           <Link href="/"><Crest size={120} priority /></Link>
           <p className="font-display text-sm font-semibold tracking-[0.4em] text-silver uppercase">Ascend CF · Pro Clubs</p>
-          <h1 className="font-display text-6xl leading-none font-bold tracking-[0.03em] text-white uppercase sm:text-7xl">Seja do Ascend</h1>
+          <h1 className="font-display text-6xl leading-none font-bold tracking-[0.03em] text-white uppercase sm:text-7xl"><TextReveal text="Seja do Ascend" /></h1>
           <p className="max-w-lg text-sm text-ink-300">Preencha sua proposta. A comissão técnica avalia e, se aprovada, entra em contato com você.</p>
         </div>
       </section>
-      <div className="mx-auto max-w-3xl px-4 py-8"><ApplyForm /></div>
+      <Reveal delay={0.3} className="mx-auto max-w-3xl px-4 py-8"><ApplyForm /></Reveal>
       <footer className="pb-10 text-center text-ink-400">
         <p className="font-display text-sm tracking-[0.4em]">RISE. CONQUER. ASCEND.</p>
         <p className="mt-2 text-xs"><Link href="/privacidade" className="hover:text-accent-400">Política de Privacidade e Cookies</Link></p>

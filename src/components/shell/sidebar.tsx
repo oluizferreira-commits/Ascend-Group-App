@@ -11,6 +11,7 @@ import { cn } from "@/lib/cn";
 import type { NavItem } from "./nav";
 import { logoutAction } from "@/server/actions/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { motion } from "motion/react";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "layout-dashboard": LayoutDashboard, users: Users, swords: Swords, trophy: Trophy, megaphone: Megaphone,
@@ -52,12 +53,12 @@ function NavList({ sections, onNavigate }: { sections: Section[]; onNavigate?: (
                     aria-current={active ? "page" : undefined}
                     className={cn(
                       "relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition",
-                      active ? "bg-white/[0.06] text-white" : "text-ink-400 hover:bg-white/[0.04] hover:text-ink-100",
+                      active ? "text-white" : "text-ink-400 hover:bg-white/[0.04] hover:text-ink-100",
                     )}
                   >
-                    {active && <span className="absolute inset-y-1 left-0 w-[3px] rounded-r bg-[#3a63f0]" />}
-                    <Icon className={cn("size-4", active && "text-accent-400")} />
-                    {item.label}
+                    {active && <motion.span layoutId={onNavigate ? "nav-active-m" : "nav-active"} className="absolute inset-0 rounded-md bg-white/[0.06]"><span className="absolute inset-y-1 left-0 w-[3px] rounded-r bg-[#3a63f0]" /></motion.span>}
+                    <Icon className={cn("relative size-4", active && "text-accent-400")} />
+                    <span className="relative">{item.label}</span>
                   </Link>
                 </li>
               );
@@ -157,6 +158,7 @@ export function MobileTabBar({ items }: { items: NavItem[] }) {
         const active = isActive(pathname, item.href);
         return (
           <Link key={item.href} href={item.href} className={cn("relative flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium", active ? "text-accent-400" : "text-ink-400")}>
+            {active && <motion.span layoutId="tab-active" className="absolute inset-x-4 top-0 h-[3px] rounded-b bg-accent-500" />}
             <Icon className="size-5" />
             {item.label}
           </Link>

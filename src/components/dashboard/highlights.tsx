@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { SpotlightCard } from "@/components/fx/spotlight-card";
+import { NumberTicker } from "@/components/fx/number-ticker";
 import { Crown, Footprints, Goal, Zap } from "lucide-react";
 import { Avatar } from "@/components/ui/basics";
 import { POSITION_LABELS } from "@/lib/domain";
@@ -20,7 +22,7 @@ export function HighlightCard({
   emptyText: string;
 }) {
   return (
-    <article className="card relative min-w-0 overflow-hidden border-t-[3px] border-t-accent-500 p-5">
+    <SpotlightCard as="article" className="card min-w-0 overflow-hidden border-t-[3px] border-t-accent-500 p-5 transition-transform duration-300 hover:-translate-y-0.5">
       <div className="mb-4 flex items-center gap-2">
         <Icon className="size-4 text-accent-400" />
         <h3 className="eyebrow">{title}</h3>
@@ -55,7 +57,7 @@ export function HighlightCard({
       ) : (
         <p className="py-6 text-center text-sm text-ink-400">{emptyText}</p>
       )}
-    </article>
+    </SpotlightCard>
   );
 }
 
@@ -68,7 +70,7 @@ export function DashboardHighlights({ best, scorer, assister, decisive, threshol
         title="Melhor jogador"
         icon={Crown}
         entry={best}
-        metric={best ? fmtNum(best.s.avgRating, 1) : null}
+        metric={best?.s.avgRating != null ? <NumberTicker value={best.s.avgRating} decimals={1} /> : null}
         metricLabel="Nota média"
         emptyText={`Ninguém atingiu o mínimo de ${threshold} ${threshold === 1 ? "jogo" : "jogos"} com estatísticas nesta temporada.`}
         extras={best ? [
@@ -81,7 +83,7 @@ export function DashboardHighlights({ best, scorer, assister, decisive, threshol
         title="Artilheiro"
         icon={Goal}
         entry={scorer}
-        metric={scorer?.s.goals}
+        metric={scorer ? <NumberTicker value={scorer.s.goals} /> : null}
         metricLabel="Gols"
         emptyText="Nenhum gol registrado nesta temporada."
         extras={scorer ? [
@@ -94,7 +96,7 @@ export function DashboardHighlights({ best, scorer, assister, decisive, threshol
         title="Melhor assistente"
         icon={Footprints}
         entry={assister}
-        metric={assister?.s.assists}
+        metric={assister ? <NumberTicker value={assister.s.assists} /> : null}
         metricLabel="Assistências"
         emptyText="Nenhuma assistência registrada nesta temporada."
         extras={assister ? [

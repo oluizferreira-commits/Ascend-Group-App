@@ -7,6 +7,7 @@ import "./globals.css";
 import { ServiceWorkerRegistrar, AppTouchGuards } from "@/components/pwa";
 import { UpdateNotice } from "@/components/update-notice";
 import { CookieNotice } from "@/components/cookie-notice";
+import { MotionProvider } from "@/components/fx/motion-provider";
 import { getThemeMode } from "@/lib/theme";
 
 export const metadata: Metadata = {
@@ -37,7 +38,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="pt-BR" data-theme={mode === "system" ? undefined : mode}>
       <body>
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <ServiceWorkerRegistrar />
         <AppTouchGuards />
         <UpdateNotice />
