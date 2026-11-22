@@ -98,10 +98,10 @@ function Frame({ crest, children, title }: { crest: string; children: React.Reac
 
 const fontsOf = async () => (await loadAssets()).fonts.map((f) => ({ ...f, style: "normal" as const }));
 
-export async function renderShareCard(c: ShareCard) {
+export async function renderShareCard(c: ShareCard, title?: string) {
   const { crest } = await loadAssets();
   return new ImageResponse(
-    <Frame crest={crest} title={`${POSITION_NAMES[c.position].toUpperCase()}`}><Card c={c} scale={1.45} /></Frame>,
+    <Frame crest={crest} title={title ?? POSITION_NAMES[c.position].toUpperCase()}><Card c={c} scale={1.45} /></Frame>,
     { width: W, height: H, fonts: await fontsOf() },
   );
 }

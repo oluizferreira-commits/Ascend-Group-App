@@ -3,6 +3,7 @@ import { and, eq, gt, gte, lte } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { notify } from "./notify";
 import { mvpCandidates } from "./services/mvp";
+import { runAwards } from "./services/awards";
 import { mvpWindow } from "@/lib/mvp";
 import { fmtWeekdayTime } from "@/lib/format";
 
@@ -64,6 +65,8 @@ export async function runReminders(clubId: string) {
         body: "A votação fica aberta por 48 horas.", link: `/app/partidas/${m.id}#craque`,
       });
     }
+    // 4) Bola de Prata / Bola de Ouro: create editions, announce openings, freeze winners.
+    await runAwards(clubId);
   } catch (e) {
     console.error("[reminders] failed", e);
   }

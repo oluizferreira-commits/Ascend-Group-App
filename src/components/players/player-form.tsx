@@ -39,7 +39,7 @@ export function PlayerForm({
           <input id="shirtNumber" name="shirtNumber" type="number" min={1} max={99} defaultValue={initial.shirtNumber ?? ""} className="input" />
         </Field>
         <Field label="Foto (URL https)" name="avatarUrl" error={fe.avatarUrl} className="sm:col-span-2">
-          <input id="avatarUrl" name="avatarUrl" type="url" placeholder="https://…" defaultValue={initial.avatarUrl ?? ""} className="input" />
+          <input id="avatarUrl" name="avatarUrl" type="text" inputMode="url" placeholder="https://…" defaultValue={initial.avatarUrl ?? ""} className="input" />
         </Field>
         <Field label="Conta vinculada" name="userId" error={fe.userId} hint="Permite que o jogador veja o próprio perfil e informe disponibilidade.">
           <select id="userId" name="userId" defaultValue={initial.userId ?? ""} className="input">

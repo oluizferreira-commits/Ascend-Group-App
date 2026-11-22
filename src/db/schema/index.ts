@@ -5,3 +5,4 @@ export * from "./sport";
 export * from "./comms";
 export * from "./recruitment";
 export * from "./engagement";
+export * from "./awards";

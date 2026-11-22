@@ -31,3 +31,15 @@ describe("Seja do Ascend validation", () => {
     expect(applicationSchema.safeParse({ ...base, contactWhatsapp: "123" }).success).toBe(false);
   });
 });
+
+import { playerSchema } from "@/lib/validation/player";
+
+describe("player avatar", () => {
+  const base = { fullName: "A B", nickname: "ab", primaryPosition: "ST", status: "available", secondaryPositions: [], userId: "" };
+  it("accepts https and internal application photos, rejects others", () => {
+    expect(playerSchema.safeParse({ ...base, avatarUrl: "https://example.com/a.png" }).success).toBe(true);
+    expect(playerSchema.safeParse({ ...base, avatarUrl: "/api/propostas/0f9a1c2e-1234-4abc-9def-0123456789ab/foto" }).success).toBe(true);
+    expect(playerSchema.safeParse({ ...base, avatarUrl: "/etc/passwd" }).success).toBe(false);
+    expect(playerSchema.safeParse({ ...base, avatarUrl: "http://example.com/a.png" }).success).toBe(false);
+  });
+});

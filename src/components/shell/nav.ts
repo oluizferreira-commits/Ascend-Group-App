@@ -11,6 +11,7 @@ export const NAV: { section: string; items: NavItem[] }[] = [
       { href: "/app/partidas", label: "Partidas", icon: "swords", permission: "matches.view" },
       { href: "/app/escalacoes", label: "Escalações", icon: "clipboard", permission: "lineups.view" },
       { href: "/app/comparar", label: "Comparar", icon: "compare", permission: "stats.view" },
+      { href: "/app/premios", label: "Premiações", icon: "award", permission: "dashboard.view" },
       { href: "/app/rankings", label: "Rankings", icon: "trophy", permission: "stats.view" },
       { href: "/app/avisos", label: "Avisos", icon: "megaphone", permission: "announcements.view" },
       { href: "/app/calendario", label: "Calendário", icon: "calendar", permission: "dashboard.view" },

@@ -43,6 +43,13 @@
       "when": 1795348852479,
       "tag": "0005_engagement",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795367471077,
+      "tag": "0006_awards",
+      "breakpoints": true
     }
   ]
 }

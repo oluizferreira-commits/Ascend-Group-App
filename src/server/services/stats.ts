@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, gte, lte, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { POSITION_GROUPS, matchResult, positionGroup, type Position, type PositionGroup } from "@/lib/domain";
 import {
@@ -20,14 +20,20 @@ export async function getRatingConfig(clubId: string) {
   };
 }
 
-type Scope = { clubId: string; seasonId?: string | null; competitionId?: string | null };
+/** `from` / `to` are São Paulo calendar dates (YYYY-MM-DD), both inclusive. */
+type Scope = { clubId: string; seasonId?: string | null; competitionId?: string | null; from?: string; to?: string };
 
-function matchFilter({ clubId, seasonId, competitionId }: Scope) {
+const spStart = (d: string) => new Date(`${d}T00:00:00-03:00`);
+const spEnd = (d: string) => new Date(`${d}T23:59:59.999-03:00`);
+
+function matchFilter({ clubId, seasonId, competitionId, from, to }: Scope) {
   return and(
     eq(schema.matches.clubId, clubId),
     eq(schema.matches.status, "finished"),
     seasonId ? eq(schema.matches.seasonId, seasonId) : undefined,
     competitionId ? eq(schema.matches.competitionId, competitionId) : undefined,
+    from ? gte(schema.matches.kickoffAt, spStart(from)) : undefined,
+    to ? lte(schema.matches.kickoffAt, spEnd(to)) : undefined,
   );
 }
 

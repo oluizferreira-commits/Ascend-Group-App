@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  Bell, CalendarDays, GitCompareArrows, CalendarRange, ClipboardList, Image as ImageIcon, LayoutDashboard, LogOut, Medal, Megaphone, Menu,
+  Award, Bell, CalendarDays, GitCompareArrows, CalendarRange, ClipboardList, Image as ImageIcon, LayoutDashboard, LogOut, Medal, Megaphone, Menu,
   RefreshCw, ScrollText, Shield, SlidersHorizontal, Swords, Trophy, User, UserCheck, UserCircle, UserPlus, Users, X,
 } from "lucide-react";
 import { Crest } from "@/components/crest";
@@ -16,7 +16,7 @@ import { motion } from "motion/react";
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "layout-dashboard": LayoutDashboard, users: Users, swords: Swords, trophy: Trophy, megaphone: Megaphone,
   clipboard: ClipboardList, refresh: RefreshCw, medal: Medal, calendar: CalendarDays, image: ImageIcon,
-  shield: Shield, "calendar-range": CalendarRange, sliders: SlidersHorizontal, scroll: ScrollText, "user-check": UserCheck, "user-plus": UserPlus, user: User, compare: GitCompareArrows,
+  shield: Shield, "calendar-range": CalendarRange, sliders: SlidersHorizontal, scroll: ScrollText, "user-check": UserCheck, "user-plus": UserPlus, user: User, compare: GitCompareArrows, award: Award,
 };
 
 type Section = { section: string; items: NavItem[] };

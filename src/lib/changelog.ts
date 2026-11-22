@@ -5,6 +5,16 @@
 export const CHANGELOG: { date: string; title: string; items: string[] }[] = [
   {
     date: "2026-11-22",
+    title: "Bola de Prata e Bola de Ouro",
+    items: [
+      "Nova aba Premiações: Bola de Prata da semana e Bola de Ouro do mês.",
+      "Todo o elenco e a comissão votam — link pronto para mandar no WhatsApp.",
+      "Primeira Bola de Prata: sábado, 28/11. Primeira Bola de Ouro: votação de 1 a 3 de dezembro.",
+      "Os vencedores ficam registrados para sempre e aparecem no perfil com os troféus.",
+    ],
+  },
+  {
+    date: "2026-11-22",
     title: "Cara de app",
     items: [
       "Tela de abertura com o escudo — e o número da sua camisa.",

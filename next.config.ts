@@ -28,6 +28,7 @@ const nextConfig: NextConfig = {
     "/api/media/[template]": ["./assets/fonts/**", "./public/brand/generated/crest-256.png"],
     "/api/card/[id]": ["./assets/fonts/**", "./public/brand/generated/crest-256.png"],
     "/api/compare": ["./assets/fonts/**", "./public/brand/generated/crest-256.png"],
+    "/api/premios/[id]/arte": ["./assets/fonts/**", "./public/brand/generated/crest-256.png"],
   },
   turbopack: {
     rules: {

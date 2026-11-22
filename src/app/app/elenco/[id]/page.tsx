@@ -8,6 +8,8 @@ import { getPlayer } from "@/server/services/players";
 import { getPlayerMatchHistory, getPlayerSeasonHistory, getSeasonStats } from "@/server/services/stats";
 import { Avatar, Badge, PageHeader, ResultPill, SectionTitle, StatTile } from "@/components/ui/basics";
 import { RatingTrend } from "@/components/sparkline";
+import { playerTrophies } from "@/server/services/awards";
+import { TrophyRow } from "@/components/awards/trophy-row";
 import { FOOT_LABELS, PLAYER_STATUS_LABELS, POSITION_LABELS, POSITION_NAMES } from "@/lib/domain";
 import { fmtDate, fmtNum } from "@/lib/format";
 
@@ -27,10 +29,11 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   if (!player) notFound();
   const overview = await getClubOverview(ctx.club.id);
   const seasonId = overview.currentSeason?.id ?? null;
-  const [stats, history, seasons] = await Promise.all([
+  const [stats, history, seasons, cabinet] = await Promise.all([
     getSeasonStats({ clubId: ctx.club.id, seasonId }),
     getPlayerMatchHistory(ctx.club.id, id, seasonId),
     getPlayerSeasonHistory(ctx.club.id, id),
+    playerTrophies(ctx.club.id, id),
   ]);
   const s = stats.summaryMap.get(id)!;
   const pa = s.optional.passesAttempted, pc = s.optional.passesCompleted;
@@ -60,6 +63,7 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
         <dl className="grid flex-1 grid-cols-2 gap-x-6 gap-y-3 text-sm md:grid-cols-4">
           <div className="col-span-2"><dt className="label">Nome completo</dt><dd className="font-medium">{player.fullName}</dd></div>
           <div><dt className="label">Posição</dt><dd>{POSITION_NAMES[player.primaryPosition]} ({POSITION_LABELS[player.primaryPosition]})</dd></div>
+          {(cabinet.gold > 0 || cabinet.silver > 0) && <div className="col-span-2 md:col-span-4"><dt className="label">Premiações</dt><dd><TrophyRow gold={cabinet.gold} silver={cabinet.silver} /></dd></div>}
           <div><dt className="label">Situação</dt><dd><Badge tone="gold">{PLAYER_STATUS_LABELS[player.status]}</Badge></dd></div>
           <div><dt className="label">Secundárias</dt><dd>{player.secondaryPositions.length ? player.secondaryPositions.map((p) => POSITION_LABELS[p]).join(", ") : "—"}</dd></div>
           <div><dt className="label">Pé dominante</dt><dd>{player.preferredFoot ? FOOT_LABELS[player.preferredFoot] : "—"}</dd></div>

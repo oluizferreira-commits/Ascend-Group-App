@@ -13,6 +13,9 @@ import { getMatchday } from "@/server/services/matchday";
 import { MatchdayHero } from "@/components/engagement/matchday";
 import { CallupSheetButton } from "@/components/mobile/callup-sheet";
 import { recentMvpPrompt } from "@/server/services/mvp";
+import { openAwardPrompt } from "@/server/services/awards";
+import { Ball } from "@/components/awards/ball";
+import { AWARD_LABELS } from "@/lib/awards";
 import { squadAttributes, cardOverall } from "@/lib/attributes";
 import { PlayerCard } from "@/components/cards/player-card";
 import { Crest } from "@/components/crest";
@@ -33,13 +36,13 @@ export default async function DashboardPage() {
   const ctx = await requirePage("dashboard.view");
   // Independent queries start immediately (no waterfall).
   const independent = Promise.all([
-    getMe(ctx), getMatchday(ctx), recentMvpPrompt(ctx),
+    getMe(ctx), getMatchday(ctx), recentMvpPrompt(ctx), openAwardPrompt(ctx),
     ctx.playerId ? pendingCallupsFor(ctx.playerId) : Promise.resolve([] as Awaited<ReturnType<typeof pendingCallupsFor>>),
     nextMatch(ctx.club.id), listActiveAnnouncements(ctx.club.id, visibleScopes(ctx), 5),
   ]);
   const overview = await getClubOverview(ctx.club.id);
   const season = overview.currentSeason;
-  const [[me, matchday, mvpPrompt, callups, upcoming, announcements], stats, recent] = await Promise.all([
+  const [[me, matchday, mvpPrompt, awardPrompt, callups, upcoming, announcements], stats, recent] = await Promise.all([
     independent,
     getSeasonStats({ clubId: ctx.club.id, seasonId: season?.id ?? null }),
     recentResults(ctx.club.id, 5, season?.id ?? null),
@@ -73,6 +76,13 @@ export default async function DashboardPage() {
         <MatchdayHero serverNow={matchday.serverNow} kickoffIso={matchday.match.kickoffAt.toISOString()} opponent={matchday.match.opponentName} competition={matchday.competition}
           matchId={matchday.match.id} lineup={matchday.lineup} eventId={matchday.eventId} called={matchday.called} confirmed={matchday.confirmed}
           pending={matchday.pending} myStatus={matchday.myStatus} />
+      )}
+      {awardPrompt && (
+        <Link href={`/app/premios/${awardPrompt.id}`} className="flex items-center gap-3 rounded-lg border border-accent-500/50 border-l-4 border-l-accent-500 bg-accent-500/10 p-4 hover:bg-accent-500/15">
+          <Ball kind={awardPrompt.kind} size={36} />
+          <span className="flex-1"><b className="block">Votação aberta: {AWARD_LABELS[awardPrompt.kind]}</b><span className="text-sm text-ink-300">{awardPrompt.label}</span></span>
+          <span className="btn-primary min-h-0 py-1.5">Votar</span>
+        </Link>
       )}
       {mvpPrompt && (
         <Link href={`/app/partidas/${mvpPrompt.id}#craque`} className="flex items-center gap-3 rounded-lg border border-accent-500/50 border-l-4 border-l-accent-500 bg-accent-500/10 p-4 hover:bg-accent-500/15">

@@ -9,6 +9,8 @@ import { pendingCallupsFor } from "@/server/services/calendar";
 import { PlayerCard } from "@/components/cards/player-card";
 import { ShareImageButton } from "@/components/share/share-image";
 import { CallupSheetButton } from "@/components/mobile/callup-sheet";
+import { playerTrophies } from "@/server/services/awards";
+import { TrophyRow } from "@/components/awards/trophy-row";
 import { NumberTicker } from "@/components/fx/number-ticker";
 import { Reveal, RevealItem, Stagger } from "@/components/fx/reveal";
 import { SectionTitle, StatTile } from "@/components/ui/basics";
@@ -24,7 +26,7 @@ export default async function MePage() {
   const { seasonId, seasonName } = await currentSeasonInfo(ctx.club.id);
   const [{ cards }, callups] = await Promise.all([getCardsData(ctx.club.id, seasonId), pendingCallupsFor(me.id)]);
   const c = cards.get(me.id)!;
-  const trend = await overallTrend(me.id, me.overall);
+  const [trend, cabinet] = await Promise.all([overallTrend(me.id, me.overall), playerTrophies(ctx.club.id, me.id)]);
   const s = c.summary;
 
   return (
@@ -41,6 +43,7 @@ export default async function MePage() {
             <p className="font-display text-sm font-semibold tracking-[0.35em] text-silver uppercase">{me.shirtNumber != null ? `Camisa ${me.shirtNumber}` : "Ascend CF"}</p>
             <h1 className="mt-1 font-display text-5xl leading-none font-bold tracking-[0.03em] text-white uppercase sm:text-6xl">{me.nickname}</h1>
             <p className="mt-2 text-ink-300">{POSITION_NAMES[me.primaryPosition]}</p>
+            <TrophyRow gold={cabinet.gold} silver={cabinet.silver} className="mt-2 text-white" />
             <OverallTrend trend={trend} synced={me.overallSource === "ea" ? me.overallSyncedAt : null} className="mt-2 justify-center text-ink-300 md:justify-start" />
             <p className="mt-1 text-xs text-ink-400">{c.ovr.source === "ea" ? "Geral = overall do EA FC" : c.ovr.source === "rating" ? "Geral = nota média × 10" : "Sem jogos registrados ainda"} · atributos comparados ao elenco</p>
             <div className="mt-5 flex flex-wrap justify-center gap-2 md:justify-start">
