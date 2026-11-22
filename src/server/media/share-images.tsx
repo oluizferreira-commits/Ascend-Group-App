@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import sharp from "sharp";
 import { db, schema } from "@/db";
 import { loadAssets } from "./render";
-import { cardTier, type AttributeKey, type Attributes } from "@/lib/attributes";
+import { CARD_ATTRS, cardTier, type Attributes } from "@/lib/attributes";
 import { POSITION_LABELS, POSITION_NAMES, type Position } from "@/lib/domain";
 import type { RowResult } from "@/lib/compare";
 
@@ -15,7 +15,6 @@ const TIERS = {
   ascend: { rim: "#8fa9ff", glow: ["#3a63f0", 0.6] as const, metal: [[0, "#e6ecfd"], [0.25, "#9aa6bd"], [0.45, "#56627a"], [0.6, "#d5dceb"], [0.8, "#6d7891"], [1, "#c9d1dc"]] as Stop[] },
   base: { rim: "#5a6f9e", glow: ["#1c3fb0", 0.45] as const, metal: [[0, "#9aa6bd"], [0.35, "#4a5672"], [0.55, "#7d8aa3"], [0.8, "#3a4560"], [1, "#8b96ad"]] as Stop[] },
 };
-const CARD_ATTRS: AttributeKey[] = ["FIN", "DEC", "DEF", "CRI", "PAS", "REG"];
 // Shield silhouette — same points as components/cards/player-card.tsx
 const SHIELD_PTS: [number, number][] = [[50, 0], [93, 3.2], [100, 9.5], [100, 83], [50, 100], [0, 83], [0, 9.5], [7, 3.2]];
 const poly = (x: number, y: number, w: number, h: number) => SHIELD_PTS.map(([px, py]) => `${(x + (px / 100) * w).toFixed(1)},${(y + (py / 100) * h).toFixed(1)}`).join(" ");

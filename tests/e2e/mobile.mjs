@@ -65,7 +65,8 @@ const swipe = async (fromX, toX, y = 420) => m.evaluate(([a, b, yy]) => {
   el.dispatchEvent(new TouchEvent("touchstart", { touches: [mk(a)], changedTouches: [mk(a)], bubbles: true }));
   el.dispatchEvent(new TouchEvent("touchend", { touches: [], changedTouches: [mk(b)], bubbles: true }));
 }, [fromX, toX, y]);
-await m.goto(`${BASE}/app`);
+await m.goto(`${BASE}/app`, { waitUntil: "networkidle" });
+await m.waitForTimeout(500); // gesture listeners attach after hydration
 await swipe(320, 80);
 await m.waitForURL(`${BASE}/app/partidas`);
 await swipe(80, 320);

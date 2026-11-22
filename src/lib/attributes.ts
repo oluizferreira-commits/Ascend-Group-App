@@ -14,6 +14,9 @@ export const ATTRIBUTES = {
   REG: { label: "Regularidade", hint: "nota média − desvio (mín. 3 jogos)" },
 } as const;
 export type AttributeKey = keyof typeof ATTRIBUTES;
+
+/** Attribute order on the player card (two rows of three). */
+export const CARD_ATTRS: AttributeKey[] = ["FIN", "DEC", "DEF", "CRI", "PAS", "REG"];
 export type Attributes = Record<AttributeKey, number | null>;
 
 export function rawAttributes(s: PlayerSeasonSummary): Attributes {

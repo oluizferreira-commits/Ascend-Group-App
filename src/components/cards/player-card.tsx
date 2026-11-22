@@ -1,7 +1,7 @@
 "use client";
 import { useRef } from "react";
 import { cn } from "@/lib/cn";
-import { ATTRIBUTES, cardTier, type AttributeKey, type Attributes } from "@/lib/attributes";
+import { ATTRIBUTES, CARD_ATTRS, cardTier, type AttributeKey, type Attributes } from "@/lib/attributes";
 import { POSITION_LABELS, type Position } from "@/lib/domain";
 
 export type PlayerCardProps = {
@@ -22,8 +22,6 @@ export type PlayerCardProps = {
   highlight?: Partial<Record<AttributeKey, boolean>>;
 };
 
-/** Attribute order on the card (two rows of three). */
-export const CARD_ATTRS: AttributeKey[] = ["FIN", "DEC", "DEF", "CRI", "PAS", "REG"];
 
 const TIERS = {
   lenda: { rim: "#bcd0ff", glow: "rgba(111,143,255,0.75)", metal: "linear-gradient(160deg,#ffffff 0%,#c9d1dc 18%,#7d8aa3 38%,#f4f7ff 52%,#8f9bb3 70%,#e6ecfd 100%)", label: "Lenda" },

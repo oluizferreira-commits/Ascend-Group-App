@@ -5,10 +5,10 @@ import { GitCompareArrows } from "lucide-react";
 import { requirePage } from "@/server/auth/session";
 import { currentSeasonInfo, getCardsData, overallTrend } from "@/server/services/player-card";
 import { OverallTrend } from "@/components/cards/overall-trend";
-import { CARD_ATTRS, PlayerCard } from "@/components/cards/player-card";
+import { PlayerCard } from "@/components/cards/player-card";
 import { ShareImageButton } from "@/components/share/share-image";
 import { PageHeader } from "@/components/ui/basics";
-import { ATTRIBUTES } from "@/lib/attributes";
+import { ATTRIBUTES, CARD_ATTRS } from "@/lib/attributes";
 
 export const metadata: Metadata = { title: "Carta do jogador" };
 

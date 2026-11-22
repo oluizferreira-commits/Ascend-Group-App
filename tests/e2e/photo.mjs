@@ -44,6 +44,8 @@ if (SHOTS) await page.screenshot({ path: `${SHOTS}/photo-editor.png`, fullPage: 
 
 step("photo is served with alpha and the card uses it");
 await page.goto(`${BASE}/app/elenco/${id}/carta`);
+await page.getByText("Finalização").first().waitFor(); // attribute list renders (server page, regression)
+assert.equal(await page.getByText("Algo deu errado").count(), 0);
 const src = await page.locator(`[aria-label^="Carta de e2e_st"] img[src*="/api/jogadores/"]`).first().getAttribute("src");
 assert.match(src, new RegExp(`/api/jogadores/${id}/foto\\?v=`));
 const r = await page.request.get(BASE + src);
