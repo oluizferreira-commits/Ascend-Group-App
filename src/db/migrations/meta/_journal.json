@@ -15,6 +15,13 @@
       "when": 1795302031852,
       "tag": "0001_db_guards",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795304606068,
+      "tag": "0002_awards_push",
+      "breakpoints": true
     }
   ]
 }

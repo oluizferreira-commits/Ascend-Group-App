@@ -9,22 +9,18 @@ export const NAV: { section: string; items: NavItem[] }[] = [
       { href: "/app", label: "Painel", icon: "layout-dashboard", permission: "dashboard.view" },
       { href: "/app/elenco", label: "Elenco", icon: "users", permission: "players.view" },
       { href: "/app/partidas", label: "Partidas", icon: "swords", permission: "matches.view" },
+      { href: "/app/escalacoes", label: "Escalações", icon: "clipboard", permission: "lineups.view" },
       { href: "/app/rankings", label: "Rankings", icon: "trophy", permission: "stats.view" },
       { href: "/app/avisos", label: "Avisos", icon: "megaphone", permission: "announcements.view" },
-    ],
-  },
-  {
-    section: "Em construção",
-    items: [
-      { href: "#", label: "Escalações e táticas", icon: "clipboard", soon: "Fase 3" },
-      { href: "#", label: "Competições", icon: "medal", soon: "Fase 5" },
-      { href: "#", label: "Calendário", icon: "calendar", soon: "Fase 5" },
-      { href: "#", label: "Central de mídia", icon: "image", soon: "Fase 7" },
+      { href: "/app/calendario", label: "Calendário", icon: "calendar", permission: "dashboard.view" },
+      { href: "/app/competicoes", label: "Competições", icon: "medal", permission: "competitions.view" },
+      { href: "/app/disponibilidade", label: "Disponibilidade", icon: "user-check", permission: "dashboard.view" },
     ],
   },
   {
     section: "Administração",
     items: [
+      { href: "/app/midia", label: "Central de mídia", icon: "image", permission: "media.manage" },
       { href: "/app/integracao", label: "Integração EA FC", icon: "refresh", permission: "integration.manage" },
       { href: "/app/admin/usuarios", label: "Usuários e cargos", icon: "shield", permission: "users.manage" },
       { href: "/app/admin/temporadas", label: "Temporadas", icon: "calendar-range", permission: "seasons.manage" },

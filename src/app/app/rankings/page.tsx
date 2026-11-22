@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requirePage } from "@/server/auth/session";
+import { desc, eq } from "drizzle-orm";
+import { db, schema } from "@/db";
 import { getClubOverview, listSeasons } from "@/server/services/club";
 import { getSeasonStats } from "@/server/services/stats";
 import { Avatar, PageHeader, SectionTitle } from "@/components/ui/basics";
@@ -46,6 +48,11 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
   const [overview, seasons] = await Promise.all([getClubOverview(ctx.club.id), listSeasons(ctx.club.id)]);
   const seasonId = sp.season === "all" ? null : seasons.some((s) => s.id === sp.season) ? sp.season! : overview.currentSeason?.id ?? null;
   const { rankings: r, playerMap, record, config } = await getSeasonStats({ clubId: ctx.club.id, seasonId });
+  const awards = await db.select({ a: schema.seasonAwards, season: schema.seasons.name }).from(schema.seasonAwards)
+    .innerJoin(schema.seasons, eq(schema.seasons.id, schema.seasonAwards.seasonId))
+    .where(eq(schema.seasonAwards.clubId, ctx.club.id)).orderBy(desc(schema.seasons.startsOn));
+  const bySeason = new Map<string, typeof awards>();
+  for (const a of awards) bySeason.set(a.season, [...(bySeason.get(a.season) ?? []), a]);
 
   const rating: Col[] = [{ label: "Nota", value: (s) => fmtNum(s.avgRating, 1), strong: true }, { label: "G+A", value: (s) => s.goalInvolvements }];
   const eligibility = `Mínimo de ${r.threshold} ${r.threshold === 1 ? "jogo" : "jogos"} (${config.minMatchesPct}% das ${record.played} partidas do clube).`;
@@ -82,6 +89,19 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
           { label: "Índice", value: (s) => fmtNum(s.consistency, 2), strong: true }, { label: "Média", value: (s) => fmtNum(s.avgRating, 1) }, { label: "σ", value: (s) => fmtNum(s.ratingStdDev, 2) },
         ]} />
       </div>
+      <section className="card mt-6 p-5">
+        <SectionTitle>Histórico de vencedores</SectionTitle>
+        {bySeason.size === 0 ? <p className="text-sm text-ink-400">Nenhuma temporada com premiações registradas. A diretoria registra em Administração → Temporadas.</p> : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {[...bySeason.entries()].map(([season, list]) => (
+              <div key={season} className="rounded-lg border border-gold-700/40 p-4">
+                <p className="eyebrow mb-2">Temporada {season}</p>
+                <ul className="space-y-1 text-sm">{list.map(({ a }) => <li key={a.id} className="flex justify-between gap-2"><span className="text-ink-300">{a.award}</span><span><b>{a.playerName}</b> <span className="text-xs text-ink-400">{a.value}</span></span></li>)}</ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { bigserial, boolean, check, date, index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
-import { clubs, users } from "./core";
+import { clubs, seasons, users } from "./core";
 import {
   announcementCategoryEnum, announcementPriorityEnum, attendanceStatusEnum, availabilityStatusEnum,
   eventTypeEnum, syncStatusEnum, syncTriggerEnum, visibilityEnum,
@@ -144,3 +144,29 @@ export const auditLogs = pgTable(
   },
   (t) => [index("audit_logs_club_time_idx").on(t.clubId, t.createdAt)],
 );
+
+/** Season awards frozen when a season is closed ("histórico de vencedores"). */
+export const seasonAwards = pgTable(
+  "season_awards",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    clubId: uuid("club_id").notNull().references(() => clubs.id, { onDelete: "cascade" }),
+    seasonId: uuid("season_id").notNull().references(() => seasons.id, { onDelete: "cascade" }),
+    award: text("award").notNull(),
+    playerId: uuid("player_id").references(() => players.id, { onDelete: "set null" }),
+    playerName: text("player_name").notNull(),
+    value: text("value").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("season_awards_uq").on(t.seasonId, t.award)],
+);
+
+/** Web Push subscriptions (one per browser/device). */
+export const pushSubscriptions = pgTable("push_subscriptions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  endpoint: text("endpoint").notNull().unique(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

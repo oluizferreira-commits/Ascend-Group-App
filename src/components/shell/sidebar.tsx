@@ -3,8 +3,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  CalendarDays, CalendarRange, ClipboardList, Image as ImageIcon, LayoutDashboard, LogOut, Medal, Megaphone, Menu,
-  RefreshCw, ScrollText, Shield, SlidersHorizontal, Swords, Trophy, UserCircle, Users, X,
+  Bell, CalendarDays, CalendarRange, ClipboardList, Image as ImageIcon, LayoutDashboard, LogOut, Medal, Megaphone, Menu,
+  RefreshCw, ScrollText, Shield, SlidersHorizontal, Swords, Trophy, UserCheck, UserCircle, Users, X,
 } from "lucide-react";
 import { Crest } from "@/components/crest";
 import { cn } from "@/lib/cn";
@@ -14,7 +14,7 @@ import { logoutAction } from "@/server/actions/auth";
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "layout-dashboard": LayoutDashboard, users: Users, swords: Swords, trophy: Trophy, megaphone: Megaphone,
   clipboard: ClipboardList, refresh: RefreshCw, medal: Medal, calendar: CalendarDays, image: ImageIcon,
-  shield: Shield, "calendar-range": CalendarRange, sliders: SlidersHorizontal, scroll: ScrollText,
+  shield: Shield, "calendar-range": CalendarRange, sliders: SlidersHorizontal, scroll: ScrollText, "user-check": UserCheck,
 };
 
 type Section = { section: string; items: NavItem[] };
@@ -97,13 +97,22 @@ function Brand() {
   );
 }
 
-export function Sidebar({ sections, userName, roleNames }: { sections: Section[]; userName: string; roleNames: string }) {
+function BellLink({ unread }: { unread: number }) {
+  return (
+    <Link href="/app/notificacoes" className="btn-ghost relative px-2" aria-label={`Notificações${unread ? ` (${unread} não lidas)` : ""}`}>
+      <Bell className="size-5" />
+      {unread > 0 && <span className="absolute -top-0.5 -right-0.5 grid min-w-4 place-items-center rounded-full bg-gold-400 px-1 text-[10px] font-bold text-ink-950">{unread > 99 ? "99+" : unread}</span>}
+    </Link>
+  );
+}
+
+export function Sidebar({ sections, userName, roleNames, unread }: { sections: Section[]; userName: string; roleNames: string; unread: number }) {
   const [open, setOpen] = useState(false);
   return (
     <>
       {/* Desktop */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-ink-800 bg-ink-900/95 px-3 py-5 lg:flex">
-        <Brand />
+        <div className="flex items-center justify-between"><Brand /><BellLink unread={unread} /></div>
         <div className="gold-rule my-5" />
         <div className="flex-1 overflow-y-auto"><NavList sections={sections} /></div>
         <UserBox name={userName} roles={roleNames} />
@@ -112,9 +121,10 @@ export function Sidebar({ sections, userName, roleNames }: { sections: Section[]
       {/* Mobile top bar */}
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-ink-800 bg-ink-950/90 px-4 py-3 backdrop-blur lg:hidden" style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
         <Brand />
+        <div className="flex items-center gap-1"><BellLink unread={unread} />
         <button onClick={() => setOpen(true)} className="btn-ghost px-2" aria-label="Abrir menu" aria-expanded={open}>
           <Menu className="size-6" />
-        </button>
+        </button></div>
       </header>
 
       {open && (

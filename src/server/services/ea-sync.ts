@@ -1,6 +1,7 @@
 import "server-only";
 import { and, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
+import { notify } from "../notify";
 import { eaGet, eaUrl, matchesUrl, EaBlockedError } from "@/integrations/ea-fc/client";
 import { importEaMatches, type ImportSummary } from "@/integrations/ea-fc/importer";
 import { EA_MATCH_TYPES, EA_PLATFORMS, eaMembersResponseSchema, type EaMatchType, type EaPlatform } from "@/integrations/ea-fc/types";
@@ -66,6 +67,12 @@ export async function runLoggedImport(opts: {
       batches: batches.map((b) => ({ matchType: b.matchType, payload: b.payload })),
     },
   }).where(eq(schema.synchronizationLogs.id, log.id)).returning();
+  if (totals.created > 0) {
+    await notify(opts.clubId, { kind: "members" }, {
+      type: "match.result", title: `${totals.created} ${totals.created === 1 ? "nova partida importada" : "novas partidas importadas"} da EA`,
+      body: "Resultados e estatísticas atualizados.", link: "/app/partidas",
+    });
+  }
   return done;
 }
 

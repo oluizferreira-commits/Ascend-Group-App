@@ -3,6 +3,8 @@ import { requirePage } from "@/server/auth/session";
 import { listSeasons } from "@/server/services/club";
 import { Badge, PageHeader, SectionTitle } from "@/components/ui/basics";
 import { SeasonForm } from "@/components/admin/season-form";
+import { closeSeasonAwardsAction } from "@/server/actions/admin";
+import { ConfirmSubmit } from "@/components/ui/confirm-button";
 
 export const metadata: Metadata = { title: "Temporadas" };
 
@@ -22,6 +24,9 @@ export default async function SeasonsPage() {
                 {s.name} {s.isCurrent && <Badge tone="gold">Atual</Badge>}
               </summary>
               <div className="mt-4"><SeasonForm season={s} /></div>
+              <form action={closeSeasonAwardsAction.bind(null, s.id)} className="mt-3 border-t border-ink-800 pt-3">
+                <ConfirmSubmit className="btn-secondary" message="Registrar os vencedores desta temporada no histórico? (Pode ser refeito depois; substitui o registro anterior.)">Registrar premiações da temporada</ConfirmSubmit>
+              </form>
             </details>
           ))}
         </section>

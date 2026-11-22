@@ -7,6 +7,7 @@ import { getMatchDetail } from "@/server/services/matches";
 import { listPlayers } from "@/server/services/players";
 import { getRatingConfig } from "@/server/services/stats";
 import { deleteMatchAction, saveMatchSheetAction } from "@/server/actions/matches";
+import { callupForMatchAction } from "@/server/actions/calendar";
 import { Badge, PageHeader, ResultPill, SectionTitle } from "@/components/ui/basics";
 import { ConfirmSubmit } from "@/components/ui/confirm-button";
 import { SheetEditor } from "@/components/matches/sheet-editor";
@@ -46,12 +47,17 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
       <PageHeader
         eyebrow={detail.competition ?? "Amistoso / sem competição"}
         title={`Ascend FC × ${m.opponentName}`}
-        actions={canManage && (
+        actions={(canManage || ctx.permissions.has("callups.manage")) && (
           <>
+            {ctx.permissions.has("callups.manage") && m.status === "scheduled" && (
+              <form action={callupForMatchAction.bind(null, id)}><button className="btn-primary">Convocação</button></form>
+            )}
+            {ctx.permissions.has("media.manage") && <Link href={`/app/midia?template=result&match=${id}`} className="btn-secondary">Gerar arte</Link>}
+            {canManage && <>
             <Link href={`/app/partidas/${id}/editar`} className="btn-secondary"><Pencil className="size-4" />Editar</Link>
             <form action={deleteMatchAction.bind(null, id)}>
               <ConfirmSubmit className="btn-danger" message="Excluir esta partida e toda a súmula? Esta ação fica registrada na auditoria e não pode ser desfeita."><Trash2 className="size-4" />Excluir</ConfirmSubmit>
-            </form>
+            </form></>}
           </>
         )}
       />

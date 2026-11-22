@@ -6,6 +6,7 @@ import { getClubOverview } from "@/server/services/club";
 import { getSeasonStats } from "@/server/services/stats";
 import { nextMatch, recentResults } from "@/server/services/matches";
 import { listActiveAnnouncements, visibleScopes } from "@/server/services/announcements";
+import { pendingCallupsFor } from "@/server/services/calendar";
 import { Crest } from "@/components/crest";
 import { Badge, EmptyState, ResultPill, SectionTitle, StatTile } from "@/components/ui/basics";
 import { DashboardHighlights } from "@/components/dashboard/highlights";
@@ -25,11 +26,24 @@ export default async function DashboardPage() {
     recentResults(ctx.club.id, 5, season?.id ?? null),
     listActiveAnnouncements(ctx.club.id, visibleScopes(ctx), 5),
   ]);
+  const callups = ctx.playerId ? await pendingCallupsFor(ctx.playerId) : [];
   const { record, rankings, playerMap } = stats;
   const entry = (s: (typeof rankings.best)[number] | undefined) => (s ? { s, player: playerMap.get(s.playerId)! } : null);
 
   return (
     <div className="space-y-8">
+      {callups.length > 0 && (
+        <section className="rounded-xl border border-gold-500/60 bg-gold-500/10 p-4">
+          <p className="eyebrow mb-2">Você foi convocado</p>
+          <ul className="space-y-1">
+            {callups.map(({ e }) => (
+              <li key={e.id}><Link href={`/app/calendario/${e.id}`} className="flex flex-wrap items-center gap-2 text-sm hover:text-gold-300">
+                <b>{e.title}</b><span className="text-ink-300 capitalize">{fmtWeekdayTime(e.startsAt)}</span><span className="text-gold-400 underline">Confirmar presença</span>
+              </Link></li>
+            ))}
+          </ul>
+        </section>
+      )}
       {/* Hero */}
       <section className="card-premium relative overflow-hidden p-6 sm:p-8 animate-rise">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgb(201_162_74/0.12),transparent_45%)]" />

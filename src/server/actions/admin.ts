@@ -75,3 +75,36 @@ export async function saveRatingConfigAction(_prev: ActionResult | null, form: F
   revalidatePath("/app", "layout");
   return { ok: true, message: "Critérios salvos. Rankings e notas foram recalculados." };
 }
+
+import { getSeasonStats } from "../services/stats";
+import { fmtNum } from "@/lib/format";
+
+/** Freezes the season's award winners into season_awards (re-running replaces them). */
+export async function closeSeasonAwardsAction(seasonId: string): Promise<void> {
+  const ctx = await requireAction("seasons.manage");
+  const [season] = await db.select().from(schema.seasons).where(and(eq(schema.seasons.id, seasonId), eq(schema.seasons.clubId, ctx.club.id)));
+  if (!season) return;
+  const st = await getSeasonStats({ clubId: ctx.club.id, seasonId });
+  const r = st.rankings;
+  type S = (typeof r.best)[number];
+  const defs: [string, S | undefined, (s: S) => string][] = [
+    ["Melhor jogador", r.best[0], (s) => `nota ${fmtNum(s.avgRating, 1)}`],
+    ["Artilheiro", r.scorers[0], (s) => `${s.goals} gols`],
+    ["Melhor assistente", r.assisters[0], (s) => `${s.assists} assistências`],
+    ["Mais decisivo", r.decisive[0], (s) => `${s.goalInvolvements} G+A`],
+    ["Melhor atacante", r.bestByGroup.ATT[0], (s) => `nota ${fmtNum(s.avgRating, 1)}`],
+    ["Melhor meio-campista", r.bestByGroup.MID[0], (s) => `nota ${fmtNum(s.avgRating, 1)}`],
+    ["Melhor defensor", r.bestByGroup.DEF[0], (s) => `nota ${fmtNum(s.avgRating, 1)}`],
+    ["Melhor goleiro", r.bestByGroup.GK[0], (s) => `nota ${fmtNum(s.avgRating, 1)}`],
+    ["Mais regular", r.regular[0], (s) => `índice ${fmtNum(s.consistency, 2)}`],
+  ];
+  const rows = defs.filter(([, s]) => s).map(([award, s, v]) => ({
+    clubId: ctx.club.id, seasonId, award, playerId: s!.playerId, playerName: st.playerMap.get(s!.playerId)!.nickname, value: v(s!),
+  }));
+  await db.transaction(async (tx) => {
+    await tx.delete(schema.seasonAwards).where(eq(schema.seasonAwards.seasonId, seasonId));
+    if (rows.length) await tx.insert(schema.seasonAwards).values(rows);
+    await audit(ctx, "season.awards_close", "season", seasonId, { awards: rows.map((x) => `${x.award}: ${x.playerName}`) }, tx);
+  });
+  revalidatePath("/app", "layout");
+}
