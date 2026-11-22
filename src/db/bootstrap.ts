@@ -14,7 +14,7 @@ import { POSITION_GROUPS } from "../lib/domain";
 type AnyDb = PostgresJsDatabase<typeof schema>;
 
 export const ORG = { name: "Ascend Group", slug: "ascend-group", motto: "RISE. CONQUER. ASCEND." };
-export const CLUB = { name: "Ascend FC", slug: "ascend-fc", shortName: "AFC" };
+export const CLUB = { name: "Ascend CF", slug: "ascend-fc", shortName: "ACF" };
 
 export async function bootstrapReferenceData(db: AnyDb) {
   return db.transaction(async (tx) => {
@@ -45,6 +45,11 @@ export async function bootstrapReferenceData(db: AnyDb) {
       .where(and(eq(schema.clubs.organizationId, org.id), eq(schema.clubs.slug, CLUB.slug)));
     if (!club) {
       [club] = await tx.insert(schema.clubs).values({ ...CLUB, organizationId: org.id }).returning();
+    } else if (club.name !== CLUB.name) {
+      // keep the display name in sync with the official identity (slug stays stable)
+      [club] = await tx.update(schema.clubs).set({ name: CLUB.name, shortName: CLUB.shortName }).where(eq(schema.clubs.id, club.id)).returning();
+      await tx.update(schema.competitionTeams).set({ name: CLUB.name })
+        .where(and(eq(schema.competitionTeams.isOwnClub, true), sql`${schema.competitionTeams.competitionId} in (select id from competitions where club_id = ${club.id})`));
     }
 
     // Built-in formations (club_id = null)

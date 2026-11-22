@@ -1,9 +1,9 @@
-# Ascend Group · Ascend FC — Plataforma de Gestão Esportiva
+# Ascend Group · Ascend CF — Plataforma de Gestão Esportiva
 
-Plataforma oficial de gestão do **Ascend FC** (EA SPORTS FC™ Pro Clubs).
+Plataforma oficial de gestão do **Ascend CF** (EA SPORTS FC™ Pro Clubs).
 **RISE. CONQUER. ASCEND.**
 
-Aplicação web responsiva e PWA instalável (desktop, Android e iPhone), com banco de dados
+Aplicação web responsiva e PWA instalável, com tema claro (branco e azul) e escuro (preto e azul), (desktop, Android e iPhone), com banco de dados
 relacional, autenticação individual, permissões por cargo verificadas no servidor e no banco,
 e registro de auditoria.
 
@@ -26,9 +26,8 @@ npm run dev                   # http://localhost:3000
 
 ### Escudo oficial
 
-O arquivo original enviado pelo proprietário está em `public/brand/ascend-fc-crest-original.jpg` (intocado).
-`public/brand/ascend-fc-crest.png` é a conversão sem perdas (mesmos pixels) usada pela interface, e os ícones
-do PWA em `public/brand/generated/` são gerados a partir dela:
+O escudo oficial original está em `public/brand/ascend-fc-crest.png` (intocado). Os ícones do PWA e as versões
+reduzidas em `public/brand/generated/` são gerados a partir dele:
 
 ```bash
 npm run brand:assets          # gera ícones do PWA em public/brand/generated/

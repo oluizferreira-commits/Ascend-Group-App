@@ -74,7 +74,7 @@ d("database guards", () => {
   it("computes standings from fixtures", async () => {
     const [c] = await db.insert(schema.competitions).values({ clubId, name: "Liga" }).returning();
     const [a, b, x] = await db.insert(schema.competitionTeams).values([
-      { competitionId: c.id, name: "Ascend FC", isOwnClub: true }, { competitionId: c.id, name: "B" }, { competitionId: c.id, name: "C" },
+      { competitionId: c.id, name: "Ascend CF", isOwnClub: true }, { competitionId: c.id, name: "B" }, { competitionId: c.id, name: "C" },
     ]).returning();
     await db.insert(schema.competitionFixtures).values([
       { competitionId: c.id, homeTeamId: a.id, awayTeamId: b.id, homeGoals: 2, awayGoals: 0 },
@@ -82,7 +82,7 @@ d("database guards", () => {
       { competitionId: c.id, homeTeamId: b.id, awayTeamId: x.id }, // not played yet
     ]);
     const rows = await sql`select * from standings where competition_id = ${c.id} order by points desc, goal_difference desc`;
-    expect(rows[0]).toMatchObject({ team_name: "Ascend FC", played: 2, won: 1, drawn: 1, lost: 0, goals_for: 3, goals_against: 1, points: 4 });
+    expect(rows[0]).toMatchObject({ team_name: "Ascend CF", played: 2, won: 1, drawn: 1, lost: 0, goals_for: 3, goals_against: 1, points: 4 });
     expect(rows.find((r) => r.team_name === "B")).toMatchObject({ played: 1, lost: 1, points: 0 });
   });
 });

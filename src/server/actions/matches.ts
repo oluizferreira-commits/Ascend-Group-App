@@ -67,7 +67,7 @@ export async function createMatchAction(_prev: ActionResult | null, form: FormDa
     await audit(ctx, "match.create", "match", id, { opponent: parsed.data.opponentName, status: parsed.data.status });
     const r = toRow(parsed.data);
     await notify(ctx.club.id, { kind: "members" }, r.status === "finished"
-      ? { type: "match.result", title: `Resultado: Ascend FC ${r.goalsFor} × ${r.goalsAgainst} ${r.opponentName}`, link: `/app/partidas/${id}`, excludeUserId: ctx.user.id }
+      ? { type: "match.result", title: `Resultado: Ascend CF ${r.goalsFor} × ${r.goalsAgainst} ${r.opponentName}`, link: `/app/partidas/${id}`, excludeUserId: ctx.user.id }
       : { type: "match.created", title: `Nova partida: vs ${r.opponentName}`, body: fmtWeekdayTime(r.kickoffAt), link: `/app/partidas/${id}`, excludeUserId: ctx.user.id });
     await syncFixturesFromMatch(ctx.club.id, id);
   } catch (e) {
@@ -92,7 +92,7 @@ export async function updateMatchAction(matchId: string, _prev: ActionResult | n
     if (!before) return { ok: false, error: "Partida não encontrada." };
     await db.update(schema.matches).set(row).where(and(eq(schema.matches.id, matchId), eq(schema.matches.clubId, ctx.club.id)));
     if (row.status === "finished" && (before.status !== "finished" || before.goalsFor !== row.goalsFor || before.goalsAgainst !== row.goalsAgainst)) {
-      await notify(ctx.club.id, { kind: "members" }, { type: "match.result", title: `Resultado: Ascend FC ${row.goalsFor} × ${row.goalsAgainst} ${row.opponentName}`, link: `/app/partidas/${matchId}`, excludeUserId: ctx.user.id });
+      await notify(ctx.club.id, { kind: "members" }, { type: "match.result", title: `Resultado: Ascend CF ${row.goalsFor} × ${row.goalsAgainst} ${row.opponentName}`, link: `/app/partidas/${matchId}`, excludeUserId: ctx.user.id });
     } else if (row.status === "scheduled" && before.kickoffAt.getTime() !== row.kickoffAt.getTime()) {
       await notify(ctx.club.id, { kind: "members" }, { type: "match.time_changed", title: `Horário alterado: vs ${row.opponentName}`, body: `Novo horário: ${fmtWeekdayTime(row.kickoffAt)}`, link: `/app/partidas/${matchId}`, excludeUserId: ctx.user.id });
     }

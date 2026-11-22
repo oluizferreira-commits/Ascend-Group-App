@@ -45,9 +45,9 @@ export default async function CompetitionPage({ params }: { params: Promise<{ id
                   <thead><tr><th>#</th><th>Time</th><th className="text-right">P</th><th className="text-right">J</th><th className="text-right">V</th><th className="text-right">E</th><th className="text-right">D</th><th className="text-right">GP</th><th className="text-right">GC</th><th className="text-right">SG</th></tr></thead>
                   <tbody>
                     {c.standings.filter((s) => (s.group_name ?? "") === g).map((s, i) => (
-                      <tr key={s.team_id} className={cn(s.is_own_club && "bg-wine-900/40")}>
-                        <td className="font-display text-gold-400">{i + 1}</td>
-                        <td className={cn(s.is_own_club && "font-semibold text-gold-300")}>{s.team_name}</td>
+                      <tr key={s.team_id} className={cn(s.is_own_club && "bg-brand-900/40")}>
+                        <td className="font-display text-accent-400">{i + 1}</td>
+                        <td className={cn(s.is_own_club && "font-semibold text-accent-300")}>{s.team_name}</td>
                         <td className="text-right font-bold">{s.points}</td><td className="text-right">{s.played}</td><td className="text-right">{s.won}</td><td className="text-right">{s.drawn}</td><td className="text-right">{s.lost}</td>
                         <td className="text-right">{s.goals_for}</td><td className="text-right">{s.goals_against}</td><td className="text-right">{s.goal_difference}</td>
                       </tr>
@@ -66,16 +66,16 @@ export default async function CompetitionPage({ params }: { params: Promise<{ id
                   <li key={f.id} className="py-2.5">
                     <div className="flex flex-wrap items-center gap-2 text-sm">
                       {f.round && <Badge>{f.round}</Badge>}
-                      <span className="flex-1">{teamName.get(f.homeTeamId)} <b className="mx-1 font-display text-lg text-gold-300">{f.homeGoals ?? "–"} × {f.awayGoals ?? "–"}</b> {teamName.get(f.awayTeamId)}</span>
+                      <span className="flex-1">{teamName.get(f.homeTeamId)} <b className="mx-1 font-display text-lg text-accent-300">{f.homeGoals ?? "–"} × {f.awayGoals ?? "–"}</b> {teamName.get(f.awayTeamId)}</span>
                       {f.scheduledAt && <span className="text-xs text-ink-400">{fmtDateTime(f.scheduledAt)}</span>}
-                      {f.matchId && <Link href={`/app/partidas/${f.matchId}`} className="text-xs text-gold-400 hover:underline">súmula</Link>}
+                      {f.matchId && <Link href={`/app/partidas/${f.matchId}`} className="text-xs text-accent-400 hover:underline">súmula</Link>}
                     </div>
                     {canManage && (
                       <details className="mt-2">
                         <summary className="cursor-pointer text-xs text-ink-400">Editar</summary>
                         <div className="mt-2"><FixtureForm compId={id} teams={c.teams} matches={matchOpts}
                           fixture={{ ...f, scheduledAt: f.scheduledAt ? toLocalInput(f.scheduledAt) : "" }} /></div>
-                        <form action={deleteFixtureAction.bind(null, id, f.id)} className="mt-1"><ConfirmSubmit className="btn-ghost min-h-0 px-2 py-1 text-xs text-red-300" message="Excluir este jogo?">Excluir jogo</ConfirmSubmit></form>
+                        <form action={deleteFixtureAction.bind(null, id, f.id)} className="mt-1"><ConfirmSubmit className="btn-ghost min-h-0 px-2 py-1 text-xs text-loss" message="Excluir este jogo?">Excluir jogo</ConfirmSubmit></form>
                       </details>
                     )}
                   </li>
@@ -92,8 +92,8 @@ export default async function CompetitionPage({ params }: { params: Promise<{ id
             <ul className="mb-4 space-y-1 text-sm">
               {c.teams.map((t) => (
                 <li key={t.id} className="flex items-center justify-between gap-2">
-                  <span className={cn(t.isOwnClub && "text-gold-300")}>{t.name}{t.groupName && <span className="text-xs text-ink-400"> · Grupo {t.groupName}</span>}</span>
-                  {canManage && !t.isOwnClub && <form action={removeTeamAction.bind(null, id, t.id)}><ConfirmSubmit className="btn-ghost min-h-0 px-2 py-0.5 text-xs text-red-300" message={`Remover ${t.name} e seus jogos?`}>remover</ConfirmSubmit></form>}
+                  <span className={cn(t.isOwnClub && "text-accent-300")}>{t.name}{t.groupName && <span className="text-xs text-ink-400"> · Grupo {t.groupName}</span>}</span>
+                  {canManage && !t.isOwnClub && <form action={removeTeamAction.bind(null, id, t.id)}><ConfirmSubmit className="btn-ghost min-h-0 px-2 py-0.5 text-xs text-loss" message={`Remover ${t.name} e seus jogos?`}>remover</ConfirmSubmit></form>}
                 </li>
               ))}
             </ul>
@@ -103,7 +103,7 @@ export default async function CompetitionPage({ params }: { params: Promise<{ id
             <SectionTitle>Artilharia do Ascend</SectionTitle>
             {c.scorers.length === 0 ? <p className="text-sm text-ink-400">Sem gols registrados nesta competição.</p> : (
               <table className="data-table"><thead><tr><th>Jogador</th><th className="text-right">J</th><th className="text-right">G</th><th className="text-right">A</th></tr></thead>
-                <tbody>{c.scorers.map((s) => <tr key={s.playerId}><td><Link href={`/app/elenco/${s.playerId}`} className="hover:text-gold-300">{s.nickname}</Link></td><td className="text-right">{s.matches}</td><td className="text-right font-semibold text-gold-300">{s.goals}</td><td className="text-right">{s.assists}</td></tr>)}</tbody>
+                <tbody>{c.scorers.map((s) => <tr key={s.playerId}><td><Link href={`/app/elenco/${s.playerId}`} className="hover:text-accent-300">{s.nickname}</Link></td><td className="text-right">{s.matches}</td><td className="text-right font-semibold text-accent-300">{s.goals}</td><td className="text-right">{s.assists}</td></tr>)}</tbody>
               </table>
             )}
           </section>

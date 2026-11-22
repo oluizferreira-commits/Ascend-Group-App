@@ -51,7 +51,7 @@ export function PlayerForm({
         </Field>
       </fieldset>
 
-      <div className="gold-rule" />
+      <div className="accent-rule" />
 
       <fieldset className="grid gap-4 sm:grid-cols-3">
         <legend className="eyebrow mb-3">Perfil esportivo</legend>
@@ -76,7 +76,7 @@ export function PlayerForm({
             {POSITIONS.map((p) => (
               <label key={p} className="cursor-pointer">
                 <input type="checkbox" name="secondaryPositions" value={p} defaultChecked={initial.secondaryPositions?.includes(p)} className="peer sr-only" />
-                <span className="inline-block rounded-md border border-ink-600 px-2.5 py-1 text-xs text-ink-300 peer-checked:border-gold-500 peer-checked:bg-gold-500/10 peer-checked:text-gold-300 peer-focus-visible:ring-2 peer-focus-visible:ring-gold-400">
+                <span className="inline-block rounded-md border border-ink-600 px-2.5 py-1 text-xs text-ink-300 peer-checked:border-accent-500 peer-checked:bg-accent-500/10 peer-checked:text-accent-300 peer-focus-visible:ring-2 peer-focus-visible:ring-accent-400">
                   {POSITION_LABELS[p]}
                 </span>
               </label>

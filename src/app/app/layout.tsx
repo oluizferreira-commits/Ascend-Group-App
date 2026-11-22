@@ -1,6 +1,7 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { requirePage } from "@/server/auth/session";
+import { getThemeMode } from "@/lib/theme";
 import { ROLES } from "@/server/auth/permissions";
 import { NAV } from "@/components/shell/nav";
 import { MobileTabBar, Sidebar } from "@/components/shell/sidebar";
@@ -18,7 +19,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const roleNames = ctx.roles.map((r) => ROLES[r].name).join(" · ");
   return (
     <div className="min-h-dvh">
-      <Sidebar sections={sections} userName={ctx.user.displayName} roleNames={roleNames} unread={unread} />
+      <Sidebar sections={sections} userName={ctx.user.displayName} roleNames={roleNames} unread={unread} theme={await getThemeMode()} />
       <main className="px-4 pt-6 pb-28 sm:px-6 lg:ml-64 lg:px-10 lg:pt-10 lg:pb-12">
         <div className="mx-auto max-w-7xl min-w-0">{children}</div>
       </main>

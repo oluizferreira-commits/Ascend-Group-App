@@ -24,7 +24,7 @@ export default async function NotificationsPage() {
           {rows.map((n) => {
             const inner = (
               <div className="flex gap-3 px-4 py-3">
-                <span className={cn("mt-1.5 size-2 shrink-0 rounded-full", n.readAt ? "bg-transparent" : "bg-gold-400")} />
+                <span className={cn("mt-1.5 size-2 shrink-0 rounded-full", n.readAt ? "bg-transparent" : "bg-accent-400")} />
                 <div className="min-w-0 flex-1">
                   <p className={cn("text-sm", !n.readAt && "font-semibold")}>{n.title}</p>
                   {n.body && <p className="text-sm text-ink-400">{n.body}</p>}

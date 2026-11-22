@@ -12,7 +12,7 @@ export default async function MediaPage({ searchParams }: { searchParams: Promis
   const sources = await mediaSources(ctx.club.id);
   return (
     <>
-      <PageHeader eyebrow="Central de mídia" title="Artes oficiais" description="Gere artes com a identidade do Ascend FC para Instagram, grupos e computador." />
+      <PageHeader eyebrow="Central de mídia" title="Artes oficiais" description="Gere artes com a identidade do Ascend CF para Instagram, grupos e computador." />
       <MediaStudio templates={TEMPLATES} formats={FORMATS} sources={sources} initial={sp} />
     </>
   );

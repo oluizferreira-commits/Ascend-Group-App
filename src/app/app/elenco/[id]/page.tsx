@@ -50,7 +50,7 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
         <div className="relative self-center">
           <Avatar name={player.nickname} src={player.avatarUrl} size={112} />
           {player.shirtNumber != null && (
-            <span className="absolute -right-2 -bottom-1 rounded-md border border-gold-500 bg-ink-950 px-2 font-display text-lg font-bold text-gold-300">#{player.shirtNumber}</span>
+            <span className="absolute -right-2 -bottom-1 rounded-md border border-accent-500 bg-ink-950 px-2 font-display text-lg font-bold text-accent-300">#{player.shirtNumber}</span>
           )}
         </div>
         <dl className="grid flex-1 grid-cols-2 gap-x-6 gap-y-3 text-sm md:grid-cols-4">
@@ -111,11 +111,11 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
                 {[...history].reverse().map((h) => (
                   <tr key={h.matchId}>
                     <td>{fmtDate(h.kickoffAt)}</td>
-                    <td><Link href={`/app/partidas/${h.matchId}`} className="hover:text-gold-300">{h.opponent}</Link></td>
+                    <td><Link href={`/app/partidas/${h.matchId}`} className="hover:text-accent-300">{h.opponent}</Link></td>
                     <td><ResultPill result={h.line.result} /></td>
                     <td className="text-right">{h.line.goals}</td>
                     <td className="text-right">{h.line.assists}</td>
-                    <td className="text-right font-semibold text-gold-300" title={h.line.externalRating != null ? `Calculada ${h.rating.computed} · EA ${h.line.externalRating}` : `Calculada ${h.rating.computed}`}>{fmtNum(h.rating.final, 1)}</td>
+                    <td className="text-right font-semibold text-accent-300" title={h.line.externalRating != null ? `Calculada ${h.rating.computed} · EA ${h.line.externalRating}` : `Calculada ${h.rating.computed}`}>{fmtNum(h.rating.final, 1)}</td>
                   </tr>
                 ))}
               </tbody>

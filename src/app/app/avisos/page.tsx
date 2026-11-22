@@ -44,7 +44,7 @@ export default async function AnnouncementsPage() {
                             <form action={expireAnnouncementAction.bind(null, a.id)}><button className="btn-ghost min-h-0 px-2 py-1 text-xs">Encerrar</button></form>
                           )}
                           <form action={deleteAnnouncementAction.bind(null, a.id)}>
-                            <ConfirmSubmit className="btn-ghost min-h-0 px-2 py-1 text-xs text-red-300" message="Excluir este comunicado?">Excluir</ConfirmSubmit>
+                            <ConfirmSubmit className="btn-ghost min-h-0 px-2 py-1 text-xs text-loss" message="Excluir este comunicado?">Excluir</ConfirmSubmit>
                           </form>
                         </div>
                       </li>

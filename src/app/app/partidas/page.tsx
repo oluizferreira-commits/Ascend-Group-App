@@ -86,9 +86,9 @@ export default async function MatchesPage({ searchParams }: { searchParams: Prom
             <tbody>
               {h2h.map((r) => (
                 <tr key={r.opponent}>
-                  <td><Link href={`/app/partidas?q=${encodeURIComponent(r.opponent)}`} className="hover:text-gold-300">{r.opponent}</Link></td>
-                  <td className="text-right">{r.played}</td><td className="text-right text-green-300">{r.wins}</td><td className="text-right">{r.draws}</td>
-                  <td className="text-right text-red-300">{r.losses}</td><td className="text-right">{r.gf}</td><td className="text-right">{r.ga}</td>
+                  <td><Link href={`/app/partidas?q=${encodeURIComponent(r.opponent)}`} className="hover:text-accent-300">{r.opponent}</Link></td>
+                  <td className="text-right">{r.played}</td><td className="text-right text-win">{r.wins}</td><td className="text-right">{r.draws}</td>
+                  <td className="text-right text-loss">{r.losses}</td><td className="text-right">{r.gf}</td><td className="text-right">{r.ga}</td>
                 </tr>
               ))}
             </tbody>

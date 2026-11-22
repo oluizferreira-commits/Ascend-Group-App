@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Ascend FC — agente local de sincronização EA FC.
+ * Ascend CF — agente local de sincronização EA FC.
  *
  * Roda no computador de um membro da diretoria (conexão residencial), consulta
  * os endpoints PÚBLICOS do Pro Clubs e envia as partidas para a plataforma.

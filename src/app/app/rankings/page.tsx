@@ -28,10 +28,10 @@ return (
             const p = playerMap.get(s.playerId)!;
             return (
               <tr key={s.playerId}>
-                <td className={i === 0 ? "font-display text-lg text-gold-300" : "font-display text-ink-400"}>{i + 1}</td>
-                <td><Link href={`/app/elenco/${p.id}`} className="flex items-center gap-2 hover:text-gold-300"><Avatar name={p.nickname} src={p.avatarUrl} size={28} /><span>{p.nickname} <span className="text-xs text-ink-400">{POSITION_LABELS[p.primaryPosition]}</span></span></Link></td>
+                <td className={i === 0 ? "font-display text-lg text-accent-300" : "font-display text-ink-400"}>{i + 1}</td>
+                <td><Link href={`/app/elenco/${p.id}`} className="flex items-center gap-2 hover:text-accent-300"><Avatar name={p.nickname} src={p.avatarUrl} size={28} /><span>{p.nickname} <span className="text-xs text-ink-400">{POSITION_LABELS[p.primaryPosition]}</span></span></Link></td>
                 <td className="text-right text-ink-400">{s.matches}</td>
-                {cols.map((c) => <td key={c.label} className={c.strong ? "text-right font-semibold text-gold-300" : "text-right"}>{c.value(s)}</td>)}
+                {cols.map((c) => <td key={c.label} className={c.strong ? "text-right font-semibold text-accent-300" : "text-right"}>{c.value(s)}</td>)}
               </tr>
             );
           })}
@@ -94,7 +94,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
         {bySeason.size === 0 ? <p className="text-sm text-ink-400">Nenhuma temporada com premiações registradas. A diretoria registra em Administração → Temporadas.</p> : (
           <div className="grid gap-4 md:grid-cols-2">
             {[...bySeason.entries()].map(([season, list]) => (
-              <div key={season} className="rounded-lg border border-gold-700/40 p-4">
+              <div key={season} className="rounded-lg border border-accent-700/40 p-4">
                 <p className="eyebrow mb-2">Temporada {season}</p>
                 <ul className="space-y-1 text-sm">{list.map(({ a }) => <li key={a.id} className="flex justify-between gap-2"><span className="text-ink-300">{a.award}</span><span><b>{a.playerName}</b> <span className="text-xs text-ink-400">{a.value}</span></span></li>)}</ul>
               </div>

@@ -32,7 +32,7 @@ await page.getByText("E-mail ou senha incorretos.").waitFor();
 
 step("president logs in");
 await login(page, email, password);
-await page.getByText("Nenhuma temporada atual definida").waitFor();
+await page.getByText("Cadastrar a temporada atual").waitFor();
 
 step("create season");
 await page.goto(`${BASE}/app/admin/temporadas`);
@@ -94,7 +94,7 @@ await page.getByText("Súmula salva.").waitFor();
 
 step("dashboard shows record and highlights");
 await page.goto(`${BASE}/app`);
-await page.getByText("Temporada E2E 1").waitFor();
+await page.locator("dd", { hasText: "E2E 1" }).waitFor();
 const scorer = page.locator("article", { hasText: "Artilheiro" });
 await scorer.getByText("e2e_st").waitFor();
 const assister = page.locator("article", { hasText: "Melhor assistente" });

@@ -5,25 +5,30 @@ import "@fontsource/barlow-condensed/600.css";
 import "@fontsource/barlow-condensed/700.css";
 import "./globals.css";
 import { ServiceWorkerRegistrar } from "@/components/pwa";
+import { getThemeMode } from "@/lib/theme";
 
 export const metadata: Metadata = {
-  title: { default: "Ascend FC — Ascend Group", template: "%s · Ascend FC" },
-  description: "Plataforma oficial de gestão esportiva do Ascend FC. RISE. CONQUER. ASCEND.",
-  applicationName: "Ascend FC",
-  appleWebApp: { capable: true, title: "Ascend FC", statusBarStyle: "black-translucent" },
-  icons: { icon: "/brand/ascend-fc-crest.png", apple: "/brand/ascend-fc-crest.png" },
+  title: { default: "Ascend CF — Ascend Group", template: "%s · Ascend CF" },
+  description: "Plataforma oficial de gestão esportiva do Ascend CF. RISE. CONQUER. ASCEND.",
+  applicationName: "Ascend CF",
+  appleWebApp: { capable: true, title: "Ascend CF", statusBarStyle: "black-translucent" },
+  icons: { icon: "/brand/generated/crest-64.png", apple: "/brand/generated/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#07070a",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#04060b" },
+  ],
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const mode = await getThemeMode();
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" data-theme={mode === "system" ? undefined : mode}>
       <body>
         {children}
         <ServiceWorkerRegistrar />

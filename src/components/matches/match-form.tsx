@@ -43,7 +43,7 @@ export function MatchForm({
         </Field>
         {status === "finished" && (
           <>
-            <Field label="Gols Ascend FC *" name="goalsFor" error={fe.goalsFor}>
+            <Field label="Gols Ascend CF *" name="goalsFor" error={fe.goalsFor}>
               <input id="goalsFor" name="goalsFor" type="number" min={0} max={99} required defaultValue={initial.goalsFor ?? ""} className="input" />
             </Field>
             <Field label="Gols adversário *" name="goalsAgainst" error={fe.goalsAgainst}>

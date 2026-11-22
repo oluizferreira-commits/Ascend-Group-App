@@ -82,7 +82,7 @@ export async function requestPasswordResetAction(_prev: ActionResult | null, for
   const link = `${process.env.APP_URL ?? "http://localhost:3000"}/redefinir-senha?token=${token}`;
   await sendMail(
     user.email,
-    "Ascend FC — redefinição de senha",
+    "Ascend CF — redefinição de senha",
     `Olá, ${user.displayName}.\n\nPara criar uma nova senha, acesse (válido por 30 minutos):\n${link}\n\nSe você não pediu a redefinição, ignore esta mensagem.\n\nRISE. CONQUER. ASCEND.`,
   );
   return generic;

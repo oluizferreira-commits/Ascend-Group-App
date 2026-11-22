@@ -47,8 +47,8 @@ export default async function IntegrationPage() {
           <SectionTitle>1 · Identificar o clube</SectionTitle>
           <p className="mb-3 text-sm text-ink-400">Abra a busca no seu navegador, procure o <b>clubId</b> do Ascend na resposta e cole abaixo.</p>
           <div className="mb-4 flex flex-col gap-1 text-sm">
-            {["Ascend CF", "Ascend FC"].map((n) => (
-              <a key={n} href={searchUrl(platform, n)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-gold-400 hover:underline">
+            {["Ascend CF"].map((n) => (
+              <a key={n} href={searchUrl(platform, n)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-accent-400 hover:underline">
                 Buscar “{n}” na EA <ExternalLink className="size-3.5" />
               </a>
             ))}
@@ -62,7 +62,7 @@ export default async function IntegrationPage() {
           {cfg.eaClubId ? (
             <ul className="mb-4 space-y-1 text-sm">
               {EA_MATCH_TYPES.map((t) => (
-                <li key={t}><a href={matchesUrl(platform, cfg.eaClubId!, t)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-gold-400 hover:underline">{EA_MATCH_TYPE_LABELS[t]} <ExternalLink className="size-3.5" /></a></li>
+                <li key={t}><a href={matchesUrl(platform, cfg.eaClubId!, t)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-accent-400 hover:underline">{EA_MATCH_TYPE_LABELS[t]} <ExternalLink className="size-3.5" /></a></li>
               ))}
             </ul>
           ) : <p className="mb-4 text-xs text-ink-400">Configure o ID do clube para ver os links.</p>}
@@ -104,8 +104,8 @@ export default async function IntegrationPage() {
                         <td className="text-right">{m.goals ?? "—"}</td>
                         <td className="text-right">{m.assists ?? "—"}</td>
                         <td>
-                          {p ? <Link href={`/app/elenco/${p.id}`} className="text-green-300 hover:underline">Vinculado: {p.nickname}</Link>
-                            : canCreate ? <form action={createPlayerFromEaAction.bind(null, m.name)}><button className="btn-ghost min-h-0 px-2 py-1 text-xs text-gold-300">+ Criar jogador</button></form>
+                          {p ? <Link href={`/app/elenco/${p.id}`} className="text-win hover:underline">Vinculado: {p.nickname}</Link>
+                            : canCreate ? <form action={createPlayerFromEaAction.bind(null, m.name)}><button className="btn-ghost min-h-0 px-2 py-1 text-xs text-accent-300">+ Criar jogador</button></form>
                             : <span className="text-xs text-ink-400">Sem vínculo</span>}
                         </td>
                       </tr>
@@ -119,12 +119,12 @@ export default async function IntegrationPage() {
       </section>
 
       {unmatched.length > 0 && (
-        <section className="card mt-6 border-gold-600/40 p-5">
+        <section className="card mt-6 border-accent-600/40 p-5">
           <SectionTitle>Jogadores da EA sem vínculo no elenco</SectionTitle>
           <p className="mb-3 text-sm text-ink-400">As estatísticas destes nomes não foram atribuídas. Preencha “Nome / ID no EA FC” no cadastro do jogador (ou cadastre-o) e clique em <b>Reprocessar</b> na execução abaixo.</p>
           <div className="flex flex-wrap gap-2">
             {unmatched.map((u) => (
-              <Link key={u.eaName} href={`/app/elenco/novo`} className="rounded-lg border border-ink-600 px-3 py-1.5 text-sm hover:border-gold-500">
+              <Link key={u.eaName} href={`/app/elenco/novo`} className="rounded-lg border border-ink-600 px-3 py-1.5 text-sm hover:border-accent-500">
                 <b>{u.eaName}</b> <span className="text-xs text-ink-400">{u.matches} J · {u.goals} G · {u.assists} A</span>
               </Link>
             ))}
@@ -147,9 +147,9 @@ export default async function IntegrationPage() {
                     <td className="text-ink-300">{ORIGIN[d.origin ?? ""] ?? (d.origin?.startsWith("reprocess") ? "Reprocessamento" : d.origin)}</td>
                     <td><Badge tone={tone}>{label}</Badge></td>
                     <td className="text-right">{l.itemsFound}</td>
-                    <td className="text-right text-green-300">{l.itemsCreated}</td>
+                    <td className="text-right text-win">{l.itemsCreated}</td>
                     <td className="text-right text-ink-400">{l.itemsSkipped}</td>
-                    <td className="max-w-xs truncate text-xs text-red-300" title={l.errorMessage ?? ""}>{l.errorMessage ?? ""}</td>
+                    <td className="max-w-xs truncate text-xs text-loss" title={l.errorMessage ?? ""}>{l.errorMessage ?? ""}</td>
                     <td>{d.batches && d.batches.length > 0 && (
                       <form action={reprocessLogAction.bind(null, l.id)}><button className="btn-ghost min-h-0 px-2 py-1 text-xs">Reprocessar</button></form>
                     )}</td>

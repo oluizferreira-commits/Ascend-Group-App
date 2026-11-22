@@ -108,11 +108,11 @@ export default async function RosterPage({ searchParams }: { searchParams: Promi
                 <Link href={`/app/elenco/${p.id}`} className="card flex items-center gap-3 p-3">
                   <Avatar name={p.nickname} src={p.avatarUrl} size={44} />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold">{p.shirtNumber != null && <span className="mr-1 text-gold-400">#{p.shirtNumber}</span>}{p.nickname}</p>
+                    <p className="truncate font-semibold">{p.shirtNumber != null && <span className="mr-1 text-accent-400">#{p.shirtNumber}</span>}{p.nickname}</p>
                     <p className="text-xs text-ink-400">{POSITION_LABELS[p.primaryPosition]} · {s.matches} J · {s.goals} G · {s.assists} A</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-display text-xl font-bold text-gold-300">{fmtNum(s.avgRating, 1)}</p>
+                    <p className="font-display text-xl font-bold text-accent-300">{fmtNum(s.avgRating, 1)}</p>
                     <Badge tone={statusTone(p.status)}>{PLAYER_STATUS_LABELS[p.status]}</Badge>
                   </div>
                 </Link>
@@ -132,9 +132,9 @@ export default async function RosterPage({ searchParams }: { searchParams: Promi
               <tbody>
                 {rows.map(({ p, s }) => (
                   <tr key={p.id}>
-                    <td className="font-display text-gold-400">{p.shirtNumber ?? "—"}</td>
+                    <td className="font-display text-accent-400">{p.shirtNumber ?? "—"}</td>
                     <td>
-                      <Link href={`/app/elenco/${p.id}`} className="flex items-center gap-3 hover:text-gold-300">
+                      <Link href={`/app/elenco/${p.id}`} className="flex items-center gap-3 hover:text-accent-300">
                         <Avatar name={p.nickname} src={p.avatarUrl} size={32} />
                         <span><span className="block font-medium">{p.nickname}</span><span className="block text-xs text-ink-400">{p.fullName}</span></span>
                       </Link>
@@ -147,7 +147,7 @@ export default async function RosterPage({ searchParams }: { searchParams: Promi
                     <td className="text-right">{s.assists}</td>
                     <td className="text-right font-semibold">{s.goalInvolvements}</td>
                     <td className="text-right text-ink-300">{fmtNum(s.goalsPerMatch, 2)}</td>
-                    <td className="text-right font-display text-lg font-bold text-gold-300">{fmtNum(s.avgRating, 1)}</td>
+                    <td className="text-right font-display text-lg font-bold text-accent-300">{fmtNum(s.avgRating, 1)}</td>
                   </tr>
                 ))}
               </tbody>

@@ -27,7 +27,7 @@ export default async function AuditPage() {
               <tr key={log.id}>
                 <td>{fmtDateTime(log.createdAt)}</td>
                 <td>{actor ?? <span className="text-ink-400">sistema</span>}</td>
-                <td><code className="text-xs text-gold-300">{log.action}</code></td>
+                <td><code className="text-xs text-accent-300">{log.action}</code></td>
                 <td className="text-xs text-ink-400">{log.entityType}{log.entityId ? ` · ${log.entityId.slice(0, 8)}` : ""}</td>
                 <td className="max-w-md truncate text-xs text-ink-400" title={JSON.stringify(log.metadata)}>{JSON.stringify(log.metadata)}</td>
               </tr>

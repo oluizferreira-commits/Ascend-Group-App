@@ -35,7 +35,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
                 {list.map((it) => (
                   <li key={it.kind + it.id}>
                     <Link href={it.href} className="flex items-center gap-3 px-4 py-3 hover:bg-ink-850">
-                      <span className="w-12 font-display text-lg text-gold-300">{timeFmt.format(it.at)}</span>
+                      <span className="w-12 font-display text-lg text-accent-300">{timeFmt.format(it.at)}</span>
                       <span className="min-w-0 flex-1 truncate">{it.title}</span>
                       <Badge tone={it.type === "match" ? "gold" : it.type === "training" ? "wine" : "neutral"}>{EVENT_TYPE_LABELS[it.type]}</Badge>
                     </Link>

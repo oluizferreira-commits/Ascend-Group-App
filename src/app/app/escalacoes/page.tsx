@@ -19,7 +19,7 @@ export default async function LineupsPage() {
         <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {rows.map(({ lineup: l, formation, opponent, kickoffAt }) => (
             <li key={l.id}>
-              <Link href={`/app/escalacoes/${l.id}`} className="card block p-4 hover:border-gold-600/50">
+              <Link href={`/app/escalacoes/${l.id}`} className="card block p-4 hover:border-accent-600/50">
                 <div className="flex items-center justify-between gap-2"><p className="font-display text-lg font-semibold uppercase">{l.name}</p><Badge tone="gold">{formation}</Badge></div>
                 <p className="mt-1 text-xs text-ink-400">
                   {l.opponentName ? `Estratégia vs ${l.opponentName} · ` : ""}{opponent ? `Partida vs ${opponent} (${fmtDateTime(kickoffAt!)}) · ` : ""}Atualizada {fmtDateTime(l.updatedAt)}

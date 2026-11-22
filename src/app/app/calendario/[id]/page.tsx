@@ -66,7 +66,7 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
                         <td className="flex gap-1">
                           <form action={setAttendanceAction.bind(null, id, p.id, "present")}><button className="btn-ghost min-h-0 px-1.5 py-0.5 text-xs">Presente</button></form>
                           <form action={setAttendanceAction.bind(null, id, p.id, "absent")}><button className="btn-ghost min-h-0 px-1.5 py-0.5 text-xs">Ausente</button></form>
-                          <form action={removeCallupAction.bind(null, id, p.id)}><button className="btn-ghost min-h-0 px-1.5 py-0.5 text-xs text-red-300">×</button></form>
+                          <form action={removeCallupAction.bind(null, id, p.id)}><button className="btn-ghost min-h-0 px-1.5 py-0.5 text-xs text-loss">×</button></form>
                         </td>
                       )}
                     </tr>

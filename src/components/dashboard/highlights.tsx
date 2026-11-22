@@ -20,10 +20,9 @@ export function HighlightCard({
   emptyText: string;
 }) {
   return (
-    <article className="card-premium relative min-w-0 overflow-hidden p-5">
-      <div className="pointer-events-none absolute -top-10 -right-10 size-36 rounded-full bg-gold-500/5 blur-2xl" />
+    <article className="card relative min-w-0 overflow-hidden border-t-[3px] border-t-accent-500 p-5">
       <div className="mb-4 flex items-center gap-2">
-        <Icon className="size-4 text-gold-400" />
+        <Icon className="size-4 text-accent-400" />
         <h3 className="eyebrow">{title}</h3>
       </div>
       {entry ? (
@@ -31,19 +30,19 @@ export function HighlightCard({
           <div className="flex items-center gap-4">
             <Avatar name={entry.player.nickname} src={entry.player.avatarUrl} size={56} />
             <div className="min-w-0 flex-1">
-              <p className="truncate font-display text-xl font-bold tracking-wide uppercase group-hover:text-gold-300">{entry.player.nickname}</p>
+              <p className="truncate font-display text-xl font-bold tracking-wide uppercase group-hover:text-accent-400">{entry.player.nickname}</p>
               <p className="truncate text-xs text-ink-400">
                 {POSITION_LABELS[entry.player.primaryPosition]}
                 {entry.player.shirtNumber != null && ` · #${entry.player.shirtNumber}`} · {entry.s.matches} {entry.s.matches === 1 ? "jogo" : "jogos"}
               </p>
             </div>
             <div className="text-right">
-              <p className="font-display text-4xl leading-none font-bold gold-text">{metric}</p>
+              <p className="font-display text-5xl leading-none font-bold text-accent-400 tabular-nums">{metric}</p>
               <p className="mt-1 text-[10px] tracking-wider text-ink-400 uppercase">{metricLabel}</p>
             </div>
           </div>
           {extras && (
-            <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-gold-700/30 pt-3 text-center">
+            <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-ink-700 pt-3 text-center">
               {extras.map((e) => (
                 <div key={e.label}>
                   <dt className="text-[10px] tracking-wider text-ink-400 uppercase">{e.label}</dt>
@@ -106,8 +105,8 @@ export function DashboardHighlights({ best, scorer, assister, decisive, threshol
       />
       <article className="card min-w-0 p-5 md:col-span-2 xl:col-span-3">
         <div className="mb-3 flex items-center justify-between">
-          <div className="flex items-center gap-2"><Zap className="size-4 text-gold-400" /><h3 className="eyebrow">Jogadores mais decisivos</h3></div>
-          <Link href="/app/rankings#decisivos" className="text-xs text-gold-400 hover:underline">Ranking completo</Link>
+          <div className="flex items-center gap-2"><Zap className="size-4 text-accent-400" /><h3 className="eyebrow">Jogadores mais decisivos</h3></div>
+          <Link href="/app/rankings#decisivos" className="text-xs text-accent-400 hover:underline">Ranking completo</Link>
         </div>
         {decisive.length === 0 ? (
           <p className="py-4 text-center text-sm text-ink-400">Sem participações em gols registradas nesta temporada.</p>
@@ -118,11 +117,11 @@ export function DashboardHighlights({ best, scorer, assister, decisive, threshol
               <tbody>
                 {decisive.slice(0, 5).map((e, i) => (
                   <tr key={e.player.id}>
-                    <td className="font-display text-gold-400">{i + 1}</td>
-                    <td><Link href={`/app/elenco/${e.player.id}`} className="flex items-center gap-2 hover:text-gold-300"><Avatar name={e.player.nickname} src={e.player.avatarUrl} size={28} />{e.player.nickname}</Link></td>
+                    <td className="font-display text-accent-400">{i + 1}</td>
+                    <td><Link href={`/app/elenco/${e.player.id}`} className="flex items-center gap-2 hover:text-accent-300"><Avatar name={e.player.nickname} src={e.player.avatarUrl} size={28} />{e.player.nickname}</Link></td>
                     <td className="text-right">{e.s.goals}</td>
                     <td className="text-right">{e.s.assists}</td>
-                    <td className="text-right font-semibold text-gold-300">{e.s.goalInvolvements}</td>
+                    <td className="text-right font-semibold text-accent-300">{e.s.goalInvolvements}</td>
                     <td className="text-right">{fmtNum(e.s.involvementsPerMatch, 2)}</td>
                     <td className="text-right text-ink-400">{e.s.matches}</td>
                   </tr>

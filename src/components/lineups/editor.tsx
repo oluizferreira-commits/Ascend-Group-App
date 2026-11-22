@@ -29,12 +29,12 @@ function Chip({ p, compact, selected, readOnly, onSelect }: { p: P; compact?: bo
       onClick={() => !readOnly && onSelect(p.id)}
       className={cn(
         "flex w-full items-center gap-2 rounded-lg border px-2 py-1.5 text-left text-sm transition",
-        selected ? "border-gold-400 bg-gold-500/15" : "border-ink-600 bg-ink-850 hover:border-gold-600/60",
+        selected ? "border-accent-400 bg-accent-500/15" : "border-ink-600 bg-ink-850 hover:border-accent-600/60",
         p.status === "unavailable" || p.status === "sidelined" ? "opacity-60" : "",
       )}
       title={PLAYER_STATUS_LABELS[p.status as keyof typeof PLAYER_STATUS_LABELS]}
     >
-      <span className="font-display text-gold-400">{p.shirtNumber ?? "–"}</span>
+      <span className="font-display text-accent-400">{p.shirtNumber ?? "–"}</span>
       <span className="truncate">{p.nickname}</span>
       {!compact && <span className="ml-auto text-[10px] text-ink-400">{POSITION_LABELS[p.primaryPosition]}</span>}
     </button>
@@ -140,7 +140,7 @@ export function LineupEditor({ action, formations, players, matches, initial = {
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* Pitch */}
-        <div className="relative mx-auto aspect-[68/100] w-full max-w-[560px] overflow-hidden rounded-xl border border-gold-700/40 bg-gradient-to-b from-[#0f2a1c] to-[#0b1f15]">
+        <div className="relative mx-auto aspect-[68/100] w-full max-w-[560px] overflow-hidden rounded-xl border border-accent-700/40 bg-gradient-to-b from-[#0f2a1c] to-[#0b1f15]">
           <svg viewBox="0 0 68 100" className="absolute inset-0 h-full w-full" aria-hidden>
             <g fill="none" stroke="rgb(255 255 255 / 0.18)" strokeWidth="0.35">
               <rect x="2" y="2" width="64" height="96" />
@@ -166,21 +166,21 @@ export function LineupEditor({ action, formations, players, matches, initial = {
                   onClick={() => (selected ? placeInSlot(s.key, selected) : p && !readOnly && setSelected(p.id))}
                   className={cn(
                     "flex w-[4.75rem] flex-col items-center gap-0.5 rounded-lg px-1 py-1 text-center transition sm:w-24",
-                    selected && !readOnly ? "ring-1 ring-gold-400/60" : "",
-                    p && selected === p.id ? "bg-gold-500/25" : "",
+                    selected && !readOnly ? "ring-1 ring-accent-400/60" : "",
+                    p && selected === p.id ? "bg-accent-500/25" : "",
                   )}
                   aria-label={`${s.label}${p ? `: ${p.nickname}` : " vazio"}`}
                 >
                   <span className={cn(
                     "grid size-9 place-items-center rounded-full border-2 font-display text-sm font-bold sm:size-11",
-                    p ? "border-gold-400 bg-gradient-to-br from-wine-700 to-wine-900 text-gold-200" : "border-dashed border-white/40 bg-black/30 text-white/60",
+                    p ? "border-accent-400 bg-gradient-to-br from-brand-700 to-brand-900 text-accent-200" : "border-dashed border-white/40 bg-black/30 text-white/60",
                   )}>
                     {p ? p.shirtNumber ?? p.nickname[0]?.toUpperCase() : s.label}
                   </span>
                   <span className={cn("max-w-full truncate rounded bg-black/55 px-1 text-[10px] leading-4 sm:text-xs", off ? "text-orange-300" : "text-white")} title={off ? "Fora da posição principal/secundária" : undefined}>
                     {p ? p.nickname : s.label}
                   </span>
-                  {p && badgesFor(p.id).length > 0 && <span className="text-[9px] font-bold text-gold-300">{badgesFor(p.id).join(" · ")}</span>}
+                  {p && badgesFor(p.id).length > 0 && <span className="text-[9px] font-bold text-accent-300">{badgesFor(p.id).join(" · ")}</span>}
                 </button>
               </div>
             );
@@ -191,13 +191,13 @@ export function LineupEditor({ action, formations, players, matches, initial = {
           {!readOnly && (
             <p className="rounded-lg border border-ink-700 bg-ink-850 p-3 text-xs text-ink-300">
               Toque num jogador e depois numa posição do campo (ou arraste no computador). Toque num titular e em outra posição para trocar.
-              {selected && <span className="mt-1 block text-gold-300">Selecionado: {byId.get(selected)?.nickname} — <button type="button" className="underline" onClick={() => toBench(selected)}>mandar para o banco</button> · <button type="button" className="underline" onClick={() => { removeEverywhere(selected); setSelected(null); }}>remover</button></span>}
+              {selected && <span className="mt-1 block text-accent-300">Selecionado: {byId.get(selected)?.nickname} — <button type="button" className="underline" onClick={() => toBench(selected)}>mandar para o banco</button> · <button type="button" className="underline" onClick={() => { removeEverywhere(selected); setSelected(null); }}>remover</button></span>}
             </p>
           )}
           <section className="card p-4" onDragOver={(e) => e.preventDefault()} onDrop={(e) => { const id = e.dataTransfer.getData("text/plain"); if (id) toBench(id); }}>
             <div className="mb-2 flex items-center justify-between">
               <h3 className="eyebrow">Reservas ({bench.length}/12)</h3>
-              {!readOnly && selected && !bench.includes(selected) && <button type="button" onClick={() => toBench(selected)} className="text-xs text-gold-400 underline">+ adicionar selecionado</button>}
+              {!readOnly && selected && !bench.includes(selected) && <button type="button" onClick={() => toBench(selected)} className="text-xs text-accent-400 underline">+ adicionar selecionado</button>}
             </div>
             {bench.length === 0 ? <p className="text-xs text-ink-400">Nenhum reserva.</p> : (
               <div className="flex flex-col gap-1.5">

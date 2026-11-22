@@ -49,7 +49,7 @@ export default async function UsersPage() {
                   </div>
                   {editable && (
                     <form action={removeMemberAction.bind(null, user.id)} className="sm:self-start">
-                      <ConfirmSubmit className="btn-ghost min-h-0 px-2 py-1 text-xs text-red-300" message={`Remover ${user.displayName} do clube? A conta perderá o acesso.`}>Remover do clube</ConfirmSubmit>
+                      <ConfirmSubmit className="btn-ghost min-h-0 px-2 py-1 text-xs text-loss" message={`Remover ${user.displayName} do clube? A conta perderá o acesso.`}>Remover do clube</ConfirmSubmit>
                     </form>
                   )}
                 </li>

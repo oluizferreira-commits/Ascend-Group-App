@@ -46,7 +46,7 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
     <>
       <PageHeader
         eyebrow={detail.competition ?? "Amistoso / sem competição"}
-        title={`Ascend FC × ${m.opponentName}`}
+        title={`Ascend CF × ${m.opponentName}`}
         actions={(canManage || ctx.permissions.has("callups.manage")) && (
           <>
             {ctx.permissions.has("callups.manage") && m.status === "scheduled" && (
@@ -63,11 +63,11 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
       />
 
       <section className="card-premium mb-6 grid items-center gap-6 p-6 sm:grid-cols-[1fr_auto_1fr]">
-        <p className="text-center font-display text-2xl font-bold uppercase sm:text-right">Ascend FC</p>
+        <p className="text-center font-display text-2xl font-bold uppercase sm:text-right">Ascend CF</p>
         <div className="text-center">
           {finished ? (
             <>
-              <p className="font-display text-6xl font-bold gold-text">{m.goalsFor} – {m.goalsAgainst}</p>
+              <p className="font-display text-6xl font-bold accent-text">{m.goalsFor} – {m.goalsAgainst}</p>
               <div className="mt-2 flex justify-center"><ResultPill result={result!} /></div>
             </>
           ) : (
@@ -117,12 +117,12 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
                     : null;
                   return (
                     <tr key={mp.id}>
-                      <td><Link href={`/app/elenco/${player.id}`} className="hover:text-gold-300">{player.nickname}{mp.isCaptain && <Badge tone="gold" className="ml-2">C</Badge>}</Link></td>
+                      <td><Link href={`/app/elenco/${player.id}`} className="hover:text-accent-300">{player.nickname}{mp.isCaptain && <Badge tone="gold" className="ml-2">C</Badge>}</Link></td>
                       <td className="text-ink-300">{{ starter: "Titular", substitute: "Reserva", unused: "Não utilizado" }[mp.role]}</td>
                       <td>{mp.position ? POSITION_LABELS[mp.position] : "—"}</td>
                       <td className="text-right">{stats?.goals ?? "—"}</td>
                       <td className="text-right">{stats?.assists ?? "—"}</td>
-                      <td className="text-right font-semibold text-gold-300">{fmtNum(rating, 1)}</td>
+                      <td className="text-right font-semibold text-accent-300">{fmtNum(rating, 1)}</td>
                     </tr>
                   );
                 })}

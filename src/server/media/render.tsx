@@ -5,7 +5,8 @@ import { ImageResponse } from "next/og";
 import type { Card, FormatKey } from "./data";
 import { FORMATS } from "./data";
 
-const GOLD = "#e2c06a", GOLD_D = "#a88232", WINE = "#5a0f22", INK = "#07070a", WHITE = "#ececf1", MUTED = "#b4b4be";
+// Ascend CF palette: black & royal blue with silver details.
+const GOLD = "#9db4ff", GOLD_D = "#2b54d6", WINE = "#0f2566", INK = "#04060b", WHITE = "#f1f4f9", MUTED = "#c9d1dc";
 let assets: Promise<{ fonts: { name: string; data: Buffer; weight: 500 | 600 | 700 }[]; crest: string }> | null = null;
 
 function loadAssets() {
@@ -42,7 +43,7 @@ function Body({ card, w, h, crest }: { card: Card; w: number; h: number; crest: 
     main = (
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: px(40), marginTop: px(24) }}>
-          <div style={{ display: "flex", fontSize: px(54), fontWeight: 700, color: WHITE }}>ASCEND FC</div>
+          <div style={{ display: "flex", fontSize: px(54), fontWeight: 700, color: WHITE }}>ASCEND CF</div>
           <div style={{ display: "flex", fontSize: px(150), fontWeight: 700, color: WHITE }}>{card.score}</div>
           <div style={{ display: "flex", fontSize: px(54), fontWeight: 700, color: WHITE, maxWidth: px(320) }}>{card.opponent.toUpperCase()}</div>
         </div>
@@ -114,7 +115,7 @@ function Body({ card, w, h, crest }: { card: Card; w: number; h: number; crest: 
   }
 
   return (
-    <div style={{ display: "flex", width: w, height: h, fontFamily: "Barlow", background: `radial-gradient(ellipse at 50% 0%, ${WINE} 0%, ${INK} 62%)`, color: WHITE, padding: px(56) }}>
+    <div style={{ display: "flex", width: w, height: h, fontFamily: "Barlow", background: `linear-gradient(160deg, #15318a 0%, ${WINE} 30%, ${INK} 75%)`, color: WHITE, padding: px(56) }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between", width: "100%", height: "100%", border: `${px(3)}px solid ${GOLD_D}`, borderRadius: px(28), padding: px(44) }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           {Header}

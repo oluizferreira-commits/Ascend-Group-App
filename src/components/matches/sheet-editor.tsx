@@ -64,7 +64,7 @@ export function SheetEditor({
       <input type="hidden" name="sheet" value={JSON.stringify(rows)} />
       <div className="flex flex-wrap items-center gap-3 text-sm">
         <span className="text-ink-400">Participantes: <b className="text-ink-100">{rows.length}</b></span>
-        <span className={cn("text-ink-400", goalsFor != null && goals > goalsFor && "text-red-300")}>
+        <span className={cn("text-ink-400", goalsFor != null && goals > goalsFor && "text-loss")}>
           Gols atribuídos: <b>{goals}</b>{goalsFor != null && ` / ${goalsFor}`}
         </span>
         <span className="text-ink-400">Assistências: <b className="text-ink-100">{assists}</b></span>
@@ -81,7 +81,7 @@ export function SheetEditor({
             <li key={r.playerId} className="rounded-lg border border-ink-700 bg-ink-850/60">
               <div className="grid grid-cols-2 items-end gap-2 p-3 sm:grid-cols-[minmax(140px,1fr)_120px_90px_70px_70px_auto_auto]">
                 <div className="col-span-2 sm:col-span-1">
-                  <p className="font-medium">{p?.shirtNumber != null && <span className="mr-1 text-gold-400">#{p.shirtNumber}</span>}{p?.nickname ?? "Jogador removido"}</p>
+                  <p className="font-medium">{p?.shirtNumber != null && <span className="mr-1 text-accent-400">#{p.shirtNumber}</span>}{p?.nickname ?? "Jogador removido"}</p>
                   <label className="mt-1 flex items-center gap-1.5 text-xs text-ink-400">
                     <input type="checkbox" disabled={!canEdit} checked={r.isCaptain} onChange={(e) => update(r.playerId, { isCaptain: e.target.checked })} /> Capitão
                   </label>
@@ -107,7 +107,7 @@ export function SheetEditor({
                   Detalhes <ChevronDown className={cn("size-4 transition", expanded && "rotate-180")} />
                 </button>
                 {canEdit && (
-                  <button type="button" onClick={() => setRows((rs) => rs.filter((x) => x.playerId !== r.playerId))} className="btn-ghost px-2 text-red-300" aria-label={`Remover ${p?.nickname}`}>
+                  <button type="button" onClick={() => setRows((rs) => rs.filter((x) => x.playerId !== r.playerId))} className="btn-ghost px-2 text-loss" aria-label={`Remover ${p?.nickname}`}>
                     <Trash2 className="size-4" />
                   </button>
                 )}

@@ -1,7 +1,7 @@
-// Ascend FC service worker — minimal, safe caching.
+// Ascend CF service worker — minimal, safe caching.
 // Pages and API responses are NEVER cached (they are user- and permission-specific);
 // only immutable build assets and brand images are cached, plus an offline fallback.
-const CACHE = "ascend-static-v2";
+const CACHE = "ascend-static-v3";
 const OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", (event) => {
@@ -45,9 +45,9 @@ self.addEventListener("fetch", (event) => {
 // ── Web Push ───────────────────────────────────────────────────
 self.addEventListener("push", (event) => {
   let data = {};
-  try { data = event.data ? event.data.json() : {}; } catch { data = { title: "Ascend FC", body: event.data && event.data.text() }; }
+  try { data = event.data ? event.data.json() : {}; } catch { data = { title: "Ascend CF", body: event.data && event.data.text() }; }
   event.waitUntil(
-    self.registration.showNotification(data.title || "Ascend FC", {
+    self.registration.showNotification(data.title || "Ascend CF", {
       body: data.body || "",
       icon: "/brand/generated/icon-192.png",
       badge: "/brand/generated/icon-192.png",

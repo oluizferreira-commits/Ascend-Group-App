@@ -1,125 +1,210 @@
 @import "tailwindcss";
 
-@theme {
-  --color-ink-950: #07070a;
-  --color-ink-900: #0c0c10;
-  --color-ink-850: #121218;
-  --color-ink-800: #18181f;
-  --color-ink-700: #24242d;
-  --color-ink-600: #34343f;
-  --color-ink-400: #8a8a96;
-  --color-ink-300: #b4b4be;
-  --color-ink-100: #ececf1;
+/*
+ * Ascend CF design tokens.
+ * Colors are CSS variables so the same utility classes work in both themes:
+ *   ink-*    neutral scale (950 = page background … 100 = main text) — flips per theme
+ *   accent-* royal blue used for highlights, links, buttons — tuned per theme for contrast
+ *   brand-*  navy surfaces (active states, panels)
+ * `.scope-dark` forces the dark values inside a block (sidebar, blue panels).
+ */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-  --color-wine-950: #2a0710;
-  --color-wine-900: #3d0a17;
-  --color-wine-800: #5a0f22;
-  --color-wine-700: #741430;
-  --color-wine-600: #8f1a3b;
-  --color-wine-400: #c9566f;
+@theme inline {
+  --color-ink-950: var(--ink-950);
+  --color-ink-900: var(--ink-900);
+  --color-ink-850: var(--ink-850);
+  --color-ink-800: var(--ink-800);
+  --color-ink-700: var(--ink-700);
+  --color-ink-600: var(--ink-600);
+  --color-ink-500: var(--ink-500);
+  --color-ink-400: var(--ink-400);
+  --color-ink-300: var(--ink-300);
+  --color-ink-200: var(--ink-200);
+  --color-ink-100: var(--ink-100);
 
-  --color-gold-300: #f1dc9c;
-  --color-gold-400: #e2c06a;
-  --color-gold-500: #c9a24a;
-  --color-gold-600: #a88232;
-  --color-gold-700: #7d6024;
+  --color-accent-200: var(--accent-200);
+  --color-accent-300: var(--accent-300);
+  --color-accent-400: var(--accent-400);
+  --color-accent-500: var(--accent-500);
+  --color-accent-600: var(--accent-600);
+  --color-accent-700: var(--accent-700);
 
-  --color-win: #3fa36b;
-  --color-draw: #b4b4be;
-  --color-loss: #d0475e;
+  --color-brand-950: var(--brand-950);
+  --color-brand-900: var(--brand-900);
+  --color-brand-800: var(--brand-800);
+  --color-brand-700: var(--brand-700);
+  --color-brand-600: var(--brand-600);
+  --color-brand-400: var(--brand-400);
+
+  --color-silver: var(--silver);
+  --color-win: var(--win);
+  --color-draw: var(--draw);
+  --color-loss: var(--loss);
 
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Barlow Condensed", "Inter Variable", ui-sans-serif, sans-serif;
 }
 
+/* ── Light: white & blue ─────────────────────────────── */
 :root {
+  color-scheme: light;
+  --ink-950: #f4f6fa;
+  --ink-900: #ffffff;
+  --ink-850: #f7f9fc;
+  --ink-800: #eef2f8;
+  --ink-700: #dfe5ee;
+  --ink-600: #c9d2df;
+  --ink-500: #a3aec0;
+  --ink-400: #5f6b82;
+  --ink-300: #3d4860;
+  --ink-200: #1f2940;
+  --ink-100: #0a1330;
+
+  --accent-200: #0f2a7a;
+  --accent-300: #14318f;
+  --accent-400: #1c3fb0;
+  --accent-500: #1c3fb0;
+  --accent-600: #1a3aa3;
+  --accent-700: #8ea3d9;
+
+  --brand-950: #fdecef;
+  --brand-900: #e8eefc;
+  --brand-800: #d6e0fa;
+  --brand-700: #b8c8f4;
+  --brand-600: #1c3fb0;
+  --brand-400: #1c3fb0;
+
+  --silver: #5f6b82;
+  --win: #15803d;
+  --draw: #64748b;
+  --loss: #c2283c;
+  --shadow: 0 1px 2px rgb(10 19 48 / 0.06), 0 1px 0 rgb(10 19 48 / 0.04);
+}
+
+/* ── Dark: black & blue ──────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ink-950: #04060b; --ink-900: #0a0e17; --ink-850: #0e1320; --ink-800: #131a2a; --ink-700: #1d2638; --ink-600: #2b3650;
+    --ink-500: #4a5672; --ink-400: #8b96ad; --ink-300: #b7c0d1; --ink-200: #dbe1ec; --ink-100: #f1f4f9;
+    --accent-200: #c9d6ff; --accent-300: #9db4ff; --accent-400: #6f8fff; --accent-500: #3a63f0; --accent-600: #2b54d6; --accent-700: #1c3fb0;
+    --brand-950: #1a0a10; --brand-900: #0c1d4f; --brand-800: #0f2566; --brand-700: #15318a; --brand-600: #1c3fb0; --brand-400: #6f8fff;
+    --silver: #c9d1dc; --win: #34c37a; --draw: #9aa4b6; --loss: #ff5d73;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"],
+.scope-dark {
   color-scheme: dark;
+  --ink-950: #04060b; --ink-900: #0a0e17; --ink-850: #0e1320; --ink-800: #131a2a; --ink-700: #1d2638; --ink-600: #2b3650;
+  --ink-500: #4a5672; --ink-400: #8b96ad; --ink-300: #b7c0d1; --ink-200: #dbe1ec; --ink-100: #f1f4f9;
+  --accent-200: #c9d6ff; --accent-300: #9db4ff; --accent-400: #6f8fff; --accent-500: #3a63f0; --accent-600: #2b54d6; --accent-700: #1c3fb0;
+  --brand-950: #1a0a10; --brand-900: #0c1d4f; --brand-800: #0f2566; --brand-700: #15318a; --brand-600: #1c3fb0; --brand-400: #6f8fff;
+  --silver: #c9d1dc; --win: #34c37a; --draw: #9aa4b6; --loss: #ff5d73;
+  --shadow: none;
 }
 
 html,
 body {
-  background: var(--color-ink-950);
-  color: var(--color-ink-100);
+  background: var(--ink-950);
+  color: var(--ink-100);
 }
 
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgb(90 15 34 / 0.35), transparent 70%),
-    linear-gradient(var(--color-ink-950), var(--color-ink-950));
-  background-attachment: fixed;
   min-height: 100dvh;
 }
 
+::selection {
+  background: var(--accent-500);
+  color: #fff;
+}
+
 @utility font-display {
-    font-family: var(--font-display);
-    letter-spacing: 0.02em;
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
 }
 
 @utility card {
-    @apply rounded-xl border border-ink-700/70 bg-ink-900/80 shadow-[0_1px_0_0_rgb(255_255_255/0.03)_inset] backdrop-blur-sm;
+  @apply rounded-lg border border-ink-700 bg-ink-900;
+  box-shadow: var(--shadow);
 }
 
+/* Blue club panel — same look in both themes (content uses dark tokens). */
 @utility card-premium {
-    @apply rounded-xl border border-gold-600/40 bg-gradient-to-br from-wine-900/70 via-ink-900 to-ink-900;
+  @apply scope-dark relative overflow-hidden rounded-lg border border-[#1c3fb0]/60 text-ink-100;
+  background:
+    linear-gradient(115deg, transparent 0 62%, rgb(255 255 255 / 0.035) 62% 64%, transparent 64% 70%, rgb(255 255 255 / 0.03) 70% 71%, transparent 71%),
+    linear-gradient(135deg, #15318a 0%, #0c1d4f 55%, #060c22 100%);
+}
+
+@utility scope-dark {
+  color-scheme: dark;
+  --ink-950: #04060b; --ink-900: #0a0e17; --ink-850: #0e1320; --ink-800: #131a2a; --ink-700: #1d2638; --ink-600: #2b3650;
+  --ink-500: #4a5672; --ink-400: #8b96ad; --ink-300: #b7c0d1; --ink-200: #dbe1ec; --ink-100: #f1f4f9;
+  --accent-200: #c9d6ff; --accent-300: #b8c8ff; --accent-400: #8fa9ff; --accent-500: #3a63f0; --accent-600: #2b54d6; --accent-700: #3a5bc4;
+  --brand-950: #1a0a10; --brand-900: #0c1d4f; --brand-800: #0f2566; --brand-700: #15318a; --brand-600: #1c3fb0; --brand-400: #6f8fff;
+  --silver: #c9d1dc; --win: #34c37a; --draw: #9aa4b6; --loss: #ff5d73;
 }
 
 @utility eyebrow {
-    @apply font-display text-xs font-semibold tracking-[0.2em] text-gold-400 uppercase;
+  @apply font-display text-xs font-semibold tracking-[0.22em] text-accent-400 uppercase;
 }
 
-@utility gold-text {
-    @apply bg-gradient-to-b from-gold-300 to-gold-600 bg-clip-text text-transparent;
+/* Kept for existing markup: headline color (silver on dark panels, deep blue on light). */
+@utility accent-text {
+  color: var(--accent-200);
 }
 
-@utility gold-rule {
-    @apply h-px w-full bg-gradient-to-r from-transparent via-gold-600/60 to-transparent;
+@utility accent-rule {
+  @apply h-px w-full bg-ink-700;
 }
 
 @utility input {
-    @apply w-full rounded-lg border border-ink-600 bg-ink-850 px-3 py-2 text-sm text-ink-100 placeholder:text-ink-400
-      focus:border-gold-500 focus:ring-2 focus:ring-gold-500/30 focus:outline-none disabled:opacity-60;
+  @apply w-full rounded-md border border-ink-600 bg-ink-900 px-3 py-2 text-sm text-ink-100 placeholder:text-ink-500
+    focus:border-accent-500 focus:ring-2 focus:ring-accent-500/25 focus:outline-none disabled:opacity-60;
 }
 
 @utility label {
-    @apply mb-1 block text-xs font-medium tracking-wide text-ink-300 uppercase;
+  @apply mb-1 block text-[11px] font-semibold tracking-[0.08em] text-ink-400 uppercase;
 }
 
 @utility btn {
-    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition
-      focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50;
+  @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4 py-2 font-display text-[15px] font-semibold tracking-[0.06em] uppercase transition
+    focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 @utility btn-primary {
-    @apply btn bg-gradient-to-b from-gold-400 to-gold-600 text-ink-950 hover:from-gold-300 hover:to-gold-500;
+  @apply btn bg-[#1c3fb0] text-white hover:bg-[#2347c5] active:bg-[#15318a];
 }
 
 @utility btn-secondary {
-    @apply btn border border-ink-600 bg-ink-800 text-ink-100 hover:border-gold-600/60 hover:bg-ink-700;
+  @apply btn border border-ink-600 bg-ink-900 text-ink-100 hover:border-accent-500 hover:text-accent-400;
 }
 
 @utility btn-danger {
-    @apply btn border border-loss/50 bg-wine-950 text-loss hover:bg-wine-900;
+  @apply btn border border-loss/40 bg-transparent text-loss hover:bg-loss/10;
 }
 
 @utility btn-ghost {
-    @apply btn text-ink-300 hover:bg-ink-800 hover:text-ink-100;
+  @apply btn font-sans text-sm font-medium tracking-normal normal-case text-ink-300 hover:bg-ink-800 hover:text-ink-100;
 }
 
 @utility data-table {
-    @apply w-full text-left text-sm;
+  @apply w-full text-left text-sm;
 }
 
 @layer components {
   .data-table th {
-      @apply border-b border-ink-700 px-3 py-2 text-xs font-medium tracking-wide whitespace-nowrap text-ink-400 uppercase;
+    @apply border-b border-ink-700 px-3 py-2.5 font-display text-xs font-semibold tracking-[0.12em] whitespace-nowrap text-ink-400 uppercase;
   }
   .data-table td {
-      @apply border-b border-ink-800 px-3 py-2.5 whitespace-nowrap;
+    @apply border-b border-ink-800 px-3 py-2.5 whitespace-nowrap;
   }
   .data-table tbody tr {
-      @apply transition-colors hover:bg-ink-850;
+    @apply transition-colors hover:bg-ink-850;
   }
 }
 

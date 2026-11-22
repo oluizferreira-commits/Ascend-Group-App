@@ -57,7 +57,7 @@ export function FetchMembersButton({ disabled }: { disabled: boolean }) {
   return (
     <form action={action} className="flex flex-col items-end gap-1">
       <button disabled={disabled} className="btn-secondary min-h-0 px-3 py-1.5 text-xs">Buscar elenco na EA</button>
-      {state && !state.ok && <span className="max-w-xs text-right text-xs text-red-300">{state.error}</span>}
+      {state && !state.ok && <span className="max-w-xs text-right text-xs text-loss">{state.error}</span>}
     </form>
   );
 }

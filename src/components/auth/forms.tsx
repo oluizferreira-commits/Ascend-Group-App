@@ -19,7 +19,7 @@ export function LoginForm({ next }: { next?: string }) {
       <FormMessage state={state} />
       <SubmitButton className="w-full" pendingText="Entrando…">Entrar</SubmitButton>
       <p className="text-center text-sm">
-        <Link href="/esqueci-senha" className="text-gold-400 hover:underline">Esqueci minha senha</Link>
+        <Link href="/esqueci-senha" className="text-accent-400 hover:underline">Esqueci minha senha</Link>
       </p>
     </form>
   );
@@ -34,7 +34,7 @@ export function ForgotForm() {
       </Field>
       <FormMessage state={state} />
       <SubmitButton className="w-full" pendingText="Enviando…">Enviar link</SubmitButton>
-      <p className="text-center text-sm"><Link href="/login" className="text-gold-400 hover:underline">Voltar ao login</Link></p>
+      <p className="text-center text-sm"><Link href="/login" className="text-accent-400 hover:underline">Voltar ao login</Link></p>
     </form>
   );
 }

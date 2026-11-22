@@ -2,14 +2,14 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Ascend FC — Ascend Group",
-    short_name: "Ascend FC",
-    description: "Plataforma oficial de gestão esportiva do Ascend FC.",
+    name: "Ascend CF — Ascend Group",
+    short_name: "Ascend CF",
+    description: "Plataforma oficial de gestão esportiva do Ascend CF.",
     start_url: "/app",
     scope: "/",
     display: "standalone",
-    background_color: "#07070a",
-    theme_color: "#07070a",
+    background_color: "#04060b",
+    theme_color: "#04060b",
     lang: "pt-BR",
     icons: [
       // Generated from the original crest by `npm run brand:assets` (original file untouched).

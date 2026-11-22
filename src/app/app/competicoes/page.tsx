@@ -26,7 +26,7 @@ export default async function CompetitionsPage() {
           {rows.length === 0 ? <EmptyState title="Nenhuma competição" /> : (
             <ul className="grid gap-3 md:grid-cols-2">
               {rows.map(({ c, season }) => (
-                <li key={c.id}><Link href={`/app/competicoes/${c.id}`} className="card block p-4 hover:border-gold-600/50">
+                <li key={c.id}><Link href={`/app/competicoes/${c.id}`} className="card block p-4 hover:border-accent-600/50">
                   <p className="font-display text-lg font-semibold uppercase">{c.name}</p>
                   <div className="mt-2 flex flex-wrap gap-1"><Badge tone="gold">{FORMAT_LABELS[c.format]}</Badge>{season && <Badge>{season}</Badge>}</div>
                 </Link></li>

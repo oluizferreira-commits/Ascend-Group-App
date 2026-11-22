@@ -66,7 +66,7 @@ export async function loadCard(clubId: string, template: TemplateKey, q: URLSear
       })).sort((a, b) => b.r - a.r);
       if (!rated.length) throw new MediaDataError("A súmula da partida não tem estatísticas.");
       const top = rated[0];
-      return { kind: "spotlight", eyebrow: `Ascend FC ${m.goalsFor}–${m.goalsAgainst} ${m.opponentName}`, title: "MVP DA PARTIDA", name: top.p.player.nickname,
+      return { kind: "spotlight", eyebrow: `Ascend CF ${m.goalsFor}–${m.goalsAgainst} ${m.opponentName}`, title: "MVP DA PARTIDA", name: top.p.player.nickname,
         sub: POSITION_NAMES[top.p.player.primaryPosition], photo: top.p.player.avatarUrl, meta,
         stats: [{ label: "Nota", value: fmtNum(top.r, 1) }, { label: "Gols", value: String(top.p.stats!.goals) }, { label: "Assist.", value: String(top.p.stats!.assists) }] };
     }
@@ -88,7 +88,7 @@ export async function loadCard(clubId: string, template: TemplateKey, q: URLSear
         const [m] = await db.select().from(schema.matches).where(eq(schema.matches.id, l.matchId));
         if (m) meta = `vs ${m.opponentName} · ${fmtWeekdayTime(m.kickoffAt)} · ${f.name}`;
       } else if (l.opponentName) meta = `vs ${l.opponentName} · ${f.name}`;
-      return { kind: "lineup", eyebrow: "Escalação oficial", title: "ASCEND FC", slots, bench, meta };
+      return { kind: "lineup", eyebrow: "Escalação oficial", title: "ASCEND CF", slots, bench, meta };
     }
     case "callup": {
       const e = await getEvent(clubId, id("event"));
@@ -141,7 +141,7 @@ export async function loadCard(clubId: string, template: TemplateKey, q: URLSear
       const p = await getPlayer(clubId, id("player"));
       if (!p) throw new MediaDataError("Jogador não encontrado.");
       return { kind: "spotlight", eyebrow: template === "signing" ? "Reforço confirmado" : "Bem-vindo ao Ascend", title: template === "signing" ? "CONTRATAÇÃO" : "APRESENTAÇÃO",
-        name: p.nickname, sub: POSITION_NAMES[p.primaryPosition], photo: p.avatarUrl, meta: p.joinedOn ? `Desde ${fmtDate(p.joinedOn + "T12:00:00Z")}` : "Ascend FC",
+        name: p.nickname, sub: POSITION_NAMES[p.primaryPosition], photo: p.avatarUrl, meta: p.joinedOn ? `Desde ${fmtDate(p.joinedOn + "T12:00:00Z")}` : "Ascend CF",
         stats: [{ label: "Camisa", value: p.shirtNumber != null ? `#${p.shirtNumber}` : "—" }, { label: "Posição", value: POSITION_LABELS[p.primaryPosition] }, ...(p.overall ? [{ label: "Overall", value: String(p.overall) }] : [])] };
     }
   }

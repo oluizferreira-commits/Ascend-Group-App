@@ -10,10 +10,10 @@ type RoleOpt = { key: RoleKey; name: string; allowed: boolean };
 function TempPasswordNotice({ state }: { state: CreateUserResult | null }) {
   if (!state?.ok || !state.data?.tempPassword) return null;
   return (
-    <div className="rounded-lg border border-gold-600/50 bg-gold-500/10 p-3 text-sm">
-      <p className="font-semibold text-gold-300">Senha temporária (exibida apenas uma vez)</p>
+    <div className="rounded-lg border border-accent-600/50 bg-accent-500/10 p-3 text-sm">
+      <p className="font-semibold text-accent-300">Senha temporária (exibida apenas uma vez)</p>
       <p className="mt-1">Login: <b>{state.data.email}</b></p>
-      <p>Senha: <code className="rounded bg-ink-950 px-1.5 py-0.5 font-mono text-gold-200 select-all">{state.data.tempPassword}</code></p>
+      <p>Senha: <code className="rounded bg-ink-950 px-1.5 py-0.5 font-mono text-accent-200 select-all">{state.data.tempPassword}</code></p>
       <p className="mt-1 text-xs text-ink-300">Envie por um canal privado e peça para trocar em “Minha conta” no primeiro acesso.</p>
     </div>
   );
@@ -25,7 +25,7 @@ function RoleChecks({ roles, selected }: { roles: RoleOpt[]; selected?: RoleKey[
       {roles.map((r) => (
         <label key={r.key} className={r.allowed ? "cursor-pointer" : "cursor-not-allowed opacity-40"} title={r.allowed ? undefined : "Seu cargo não permite atribuir este cargo"}>
           <input type="checkbox" name="roles" value={r.key} defaultChecked={selected?.includes(r.key)} disabled={!r.allowed} className="peer sr-only" />
-          <span className="inline-block rounded-md border border-ink-600 px-2.5 py-1 text-xs text-ink-300 peer-checked:border-gold-500 peer-checked:bg-gold-500/10 peer-checked:text-gold-300 peer-focus-visible:ring-2 peer-focus-visible:ring-gold-400">{r.name}</span>
+          <span className="inline-block rounded-md border border-ink-600 px-2.5 py-1 text-xs text-ink-300 peer-checked:border-accent-500 peer-checked:bg-accent-500/10 peer-checked:text-accent-300 peer-focus-visible:ring-2 peer-focus-visible:ring-accent-400">{r.name}</span>
         </label>
       ))}
     </div>
@@ -39,7 +39,7 @@ export function CreateUserForm({ roles }: { roles: RoleOpt[] }) {
     <form action={action} className="space-y-4">
       <Field label="Nome" name="displayName" error={fe.displayName}><input id="displayName" name="displayName" required maxLength={80} className="input" /></Field>
       <Field label="E-mail" name="email" error={fe.email}><input id="email" name="email" type="email" required className="input" /></Field>
-      <div><span className="label">Cargos</span><RoleChecks roles={roles} selected={["player"]} />{fe.roles && <p className="mt-1 text-xs text-red-300">{fe.roles[0]}</p>}</div>
+      <div><span className="label">Cargos</span><RoleChecks roles={roles} selected={["player"]} />{fe.roles && <p className="mt-1 text-xs text-loss">{fe.roles[0]}</p>}</div>
       <FormMessage state={state} />
       <TempPasswordNotice state={state} />
       <SubmitButton className="w-full" pendingText="Criando…">Adicionar membro</SubmitButton>

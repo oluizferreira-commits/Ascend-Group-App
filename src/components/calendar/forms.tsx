@@ -22,7 +22,7 @@ export function EventForm({ event }: { event?: { id: string; type: string; title
 }
 
 type Opt = { id: string; nickname: string; position: string; availability: string | null; reason: string | null };
-const AV = { available: ["Disponível", "text-green-300"], unavailable: ["Indisponível", "text-red-300"], doubtful: ["Dúvida", "text-gold-300"] } as const;
+const AV = { available: ["Disponível", "text-win"], unavailable: ["Indisponível", "text-loss"], doubtful: ["Dúvida", "text-accent-300"] } as const;
 
 export function CallupForm({ eventId, players }: { eventId: string; players: Opt[] }) {
   const [state, action] = useActionState(callupPlayersAction.bind(null, eventId), null);
@@ -32,7 +32,7 @@ export function CallupForm({ eventId, players }: { eventId: string; players: Opt
       <ul className="grid max-h-80 gap-1 overflow-y-auto sm:grid-cols-2">
         {players.map((p) => (
           <li key={p.id}>
-            <label className="flex cursor-pointer items-center gap-2 rounded-md border border-ink-700 px-2 py-1.5 text-sm hover:border-gold-600/50">
+            <label className="flex cursor-pointer items-center gap-2 rounded-md border border-ink-700 px-2 py-1.5 text-sm hover:border-accent-600/50">
               <input type="checkbox" name="playerIds" value={p.id} defaultChecked={p.availability !== "unavailable"} />
               <span className="flex-1 truncate">{p.nickname} <span className="text-xs text-ink-400">{p.position}</span></span>
               {p.availability && <span className={`text-[10px] ${AV[p.availability as keyof typeof AV][1]}`} title={p.reason ?? ""}>{AV[p.availability as keyof typeof AV][0]}</span>}

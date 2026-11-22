@@ -22,7 +22,7 @@ export function FormMessage({ state }: { state: ActionResult<unknown> | null }) 
       role={state.ok ? "status" : "alert"}
       className={cn(
         "rounded-lg border px-3 py-2 text-sm",
-        state.ok ? "border-win/40 bg-win/10 text-green-200" : "border-loss/40 bg-loss/10 text-red-200",
+        state.ok ? "border-win/40 bg-win/10 text-win" : "border-loss/40 bg-loss/10 text-loss",
       )}
     >
       {state.ok ? state.message : state.error}
@@ -38,7 +38,7 @@ export function Field({
       <label htmlFor={name} className="label">{label}</label>
       {children}
       {hint && !error && <p className="mt-1 text-xs text-ink-400">{hint}</p>}
-      {error?.[0] && <p className="mt-1 text-xs text-red-300">{error[0]}</p>}
+      {error?.[0] && <p className="mt-1 text-xs text-loss">{error[0]}</p>}
     </div>
   );
 }

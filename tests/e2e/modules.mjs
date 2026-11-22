@@ -45,14 +45,14 @@ for (const t of ["Rival A", "Rival B"]) {
   await page.getByText("Time adicionado.").waitFor();
 }
 const fx = page.locator("form", { has: page.getByRole("button", { name: "Adicionar jogo" }) });
-await fx.locator("select[name=homeTeamId]").selectOption({ label: "Ascend FC" });
+await fx.locator("select[name=homeTeamId]").selectOption({ label: "Ascend CF" });
 await fx.locator("select[name=awayTeamId]").selectOption({ label: "Rival A" });
 await fx.locator("input[name=homeGoals]").fill("2");
 await fx.locator("input[name=awayGoals]").fill("0");
 await fx.getByRole("button", { name: "Adicionar jogo" }).click();
 await page.getByText("Jogo salvo. Classificação atualizada.").waitFor();
 const first = page.locator("table").first().locator("tbody tr").first();
-assert.match(await first.innerText(), /Ascend FC\s+3\s+1\s+1/);
+assert.match(await first.innerText(), /Ascend CF\s+3\s+1\s+1/);
 
 step("player account linked to e2e_cb");
 await page.goto(`${BASE}/app/admin/usuarios`);

@@ -33,7 +33,7 @@ export default async function AvailabilityPage() {
                   <li key={a.id} className="flex items-center gap-2 py-2">
                     <Badge tone={L[a.status][1]}>{L[a.status][0]}</Badge>
                     <span className="flex-1">{d(a.startsOn)}{a.endsOn ? ` a ${d(a.endsOn)}` : " em diante"}{a.reason && <span className="text-ink-400"> · {a.reason}</span>}</span>
-                    <form action={deleteAvailabilityAction.bind(null, a.id)}><button className="btn-ghost min-h-0 px-2 py-0.5 text-xs text-red-300">remover</button></form>
+                    <form action={deleteAvailabilityAction.bind(null, a.id)}><button className="btn-ghost min-h-0 px-2 py-0.5 text-xs text-loss">remover</button></form>
                   </li>
                 ))}
               </ul>

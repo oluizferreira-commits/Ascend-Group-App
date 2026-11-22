@@ -70,7 +70,7 @@ export function MediaStudio({ templates, formats, sources, initial }: Props) {
         <p className="text-xs text-ink-400">As artes usam o escudo oficial e somente dados registrados na plataforma.</p>
       </div>
       <div className="card grid min-h-96 place-items-center p-4">
-        {state.loading ? <Loader2 className="size-8 animate-spin text-gold-400" /> : state.error ? <p className="text-sm text-red-300">{state.error}</p> : (
+        {state.loading ? <Loader2 className="size-8 animate-spin text-accent-400" /> : state.error ? <p className="text-sm text-loss">{state.error}</p> : (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={state.blob!} alt="Pré-visualização da arte" className="max-h-[78vh] w-auto rounded-lg shadow-2xl" />
         )}

@@ -10,10 +10,10 @@ type A = typeof schema.announcements.$inferSelect;
 export function AnnouncementCard({ a, compact }: { a: A; compact?: boolean }) {
   const urgent = a.priority === "urgent";
   return (
-    <article className={cn("rounded-lg border p-4", urgent ? "border-loss/50 bg-wine-950/60" : "border-ink-700 bg-ink-850/60")}>
+    <article className={cn("rounded-lg border p-4", urgent ? "border-loss/50 bg-brand-950/60" : "border-ink-700 bg-ink-850/60")}>
       <div className="mb-1.5 flex flex-wrap items-center gap-2">
-        {urgent && <AlertTriangle className="size-4 text-red-300" aria-label="Urgente" />}
-        {a.pinned && <Pin className="size-3.5 text-gold-400" aria-label="Fixado" />}
+        {urgent && <AlertTriangle className="size-4 text-loss" aria-label="Urgente" />}
+        {a.pinned && <Pin className="size-3.5 text-accent-400" aria-label="Fixado" />}
         <Badge tone={urgent ? "loss" : a.priority === "high" ? "gold" : "neutral"}>{PRIORITY_LABELS[a.priority]}</Badge>
         <Badge tone="wine">{ANNOUNCEMENT_CATEGORY_LABELS[a.category]}</Badge>
         <span className="ml-auto text-xs text-ink-400">{fmtDateTime(a.publishedAt)}</span>
