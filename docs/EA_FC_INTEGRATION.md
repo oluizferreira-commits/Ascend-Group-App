@@ -43,6 +43,10 @@ automática ("EA · Liga (divisões)", "EA · Playoffs", "EA · Amistosos").
 
 ## 3. Formas de sincronizar
 
+0. **Automática ao usar o app** (sem configuração): quando alguém abre o site ou o painel e a última
+   sincronização tem mais de 30 min, o servidor sincroniza em segundo plano (`after()`), sem atrasar a página.
+   Uma trava no banco garante uma única consulta à EA mesmo com várias visitas simultâneas.
+
 1. **Tela "Integração EA FC"** (Presidente/Administrador): configurar o clube, buscar o elenco da EA e criar/vincular
    jogadores, "Sincronizar agora" (limite de 1 vez a cada 10 min), importar JSON, histórico e reprocessamento.
 2. **Agendado pelo servidor**: `GET /api/integrations/ea-fc/sync` com `Authorization: Bearer $SYNC_CRON_SECRET`.

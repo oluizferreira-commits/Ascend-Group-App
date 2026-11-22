@@ -10,6 +10,8 @@ import { recentResults } from "@/server/services/matches";
 import { listActiveAnnouncements } from "@/server/services/announcements";
 import { getSessionUser } from "@/server/auth/session";
 import { getThemeMode } from "@/lib/theme";
+import { after } from "next/server";
+import { maybeAutoSync } from "@/server/services/ea-sync";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { matchResult } from "@/lib/domain";
 import { fmtDate, fmtPct } from "@/lib/format";
@@ -23,6 +25,7 @@ export default async function PublicHome() {
       </main>
     );
   }
+  after(() => maybeAutoSync(pub.club.id));
   const [season] = await db.select().from(schema.seasons).where(and(eq(schema.seasons.clubId, pub.club.id), eq(schema.seasons.isCurrent, true)));
   const [record, recent, news] = await Promise.all([
     clubRecord({ clubId: pub.club.id, seasonId: season?.id ?? null }),

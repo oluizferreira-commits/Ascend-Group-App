@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { notify } from "../notify";
 import { eaGet, eaUrl, matchesUrl, EaBlockedError } from "@/integrations/ea-fc/client";
@@ -30,11 +30,13 @@ type Batch = { matchType: EaMatchType; payload: unknown };
  */
 export async function runLoggedImport(opts: {
   clubId: string; eaClubId: string; trigger: "manual" | "scheduled" | "file"; userId: string | null;
-  batches: Batch[] | (() => Promise<Batch[]>); origin: string;
+  batches: Batch[] | (() => Promise<Batch[]>); origin: string; logId?: string;
 }) {
-  const [log] = await db.insert(schema.synchronizationLogs).values({
-    clubId: opts.clubId, provider: PROVIDER, trigger: opts.trigger, triggeredBy: opts.userId, details: { origin: opts.origin },
-  }).returning();
+  const [log] = opts.logId
+    ? await db.select().from(schema.synchronizationLogs).where(eq(schema.synchronizationLogs.id, opts.logId))
+    : await db.insert(schema.synchronizationLogs).values({
+        clubId: opts.clubId, provider: PROVIDER, trigger: opts.trigger, triggeredBy: opts.userId, details: { origin: opts.origin },
+      }).returning();
   const totals: ImportSummary = { found: 0, created: 0, skipped: 0, statsAdded: 0, invalid: [], unmatchedPlayers: [] };
   const errors: string[] = [];
   let batches: Batch[] = [];
@@ -91,7 +93,43 @@ export async function fetchAllMatchTypes(platform: EaPlatform, eaClubId: string)
 
 export async function lastServerFetch(clubId: string) {
   const logs = await listSyncLogs(clubId, 20);
-  return logs.find((l) => (l.details as { origin?: string }).origin === "server");
+  return logs.find((l) => ["server", "auto"].includes(String((l.details as { origin?: string }).origin)));
+}
+
+export const AUTO_SYNC_INTERVAL_MIN = 30;
+
+/**
+ * Opportunistic sync: called (via `after()`) when someone opens the app. Claims the
+ * slot atomically with a conditional insert, so concurrent visits fetch EA at most
+ * once per AUTO_SYNC_INTERVAL_MIN. Never throws.
+ */
+export async function maybeAutoSync(clubId: string) {
+  try {
+    const cfg = await getEaConfig(clubId);
+    if (!cfg.platform || !cfg.eaClubId) return;
+    // Transaction-scoped advisory lock serialises concurrent visits (safe with poolers).
+    const claimed = await db.transaction(async (tx) => {
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${"ea-auto-sync:" + clubId}))`);
+      return tx.execute<{ id: string }>(sql`
+        insert into synchronization_logs (club_id, provider, trigger, details)
+        select ${clubId}, ${PROVIDER}, 'scheduled', '{"origin":"auto"}'::jsonb
+        where not exists (
+          select 1 from synchronization_logs
+          where club_id = ${clubId} and provider = ${PROVIDER}
+            and details->>'origin' in ('server', 'auto')
+            and started_at > now() - make_interval(mins => ${AUTO_SYNC_INTERVAL_MIN})
+        )
+        returning id`);
+    });
+    const logId = [...claimed][0]?.id;
+    if (!logId) return;
+    await runLoggedImport({
+      clubId, eaClubId: cfg.eaClubId, trigger: "scheduled", userId: null, origin: "auto", logId,
+      batches: () => fetchAllMatchTypes(cfg.platform!, cfg.eaClubId!),
+    });
+  } catch (e) {
+    console.error("[auto-sync] failed", e);
+  }
 }
 
 export type MemberSnapshot = { name: string; favoritePosition: string | null; proOverall: number | null; gamesPlayed: number | null; goals: number | null; assists: number | null };

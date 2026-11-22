@@ -14,7 +14,7 @@ import { fmtDateTime } from "@/lib/format";
 export const metadata: Metadata = { title: "Integração EA FC" };
 
 const STATUS = { running: ["Em andamento", "gold"], success: ["Sucesso", "win"], partial: ["Parcial", "gold"], failed: ["Falhou", "loss"] } as const;
-const ORIGIN: Record<string, string> = { server: "Servidor", agent: "Agente local", json: "JSON importado" };
+const ORIGIN: Record<string, string> = { server: "Servidor (manual)", auto: "Automática", agent: "Agente local", json: "JSON importado" };
 
 type Unmatched = { eaName: string; matches: number; goals: number; assists: number };
 
