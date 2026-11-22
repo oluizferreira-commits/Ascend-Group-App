@@ -11,7 +11,8 @@ function H({ id, children }: { id?: string; children: React.ReactNode }) {
 }
 
 export default function PrivacyPage() {
-  const contact = process.env.PRIVACY_CONTACT_EMAIL?.trim();
+  // Owner-approved public contact for data requests; override with PRIVACY_CONTACT_EMAIL.
+  const contact = process.env.PRIVACY_CONTACT_EMAIL?.trim() || "lnunesgarciaferreira@gmail.com";
   const how = contact
     ? <>pelo e-mail <a className="text-accent-400 underline" href={`mailto:${contact}`}>{contact}</a></>
     : <>pelos canais oficiais do clube (Instagram, Discord ou WhatsApp da diretoria)</>;
