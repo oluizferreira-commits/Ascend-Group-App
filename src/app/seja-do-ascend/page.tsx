@@ -4,6 +4,7 @@ import { Crest } from "@/components/crest";
 import { ApplyForm } from "@/components/recruitment/apply-form";
 import { TextReveal } from "@/components/fx/text-reveal";
 import { Reveal } from "@/components/fx/reveal";
+import { ShareLinkButton } from "@/components/share/share-link";
 
 export const metadata: Metadata = {
   title: "Seja do Ascend",
@@ -24,6 +25,7 @@ export default function ApplyPage() {
           <p className="font-display text-sm font-semibold tracking-[0.4em] text-silver uppercase">Ascend CF · Pro Clubs</p>
           <h1 className="font-display text-6xl leading-none font-bold tracking-[0.03em] text-white uppercase sm:text-7xl"><TextReveal text="Seja do Ascend" /></h1>
           <p className="max-w-lg text-sm text-ink-300">Preencha sua proposta. A comissão técnica avalia e, se aprovada, entra em contato com você.</p>
+          <ShareLinkButton url="/seja-do-ascend" title="Seja do Ascend" text="Quer jogar no Ascend CF? Mande sua proposta:" label="Indicar um amigo" className="btn border border-white/25 text-white hover:bg-white/10" />
         </div>
       </section>
       <Reveal delay={0.3} className="mx-auto max-w-3xl px-4 py-8"><ApplyForm /></Reveal>

@@ -6,6 +6,7 @@ import { db, schema } from "@/db";
 import { requirePage } from "@/server/auth/session";
 import { Avatar, Badge, EmptyState, PageHeader } from "@/components/ui/basics";
 import { CopyLink } from "@/components/recruitment/staff";
+import { ShareLinkButton } from "@/components/share/share-link";
 import { APPLICATION_STATUS_LABELS, PLATFORMS } from "@/lib/validation/application";
 import { POSITION_GROUPS, POSITION_GROUP_LABELS, POSITION_LABELS, positionGroup, type PositionGroup } from "@/lib/domain";
 import { fmtDateTime } from "@/lib/format";
@@ -43,7 +44,7 @@ export default async function ApplicationsPage({ searchParams }: { searchParams:
   return (
     <>
       <PageHeader eyebrow="Recrutamento" title="Seja do Ascend" description="Propostas enviadas pelo link público. Os contatos ficam visíveis apenas para a diretoria e o treinador."
-        actions={<><CopyLink url={publicUrl} /><Link href="/seja-do-ascend" target="_blank" className="btn-secondary"><ExternalLink className="size-4" />Ver página</Link></>} />
+        actions={<><ShareLinkButton url={publicUrl} title="Seja do Ascend" text="Quer jogar no Ascend CF? Mande sua proposta:" className="btn-primary" /><CopyLink url={publicUrl} /><Link href="/seja-do-ascend" target="_blank" className="btn-secondary"><ExternalLink className="size-4" />Ver página</Link></>} />
 
       <div className="mb-4 flex flex-wrap gap-2">
         <Link href={qs({ status: undefined })} className={!status ? "btn-primary min-h-0 py-1.5" : "btn-secondary min-h-0 py-1.5"}>Todas</Link>

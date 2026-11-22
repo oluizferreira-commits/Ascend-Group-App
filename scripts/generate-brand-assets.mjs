@@ -30,3 +30,13 @@ for (const w of [64, 128, 256]) {
   await sharp(SRC).resize({ width: w, fit: "inside" }).png().toFile(`${OUT}/crest-${w}.png`);
   console.log(`✔ ${OUT}/crest-${w}.png`);
 }
+
+// iOS launch screens (apple-touch-startup-image) — crest on the brand gradient, original untouched.
+const SPLASH = [[1290, 2796], [1179, 2556], [1170, 2532], [1284, 2778], [1125, 2436], [828, 1792], [1242, 2688], [750, 1334]];
+for (const [w, h] of SPLASH) {
+  const crestW = Math.round(w * 0.42);
+  const crest = await sharp(SRC).resize(crestW, crestW, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
+  const bg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><defs><linearGradient id="g" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#15318a"/><stop offset="0.4" stop-color="#0c1d4f"/><stop offset="0.85" stop-color="#04060b"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/></svg>`);
+  await sharp(bg).composite([{ input: crest, gravity: "center" }]).png().toFile(`${OUT}/splash-${w}x${h}.png`);
+  console.log(`✔ ${OUT}/splash-${w}x${h}.png`);
+}

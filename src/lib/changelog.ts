@@ -5,6 +5,17 @@
 export const CHANGELOG: { date: string; title: string; items: string[] }[] = [
   {
     date: "2026-11-22",
+    title: "Cara de app",
+    items: [
+      "Tela de abertura com o escudo — e o número da sua camisa.",
+      "Deslize para o lado para trocar de aba e deslize uma notificação para marcar como lida.",
+      "“Tô dentro” agora é deslize para confirmar; convocações abrem uma janela rápida.",
+      "Compartilhe resultados e artes direto no Instagram e no WhatsApp.",
+      "App mais leve: carregamento instantâneo entre telas e rolagem mais suave.",
+    ],
+  },
+  {
+    date: "2026-11-22",
     title: "Dia de jogo",
     items: [
       "Modo Dia de Jogo: contagem regressiva, escalação, confirmados e o botão “Tô dentro!”.",

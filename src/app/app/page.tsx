@@ -11,6 +11,7 @@ import { pollsFor } from "@/server/services/polls";
 import { getMe } from "@/server/services/player-card";
 import { getMatchday } from "@/server/services/matchday";
 import { MatchdayHero } from "@/components/engagement/matchday";
+import { CallupSheetButton } from "@/components/mobile/callup-sheet";
 import { recentMvpPrompt } from "@/server/services/mvp";
 import { squadAttributes, cardOverall } from "@/lib/attributes";
 import { PlayerCard } from "@/components/cards/player-card";
@@ -59,9 +60,11 @@ export default async function DashboardPage() {
           <p className="eyebrow mb-2">Você foi convocado</p>
           <ul className="space-y-1">
             {callups.map(({ e }) => (
-              <li key={e.id}><Link href={`/app/calendario/${e.id}`} className="flex flex-wrap items-center gap-2 text-sm hover:text-accent-300">
-                <b>{e.title}</b><span className="text-ink-300 capitalize">{fmtWeekdayTime(e.startsAt)}</span><span className="text-accent-400 underline">Confirmar presença</span>
-              </Link></li>
+              <li key={e.id} className="flex flex-wrap items-center gap-2 text-sm">
+                <Link href={`/app/calendario/${e.id}`} className="hover:text-accent-400"><b>{e.title}</b></Link>
+                <span className="text-ink-300 capitalize">{fmtWeekdayTime(e.startsAt)}</span>
+                <CallupSheetButton eventId={e.id} title={e.title} when={fmtWeekdayTime(e.startsAt)} className="btn-primary ml-auto min-h-0 px-3 py-1.5" />
+              </li>
             ))}
           </ul>
         </section>

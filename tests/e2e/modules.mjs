@@ -92,8 +92,10 @@ for (const u of ["/app/calendario", "/app/disponibilidade", "/app/escalacoes", `
   const [sw, iw] = await m.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);
   assert.ok(sw <= iw + 1, `no horizontal overflow on ${u} (${sw}>${iw})`);
 }
-const r403 = await m.request.get(`${BASE}/api/media/awards?format=feed`);
-assert.equal(r403.status(), 403, "players cannot generate media");
+const rShare = await m.request.get(`${BASE}/api/media/awards?format=feed`);
+assert.equal(rShare.status(), 200, "members can generate share images");
+await m.goto(`${BASE}/app/midia`);
+await m.waitForURL(`${BASE}/app/sem-permissao`); // media centre UI stays staff-only
 
 step("media: PNGs render");
 const matchHref = await (async () => { await page.goto(`${BASE}/app/partidas`); return page.locator("a[href^='/app/partidas/']").filter({ hasText: "Adversário E2E" }).first().getAttribute("href"); })();

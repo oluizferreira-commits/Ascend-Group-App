@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { Check, ClipboardList, Users } from "lucide-react";
 import { respondCallupAction } from "@/server/actions/calendar";
 import { BorderBeam } from "@/components/fx/border-beam";
+import { SlideToConfirm } from "@/components/mobile/slide-to-confirm";
 import { cn } from "@/lib/cn";
 
 type Props = {
@@ -71,9 +72,7 @@ export function MatchdayHero(p: Props) {
 
         <div className="mt-5 flex flex-wrap items-center gap-2">
           {p.eventId && status && status !== "confirmed" && status !== "present" && !live && (
-            <button onClick={confirm} disabled={pending} className="btn shine h-12 bg-white px-6 text-base text-[#0c1d4f] hover:bg-[#e6ecfd]">
-              {pending ? "Confirmando…" : "Tô dentro!"}
-            </button>
+            <SlideToConfirm label="Tô dentro!" onConfirm={confirm} disabled={pending} />
           )}
           {(status === "confirmed" || status === "present") && (
             <span className="inline-flex h-12 items-center gap-2 rounded-md bg-win/20 px-4 font-display font-bold tracking-wider text-win uppercase"><Check className="size-5" />Você está dentro</span>

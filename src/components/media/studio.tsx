@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { Download, Loader2 } from "lucide-react";
+import { ShareImageButton } from "@/components/share/share-image";
 
 type Opt = { id: string; label: string };
 type Props = {
@@ -67,6 +68,7 @@ export function MediaStudio({ templates, formats, sources, initial }: Props) {
         <a href={`${url}&download=1`} className={state.blob ? "btn-primary w-full" : "btn-primary pointer-events-none w-full opacity-50"} aria-disabled={!state.blob}>
           <Download className="size-4" />Baixar PNG
         </a>
+        {state.blob && <div className="[&_button]:w-full"><ShareImageButton url={url} filename={`ascend-${template}-${format}.png`} title="Arte do Ascend CF" className="btn-secondary w-full" /></div>}
         <p className="text-xs text-ink-400">As artes usam o escudo oficial e somente dados registrados na plataforma.</p>
       </div>
       <div className="card grid min-h-96 place-items-center p-4">

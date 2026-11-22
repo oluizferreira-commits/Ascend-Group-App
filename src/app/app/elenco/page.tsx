@@ -11,6 +11,7 @@ import {
   type PlayerStatus, type PositionGroup,
 } from "@/lib/domain";
 import { fmtNum } from "@/lib/format";
+import { FiltersSheet } from "@/components/mobile/filters-sheet";
 
 export const metadata: Metadata = { title: "Elenco" };
 
@@ -58,7 +59,8 @@ export default async function RosterPage({ searchParams }: { searchParams: Promi
         actions={ctx.permissions.has("players.manage") && <Link href="/app/elenco/novo" className="btn-primary"><Plus className="size-4" />Novo jogador</Link>}
       />
 
-      <form className="card mb-5 grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 lg:grid-cols-6" method="get">
+      <FiltersSheet active={[sp.season, group, status, minMatches || undefined, sp.sort && sp.sort !== "nickname" ? sp.sort : undefined].filter(Boolean).length}>
+      <form className="mb-5 grid grid-cols-2 gap-3 sm:card sm:grid-cols-3 sm:p-4 lg:grid-cols-6" method="get">
         <div>
           <label className="label" htmlFor="season">Temporada</label>
           <select id="season" name="season" defaultValue={seasonId ?? "all"} className="input">
@@ -91,8 +93,9 @@ export default async function RosterPage({ searchParams }: { searchParams: Promi
             {Object.entries(SORTS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </select>
         </div>
-        <div className="flex items-end"><button className="btn-secondary w-full">Filtrar</button></div>
+        <div className="col-span-2 flex items-end sm:col-span-1"><button className="btn-primary w-full">Filtrar</button></div>
       </form>
+      </FiltersSheet>
 
       {rows.length === 0 ? (
         <EmptyState

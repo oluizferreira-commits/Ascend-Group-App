@@ -5,7 +5,8 @@ import { renderCard } from "@/server/media/render";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ template: string }> }) {
   const ctx = await getAuthContext();
-  if (!ctx || !ctx.permissions.has("media.manage")) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  // Any club member can generate/share images (data is club-visible); the media centre UI stays staff-only.
+  if (!ctx || !ctx.permissions.has("dashboard.view")) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   const { template } = await params;
   if (!(template in TEMPLATES)) return NextResponse.json({ error: "template" }, { status: 404 });
   const q = req.nextUrl.searchParams;

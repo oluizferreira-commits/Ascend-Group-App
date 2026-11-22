@@ -10,6 +10,7 @@ import { deleteMatchAction, saveMatchSheetAction } from "@/server/actions/matche
 import { callupForMatchAction } from "@/server/actions/calendar";
 import { getMvpVoting } from "@/server/services/mvp";
 import { MvpVote } from "@/components/engagement/mvp-vote";
+import { ShareImageButton } from "@/components/share/share-image";
 import { Badge, PageHeader, ResultPill, SectionTitle } from "@/components/ui/basics";
 import { ConfirmSubmit } from "@/components/ui/confirm-button";
 import { SheetEditor } from "@/components/matches/sheet-editor";
@@ -51,8 +52,9 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
       <PageHeader
         eyebrow={detail.competition ?? "Amistoso / sem competição"}
         title={`Ascend CF × ${m.opponentName}`}
-        actions={(canManage || ctx.permissions.has("callups.manage")) && (
+        actions={(
           <>
+            {finished && <ShareImageButton url={`/api/media/result?match=${id}&format=story`} filename={`ascend-resultado-${m.opponentName}.png`} title={`Ascend CF ${m.goalsFor}×${m.goalsAgainst} ${m.opponentName}`} label="Compartilhar resultado" />}
             {ctx.permissions.has("callups.manage") && m.status === "scheduled" && (
               <form action={callupForMatchAction.bind(null, id)}><button className="btn-primary">Convocação</button></form>
             )}

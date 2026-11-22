@@ -28,3 +28,11 @@ export async function removePushSubscriptionAction(endpoint: string) {
   if (!me) return;
   await db.delete(schema.pushSubscriptions).where(and(eq(schema.pushSubscriptions.userId, me.id), eq(schema.pushSubscriptions.endpoint, endpoint)));
 }
+
+export async function markReadAction(id: string) {
+  const me = await getSessionUser();
+  if (!me || !/^[0-9a-f-]{36}$/i.test(id)) return;
+  await db.update(schema.notifications).set({ readAt: new Date() })
+    .where(and(eq(schema.notifications.id, id), eq(schema.notifications.userId, me.id), isNull(schema.notifications.readAt)));
+  revalidatePath("/app", "layout");
+}

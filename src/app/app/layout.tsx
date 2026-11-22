@@ -11,6 +11,8 @@ import { NAV } from "@/components/shell/nav";
 import { MobileTabBar, Sidebar } from "@/components/shell/sidebar";
 import { PullToRefresh } from "@/components/pull-to-refresh";
 import { AppBadge } from "@/components/app-badge";
+import { Splash } from "@/components/mobile/splash";
+import { SwipeNav } from "@/components/mobile/swipe-nav";
 import { getMe } from "@/server/services/player-card";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -43,6 +45,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <MobileTabBar items={tabs} />
       <PullToRefresh />
       <AppBadge count={unread} />
+      <Splash number={me?.shirtNumber ?? null} />
+      <SwipeNav tabs={tabs.map((t) => t.href)} />
     </div>
   );
 }

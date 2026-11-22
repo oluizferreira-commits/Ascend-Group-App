@@ -8,6 +8,7 @@ import { OverallTrend } from "@/components/cards/overall-trend";
 import { pendingCallupsFor } from "@/server/services/calendar";
 import { PlayerCard } from "@/components/cards/player-card";
 import { ShareImageButton } from "@/components/share/share-image";
+import { CallupSheetButton } from "@/components/mobile/callup-sheet";
 import { NumberTicker } from "@/components/fx/number-ticker";
 import { Reveal, RevealItem, Stagger } from "@/components/fx/reveal";
 import { SectionTitle, StatTile } from "@/components/ui/basics";
@@ -56,7 +57,8 @@ export default async function MePage() {
         <section className="rounded-lg border border-accent-500/50 border-l-4 border-l-accent-500 bg-accent-500/10 p-4">
           <p className="eyebrow mb-2">Convocações aguardando sua resposta</p>
           <ul className="space-y-1">{callups.map(({ e }) => (
-            <li key={e.id}><Link href={`/app/calendario/${e.id}`} className="text-sm hover:text-accent-400"><b>{e.title}</b> · <span className="capitalize">{fmtWeekdayTime(e.startsAt)}</span> — <span className="text-accent-400 underline">responder</span></Link></li>
+            <li key={e.id} className="flex flex-wrap items-center gap-2 text-sm"><b>{e.title}</b> · <span className="capitalize">{fmtWeekdayTime(e.startsAt)}</span>
+              <CallupSheetButton eventId={e.id} title={e.title} when={fmtWeekdayTime(e.startsAt)} className="btn-primary ml-auto min-h-0 px-3 py-1.5" /></li>
           ))}</ul>
         </section>
       )}
