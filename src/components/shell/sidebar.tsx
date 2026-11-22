@@ -3,8 +3,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  Bell, CalendarDays, CalendarRange, ClipboardList, Image as ImageIcon, LayoutDashboard, LogOut, Medal, Megaphone, Menu,
-  RefreshCw, ScrollText, Shield, SlidersHorizontal, Swords, Trophy, UserCheck, UserCircle, UserPlus, Users, X,
+  Bell, CalendarDays, GitCompareArrows, CalendarRange, ClipboardList, Image as ImageIcon, LayoutDashboard, LogOut, Medal, Megaphone, Menu,
+  RefreshCw, ScrollText, Shield, SlidersHorizontal, Swords, Trophy, User, UserCheck, UserCircle, UserPlus, Users, X,
 } from "lucide-react";
 import { Crest } from "@/components/crest";
 import { cn } from "@/lib/cn";
@@ -16,7 +16,7 @@ import { motion } from "motion/react";
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "layout-dashboard": LayoutDashboard, users: Users, swords: Swords, trophy: Trophy, megaphone: Megaphone,
   clipboard: ClipboardList, refresh: RefreshCw, medal: Medal, calendar: CalendarDays, image: ImageIcon,
-  shield: Shield, "calendar-range": CalendarRange, sliders: SlidersHorizontal, scroll: ScrollText, "user-check": UserCheck, "user-plus": UserPlus,
+  shield: Shield, "calendar-range": CalendarRange, sliders: SlidersHorizontal, scroll: ScrollText, "user-check": UserCheck, "user-plus": UserPlus, user: User, compare: GitCompareArrows,
 };
 
 type Section = { section: string; items: NavItem[] };
@@ -35,6 +35,9 @@ function NavList({ sections, onNavigate }: { sections: Section[]; onNavigate?: (
           <ul className="space-y-0.5">
             {s.items.map((item) => {
               const Icon = ICONS[item.icon] ?? LayoutDashboard;
+              const Glyph = item.number != null
+                ? () => <span className="relative grid size-5 place-items-center rounded bg-[#1c3fb0] font-display text-[11px] font-bold text-white">{item.number}</span>
+                : null;
               if (item.soon) {
                 return (
                   <li key={item.label} className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-ink-400/70" title="Módulo em desenvolvimento">
@@ -57,7 +60,7 @@ function NavList({ sections, onNavigate }: { sections: Section[]; onNavigate?: (
                     )}
                   >
                     {active && <motion.span layoutId={onNavigate ? "nav-active-m" : "nav-active"} className="absolute inset-0 rounded-md bg-white/[0.06]"><span className="absolute inset-y-1 left-0 w-[3px] rounded-r bg-[#3a63f0]" /></motion.span>}
-                    <Icon className={cn("relative size-4", active && "text-accent-400")} />
+                    {Glyph ? <Glyph /> : <Icon className={cn("relative size-4", active && "text-accent-400")} />}
                     <span className="relative">{item.label}</span>
                   </Link>
                 </li>
@@ -164,7 +167,9 @@ export function MobileTabBar({ items }: { items: NavItem[] }) {
           <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined}
             className={cn("relative flex flex-col items-center gap-0.5 rounded-xl py-2 text-[10px] font-semibold transition-colors", active ? "text-white" : "text-ink-400 active:text-ink-100")}>
             {active && <motion.span layoutId="tab-active" className="absolute inset-0 rounded-xl bg-[#1c3fb0] shadow-[0_6px_16px_-6px_rgb(28_63_176/0.8)]" />}
-            <Icon className="relative size-5" />
+            {item.number != null
+              ? <span className={cn("relative grid size-5 place-items-center font-display text-[17px] leading-none font-bold", active ? "text-white" : "text-accent-400")}>{item.number}</span>
+              : <Icon className="relative size-5" />}
             <span className="relative">{item.label}</span>
           </Link>
         );

@@ -172,6 +172,8 @@ export function summarizeSeason(
   }
   const cs = lines.filter((l) => l.cleanSheet != null);
   optional.cleanSheets = { total: cs.filter((l) => l.cleanSheet).length, recordedIn: cs.length };
+  const mm = lines.filter((l) => l.isMotm != null);
+  optional.motm = { total: mm.filter((l) => l.isMotm).length, recordedIn: mm.length };
   const div = (a: number) => (m ? Math.round((a / m) * 100) / 100 : 0);
   return {
     playerId: input.playerId,

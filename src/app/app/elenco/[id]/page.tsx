@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Pencil } from "lucide-react";
+import { GitCompareArrows, IdCard, Pencil } from "lucide-react";
 import { requirePage } from "@/server/auth/session";
 import { getClubOverview } from "@/server/services/club";
 import { getPlayer } from "@/server/services/players";
@@ -43,7 +43,11 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
       <PageHeader
         eyebrow={isSelf ? "Meu perfil" : "Perfil do jogador"}
         title={player.nickname}
-        actions={ctx.permissions.has("players.manage") && <Link href={`/app/elenco/${id}/editar`} className="btn-secondary"><Pencil className="size-4" />Editar</Link>}
+        actions={<>
+          <Link href={`/app/elenco/${id}/carta`} className="btn-primary"><IdCard className="size-4" />Carta</Link>
+          <Link href={`/app/comparar?a=${id}`} className="btn-secondary"><GitCompareArrows className="size-4" />Comparar</Link>
+          {ctx.permissions.has("players.manage") && <Link href={`/app/elenco/${id}/editar`} className="btn-secondary"><Pencil className="size-4" />Editar</Link>}
+        </>}
       />
 
       <section className="card-premium mb-6 flex flex-col gap-6 p-6 sm:flex-row sm:items-center">

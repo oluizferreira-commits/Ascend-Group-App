@@ -7,6 +7,9 @@ import { getSeasonStats } from "@/server/services/stats";
 import { nextMatch, recentResults } from "@/server/services/matches";
 import { listActiveAnnouncements, visibleScopes } from "@/server/services/announcements";
 import { pendingCallupsFor } from "@/server/services/calendar";
+import { getMe } from "@/server/services/player-card";
+import { squadAttributes, cardOverall } from "@/lib/attributes";
+import { PlayerCard } from "@/components/cards/player-card";
 import { Crest } from "@/components/crest";
 import { EmptyState, ResultPill, SectionTitle, StatTile } from "@/components/ui/basics";
 import { DashboardHighlights } from "@/components/dashboard/highlights";
@@ -32,6 +35,12 @@ export default async function DashboardPage() {
     listActiveAnnouncements(ctx.club.id, visibleScopes(ctx), 5),
   ]);
   const callups = ctx.playerId ? await pendingCallupsFor(ctx.playerId) : [];
+  const me = await getMe(ctx);
+  const mySummary = me ? stats.summaryMap.get(me.id) : undefined;
+  const myAttrs = me ? squadAttributes(stats.summaries).get(me.id) : undefined;
+  const myOvr = me && mySummary ? cardOverall(me.overall, mySummary.avgRating) : null;
+  const firstName = ctx.user.displayName.split(" ")[0];
+  const greeting = me?.shirtNumber != null ? `Bem-vindo, camisa ${me.shirtNumber}` : `Bem-vindo, ${me?.nickname ?? firstName}`;
   const { record, rankings, playerMap } = stats;
   const entry = (s: (typeof rankings.best)[number] | undefined) => (s ? { s, player: playerMap.get(s.playerId)! } : null);
 
@@ -52,10 +61,14 @@ export default async function DashboardPage() {
       {/* Hero */}
       <section className="card-premium px-6 py-8 sm:px-10 sm:py-10">
         <BorderBeam />
+        {me?.shirtNumber != null && (
+          <span aria-hidden className="pointer-events-none absolute right-[-1%] bottom-[-18%] font-display text-[12rem] leading-none font-bold text-transparent select-none sm:text-[16rem]"
+            style={{ WebkitTextStroke: "2px rgb(255 255 255 / 0.1)" }}>{me.shirtNumber}</span>
+        )}
         <div className="relative flex flex-col items-center gap-8 text-center md:flex-row md:text-left">
           <Crest size={150} priority />
           <div className="flex-1">
-            <p className="font-display text-xs font-semibold tracking-[0.35em] text-silver uppercase">{overview.org.name}</p>
+            <p className="font-display text-xs font-semibold tracking-[0.35em] text-silver uppercase">{greeting}</p>
             <h1 className="mt-1 font-display text-6xl leading-none font-bold tracking-[0.04em] text-white uppercase sm:text-7xl"><TextReveal text={overview.club.name} /></h1>
             <p className="mt-3 font-display text-sm font-medium tracking-[0.4em] text-silver">{overview.org.motto}</p>
             {!season && ctx.permissions.has("seasons.manage") && (
@@ -69,6 +82,30 @@ export default async function DashboardPage() {
           </dl>
         </div>
       </section>
+
+      {me && mySummary && myAttrs && myOvr && (
+        <Reveal>
+          <section className="card flex flex-col items-center gap-5 overflow-hidden p-5 sm:flex-row">
+            <Link href="/app/eu" aria-label="Abrir meu espaço"><PlayerCard nickname={me.nickname} position={me.primaryPosition} shirtNumber={me.shirtNumber} avatarUrl={me.avatarUrl}
+              ovr={myOvr.value} ovrSource={myOvr.source} attributes={myAttrs} size="sm" /></Link>
+            <div className="w-full flex-1">
+              <p className="eyebrow">Minha temporada</p>
+              <dl className="mt-3 grid grid-cols-4 gap-2 text-center">
+                {[["Jogos", mySummary.matches], ["Gols", mySummary.goals], ["Assist.", mySummary.assists], ["Nota", mySummary.avgRating]].map(([label, v]) => (
+                  <div key={label as string} className="rounded-md bg-ink-850 py-2">
+                    <dt className="font-display text-[11px] tracking-[0.12em] text-ink-400 uppercase">{label}</dt>
+                    <dd className="font-display text-2xl font-bold tabular-nums">{v == null ? "—" : <NumberTicker value={v as number} decimals={label === "Nota" ? 1 : 0} />}</dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Link href="/app/eu" className="btn-primary">Minha carta</Link>
+                <Link href={`/app/comparar?a=${me.id}`} className="btn-secondary">Comparar</Link>
+              </div>
+            </div>
+          </section>
+        </Reveal>
+      )}
 
       {/* Campaign */}
       <section aria-labelledby="campanha">

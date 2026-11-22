@@ -5,6 +5,16 @@
 export const CHANGELOG: { date: string; title: string; items: string[] }[] = [
   {
     date: "2026-11-22",
+    title: "Seu app, sua camisa",
+    items: [
+      "O app agora é personalizado com o número da sua camisa — no painel, no menu e na aba “Eu”.",
+      "Carta de jogador estilo FUT com atributos calculados das suas estatísticas reais. Arraste para girar!",
+      "Compartilhe sua carta no Instagram e no WhatsApp direto do app.",
+      "Comparador de jogadores: cartas lado a lado, radar de atributos, estatísticas frente a frente e desempenho jogando juntos.",
+    ],
+  },
+  {
+    date: "2026-11-22",
     title: "Visual novo no celular",
     items: [
       "Barra de navegação de vidro flutuante e menus com efeito vidro fosco.",

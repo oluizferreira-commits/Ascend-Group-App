@@ -9,7 +9,7 @@ import { FORMATS } from "./data";
 const GOLD = "#9db4ff", GOLD_D = "#2b54d6", WINE = "#0f2566", INK = "#04060b", WHITE = "#f1f4f9", MUTED = "#c9d1dc";
 let assets: Promise<{ fonts: { name: string; data: Buffer; weight: 500 | 600 | 700 }[]; crest: string }> | null = null;
 
-function loadAssets() {
+export function loadAssets() {
   assets ??= (async () => {
     const f = (w: number) => readFile(join(process.cwd(), "assets/fonts", `barlow-condensed-latin-${w}-normal.woff`));
     const [a, b, c, crest] = await Promise.all([f(500), f(600), f(700), readFile(join(process.cwd(), "public/brand/generated/crest-256.png"))]);

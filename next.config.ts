@@ -20,7 +20,11 @@ const nextConfig: NextConfig = {
   experimental: { serverActions: { bodySizeLimit: "3mb" } },
   serverExternalPackages: ["@node-rs/argon2", "web-push"],
   // Fonts and crest read from disk by the media generator must ship with the function.
-  outputFileTracingIncludes: { "/api/media/[template]": ["./assets/fonts/**", "./public/brand/generated/crest-256.png"] },
+  outputFileTracingIncludes: {
+    "/api/media/[template]": ["./assets/fonts/**", "./public/brand/generated/crest-256.png"],
+    "/api/card/[id]": ["./assets/fonts/**", "./public/brand/generated/crest-256.png"],
+    "/api/compare": ["./assets/fonts/**", "./public/brand/generated/crest-256.png"],
+  },
   turbopack: {
     rules: {
       "*.css": {
