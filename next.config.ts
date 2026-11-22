@@ -17,7 +17,11 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   env: { NEXT_PUBLIC_APP_VERSION: APP_VERSION },
   // "Seja do Ascend" photo uploads are resized in the browser (~200 KB); keep headroom below Vercel's 4.5 MB.
-  experimental: { serverActions: { bodySizeLimit: "3mb" } },
+  experimental: {
+    serverActions: { bodySizeLimit: "3mb" },
+    // Re-use visited pages for 30 s (instant back/forward between tabs); mutations still revalidate.
+    staleTimes: { dynamic: 30, static: 300 },
+  },
   serverExternalPackages: ["@node-rs/argon2", "web-push"],
   // Fonts and crest read from disk by the media generator must ship with the function.
   outputFileTracingIncludes: {

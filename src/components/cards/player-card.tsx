@@ -85,7 +85,7 @@ export function PlayerCard(p: PlayerCardProps) {
             </span>
           )}
           {tier === "lenda" && (
-            <span aria-hidden className="absolute inset-0 mix-blend-overlay motion-safe:animate-[holo_5s_ease-in-out_infinite]"
+            <span aria-hidden className="absolute inset-0 mix-blend-overlay motion-safe:animate-[holo_5s_ease-in-out_3]"
               style={{ background: "linear-gradient(115deg,transparent 20%,rgba(255,255,255,0.55) 40%,rgba(111,143,255,0.35) 50%,transparent 70%)", backgroundSize: "250% 100%" }} />
           )}
           <div className="absolute flex flex-col items-center font-display font-bold leading-none" style={{ left: u(22), top: u(34) }}>

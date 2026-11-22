@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { and, asc, eq, gt } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { getSeasonStats } from "./stats";
@@ -29,11 +30,11 @@ export async function currentSeasonInfo(clubId: string) {
 }
 
 /** The logged-in member's own player (for personalization), or null for staff without a player. */
-export async function getMe(ctx: AuthContext) {
+export const getMe = cache(async (ctx: AuthContext) => {
   if (!ctx.playerId) return null;
   const [p] = await db.select().from(schema.players).where(and(eq(schema.players.id, ctx.playerId), eq(schema.players.clubId, ctx.club.id)));
   return p ?? null;
-}
+});
 
 /** Overall change in the last `days` (EA or manual), e.g. +2. null when unchanged / no history. */
 export async function overallTrend(playerId: string, current: number | null, days = 14) {

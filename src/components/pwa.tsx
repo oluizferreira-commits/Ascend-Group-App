@@ -20,9 +20,6 @@ export function AppTouchGuards() {
     // iOS Safari pinch gestures
     document.addEventListener("gesturestart", stop, { passive: false });
     document.addEventListener("gesturechange", stop, { passive: false });
-    // multi-touch pinch on other browsers
-    const onTouchMove = (e: TouchEvent) => { if (e.touches.length > 1) e.preventDefault(); };
-    document.addEventListener("touchmove", onTouchMove, { passive: false });
     // long-press / right-click menu on links, buttons and images (Android shows it via contextmenu)
     const onContext = (e: Event) => {
       const t = e.target as HTMLElement | null;
@@ -32,7 +29,6 @@ export function AppTouchGuards() {
     return () => {
       document.removeEventListener("gesturestart", stop);
       document.removeEventListener("gesturechange", stop);
-      document.removeEventListener("touchmove", onTouchMove);
       document.removeEventListener("contextmenu", onContext);
     };
   }, []);

@@ -30,16 +30,20 @@ export const metadata: Metadata = { title: "Painel" };
 
 export default async function DashboardPage() {
   const ctx = await requirePage("dashboard.view");
+  // Independent queries start immediately (no waterfall).
+  const independent = Promise.all([
+    getMe(ctx), getMatchday(ctx), recentMvpPrompt(ctx),
+    ctx.playerId ? pendingCallupsFor(ctx.playerId) : Promise.resolve([] as Awaited<ReturnType<typeof pendingCallupsFor>>),
+    nextMatch(ctx.club.id), listActiveAnnouncements(ctx.club.id, visibleScopes(ctx), 5),
+  ]);
   const overview = await getClubOverview(ctx.club.id);
   const season = overview.currentSeason;
-  const [stats, upcoming, recent, announcements] = await Promise.all([
+  const [[me, matchday, mvpPrompt, callups, upcoming, announcements], stats, recent] = await Promise.all([
+    independent,
     getSeasonStats({ clubId: ctx.club.id, seasonId: season?.id ?? null }),
-    nextMatch(ctx.club.id),
     recentResults(ctx.club.id, 5, season?.id ?? null),
-    listActiveAnnouncements(ctx.club.id, visibleScopes(ctx), 5),
   ]);
-  const callups = ctx.playerId ? await pendingCallupsFor(ctx.playerId) : [];
-  const [me, matchday, mvpPrompt, polls] = await Promise.all([getMe(ctx), getMatchday(ctx), recentMvpPrompt(ctx), pollsFor(announcements.map((a) => a.id), ctx.user.id)]);
+  const polls = await pollsFor(announcements.map((a) => a.id), ctx.user.id);
   const mySummary = me ? stats.summaryMap.get(me.id) : undefined;
   const myAttrs = me ? squadAttributes(stats.summaries).get(me.id) : undefined;
   const myOvr = me && mySummary ? cardOverall(me.overall, mySummary.avgRating) : null;
