@@ -5,10 +5,12 @@ import { getThemeMode } from "@/lib/theme";
 import { after } from "next/server";
 import { maybeAutoSync } from "@/server/services/ea-sync";
 import { runRetention } from "@/server/maintenance";
+import { runReminders } from "@/server/reminders";
 import { ROLES } from "@/server/auth/permissions";
 import { NAV } from "@/components/shell/nav";
 import { MobileTabBar, Sidebar } from "@/components/shell/sidebar";
 import { PullToRefresh } from "@/components/pull-to-refresh";
+import { AppBadge } from "@/components/app-badge";
 import { getMe } from "@/server/services/player-card";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -16,6 +18,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Keep EA data fresh without any external scheduler (throttled to once per 30 min).
   after(() => maybeAutoSync(ctx.club.id));
   after(() => runRetention());
+  after(() => runReminders(ctx.club.id));
   const sections = NAV.map((s) => ({
     section: s.section,
     items: s.items.filter((i) => i.soon || !i.permission || ctx.permissions.has(i.permission)),
@@ -39,6 +42,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </main>
       <MobileTabBar items={tabs} />
       <PullToRefresh />
+      <AppBadge count={unread} />
     </div>
   );
 }

@@ -21,6 +21,16 @@ export function AnnouncementForm() {
         <Field label="Válido até" name="expiresAt" error={fe.expiresAt} hint="Vazio = sem validade"><input id="expiresAt" name="expiresAt" type="datetime-local" className="input" /></Field>
       </div>
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="pinned" /> Fixar no topo</label>
+      <details className="rounded-lg border border-ink-700 p-3">
+        <summary className="cursor-pointer text-sm font-semibold">+ Enquete rápida</summary>
+        <div className="mt-3 space-y-3">
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="pollEnabled" /> Incluir enquete neste aviso</label>
+          <Field label="Pergunta" name="pollQuestion"><input id="pollQuestion" name="pollQuestion" maxLength={120} defaultValue="Você vai?" className="input" /></Field>
+          <Field label="Opções (uma por linha, até 5)" name="pollOptions" error={fe.pollOptions}>
+            <textarea id="pollOptions" name="pollOptions" rows={3} defaultValue={"Vou\nNão vou\nTalvez"} className="input" />
+          </Field>
+        </div>
+      </details>
       <FormMessage state={state} />
       <SubmitButton className="w-full" pendingText="Publicando…">Publicar comunicado</SubmitButton>
     </form>

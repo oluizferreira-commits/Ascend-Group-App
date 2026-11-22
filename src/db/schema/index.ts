@@ -4,3 +4,4 @@ export * from "./squad";
 export * from "./sport";
 export * from "./comms";
 export * from "./recruitment";
+export * from "./engagement";

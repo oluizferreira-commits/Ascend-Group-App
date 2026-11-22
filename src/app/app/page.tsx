@@ -7,7 +7,11 @@ import { getSeasonStats } from "@/server/services/stats";
 import { nextMatch, recentResults } from "@/server/services/matches";
 import { listActiveAnnouncements, visibleScopes } from "@/server/services/announcements";
 import { pendingCallupsFor } from "@/server/services/calendar";
+import { pollsFor } from "@/server/services/polls";
 import { getMe } from "@/server/services/player-card";
+import { getMatchday } from "@/server/services/matchday";
+import { MatchdayHero } from "@/components/engagement/matchday";
+import { recentMvpPrompt } from "@/server/services/mvp";
 import { squadAttributes, cardOverall } from "@/lib/attributes";
 import { PlayerCard } from "@/components/cards/player-card";
 import { Crest } from "@/components/crest";
@@ -35,7 +39,7 @@ export default async function DashboardPage() {
     listActiveAnnouncements(ctx.club.id, visibleScopes(ctx), 5),
   ]);
   const callups = ctx.playerId ? await pendingCallupsFor(ctx.playerId) : [];
-  const me = await getMe(ctx);
+  const [me, matchday, mvpPrompt, polls] = await Promise.all([getMe(ctx), getMatchday(ctx), recentMvpPrompt(ctx), pollsFor(announcements.map((a) => a.id), ctx.user.id)]);
   const mySummary = me ? stats.summaryMap.get(me.id) : undefined;
   const myAttrs = me ? squadAttributes(stats.summaries).get(me.id) : undefined;
   const myOvr = me && mySummary ? cardOverall(me.overall, mySummary.avgRating) : null;
@@ -57,6 +61,18 @@ export default async function DashboardPage() {
             ))}
           </ul>
         </section>
+      )}
+      {matchday && (
+        <MatchdayHero serverNow={matchday.serverNow} kickoffIso={matchday.match.kickoffAt.toISOString()} opponent={matchday.match.opponentName} competition={matchday.competition}
+          matchId={matchday.match.id} lineup={matchday.lineup} eventId={matchday.eventId} called={matchday.called} confirmed={matchday.confirmed}
+          pending={matchday.pending} myStatus={matchday.myStatus} />
+      )}
+      {mvpPrompt && (
+        <Link href={`/app/partidas/${mvpPrompt.id}#craque`} className="flex items-center gap-3 rounded-lg border border-accent-500/50 border-l-4 border-l-accent-500 bg-accent-500/10 p-4 hover:bg-accent-500/15">
+          <span className="text-2xl" aria-hidden>🏆</span>
+          <span className="flex-1"><b className="block">Vote no craque da partida</b><span className="text-sm text-ink-300">Ascend CF {mvpPrompt.goalsFor}×{mvpPrompt.goalsAgainst} {mvpPrompt.opponentName}</span></span>
+          <span className="btn-primary min-h-0 py-1.5">Votar</span>
+        </Link>
       )}
       {/* Hero */}
       <section className="card-premium px-6 py-8 sm:px-10 sm:py-10">
@@ -179,7 +195,7 @@ export default async function DashboardPage() {
         {announcements.length === 0 ? (
           <EmptyState title="Sem avisos ativos" />
         ) : (
-          <div className="grid gap-3 md:grid-cols-2">{announcements.map((a) => <AnnouncementCard key={a.id} a={a} compact />)}</div>
+          <div className="grid gap-3 md:grid-cols-2">{announcements.map((a) => <AnnouncementCard key={a.id} a={a} compact poll={polls.get(a.id)} canVote />)}</div>
         )}
       </section>
     </div>

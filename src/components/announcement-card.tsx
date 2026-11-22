@@ -4,10 +4,12 @@ import { ANNOUNCEMENT_CATEGORY_LABELS, PRIORITY_LABELS } from "@/lib/domain";
 import { fmtDateTime } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import type { schema } from "@/db";
+import type { PollView } from "@/server/services/polls";
+import { PollWidget } from "@/components/engagement/poll";
 
 type A = typeof schema.announcements.$inferSelect;
 
-export function AnnouncementCard({ a, compact }: { a: A; compact?: boolean }) {
+export function AnnouncementCard({ a, compact, poll, canVote = false }: { a: A; compact?: boolean; poll?: PollView; canVote?: boolean }) {
   const urgent = a.priority === "urgent";
   return (
     <article className={cn("rounded-lg border p-4", urgent ? "border-loss/50 bg-brand-950/60" : "border-ink-700 bg-ink-850/60")}>
@@ -20,6 +22,7 @@ export function AnnouncementCard({ a, compact }: { a: A; compact?: boolean }) {
       </div>
       <h4 className="font-semibold">{a.title}</h4>
       <p className={cn("mt-1 text-sm whitespace-pre-line text-ink-300", compact && "line-clamp-3")}>{a.body}</p>
+      {poll && <PollWidget announcementId={a.id} poll={poll} canVote={canVote} />}
       {a.expiresAt && <p className="mt-2 text-xs text-ink-400">Válido até {fmtDateTime(a.expiresAt)}</p>}
     </article>
   );

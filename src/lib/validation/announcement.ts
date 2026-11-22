@@ -13,4 +13,10 @@ export const announcementSchema = z.object({
   pinned: checkbox,
   publishAt: localDT,
   expiresAt: localDT,
-});
+  pollEnabled: checkbox,
+  pollQuestion: z.string().trim().max(120).optional(),
+  pollOptions: z.string().max(400).optional(),
+}).transform((d) => {
+  const options = (d.pollOptions ?? "").split("\n").map((o) => o.trim().slice(0, 40)).filter(Boolean);
+  return { ...d, poll: d.pollEnabled ? { question: d.pollQuestion || "Você vai?", options: [...new Set(options)].slice(0, 5) } : null };
+}).refine((d) => !d.poll || d.poll.options.length >= 2, { path: ["pollOptions"], message: "A enquete precisa de pelo menos 2 opções (uma por linha)." });

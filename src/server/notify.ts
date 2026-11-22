@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, inArray, isNotNull, ne } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, ne, sql } from "drizzle-orm";
 import * as webpush from "web-push";
 import { db, schema } from "@/db";
 import { ROLES, ROLE_KEYS, type Permission } from "./auth/permissions";
@@ -54,9 +54,15 @@ export async function notify(clubId: string, audience: NotifyAudience, n: { type
     await db.insert(schema.notifications).values(userIds.map((userId) => ({ userId, clubId, type: n.type, title: n.title.slice(0, 140), body: n.body?.slice(0, 500), link: n.link })));
     if (!pushEnabled()) return;
     const subs = await db.select().from(schema.pushSubscriptions).where(inArray(schema.pushSubscriptions.userId, userIds));
-    const payload = JSON.stringify({ title: n.title, body: n.body ?? "", url: n.link ?? "/app" });
+    if (!subs.length) return;
+    // Per-user unread count so the installed app icon badge is right even when the app is closed.
+    const unread = await db.select({ u: schema.notifications.userId, n: sql<number>`count(*)::int` }).from(schema.notifications)
+      .where(and(inArray(schema.notifications.userId, [...new Set(subs.map((x) => x.userId))]), isNull(schema.notifications.readAt)))
+      .groupBy(schema.notifications.userId);
+    const badgeOf = new Map(unread.map((r) => [r.u, r.n]));
     await Promise.all(subs.map(async (s) => {
       try {
+        const payload = JSON.stringify({ title: n.title, body: n.body ?? "", url: n.link ?? "/app", badge: badgeOf.get(s.userId) ?? 0 });
         await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload, { TTL: 3600 });
       } catch (e) {
         const code = (e as { statusCode?: number }).statusCode;

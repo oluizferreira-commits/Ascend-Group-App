@@ -8,6 +8,8 @@ import { listPlayers } from "@/server/services/players";
 import { getRatingConfig } from "@/server/services/stats";
 import { deleteMatchAction, saveMatchSheetAction } from "@/server/actions/matches";
 import { callupForMatchAction } from "@/server/actions/calendar";
+import { getMvpVoting } from "@/server/services/mvp";
+import { MvpVote } from "@/components/engagement/mvp-vote";
 import { Badge, PageHeader, ResultPill, SectionTitle } from "@/components/ui/basics";
 import { ConfirmSubmit } from "@/components/ui/confirm-button";
 import { SheetEditor } from "@/components/matches/sheet-editor";
@@ -40,6 +42,8 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
     redCards: stats?.redCards ?? null, externalRating: stats?.externalRating ?? null, isMotm: stats?.isMotm ?? null,
   }));
   const teamStats = Object.entries(m.teamStats ?? {});
+  const mvp = finished ? await getMvpVoting(ctx, id) : null;
+  const closesLabel = mvp?.closesAt ? new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", weekday: "short", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }).format(mvp.closesAt) : null;
   const selectable = players.filter((p) => p.status !== "inactive" || sheet.some((r) => r.playerId === p.id));
 
   return (
@@ -84,6 +88,14 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
         </dl>
         {m.notes && <p className="text-center text-sm whitespace-pre-line text-ink-300 sm:col-span-3">{m.notes}</p>}
       </section>
+
+      {mvp && mvp.candidates.length > 0 && (
+        <section id="craque" className="card mb-6 scroll-mt-24 p-5">
+          <SectionTitle>Craque da partida · voto da galera</SectionTitle>
+          <MvpVote matchId={id} open={mvp.open} closesAtLabel={closesLabel} total={mvp.total} winners={mvp.winners} myVote={mvp.myVote} selfId={ctx.playerId}
+            candidates={mvp.candidates.map((c) => ({ id: c.id, nickname: c.nickname, shirtNumber: c.shirtNumber, position: POSITION_LABELS[c.primaryPosition], avatarUrl: c.avatarUrl, votes: mvp.counts.get(c.id) ?? 0 }))} />
+        </section>
+      )}
 
       {teamStats.length > 0 && (
         <section className="card mb-6 p-5">

@@ -8,6 +8,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isNotNull } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { bearerMatches } from "@/server/token-auth";
+import { runReminders } from "@/server/reminders";
 import { MIN_SYNC_INTERVAL_MS, fetchAllMatchTypes, lastServerFetch, runLoggedImport, syncMembersFromEa } from "@/server/services/ea-sync";
 import { EA_PLATFORMS, type EaPlatform } from "@/integrations/ea-fc/types";
 
@@ -15,6 +16,8 @@ export async function GET(req: NextRequest) {
   if (!bearerMatches(req.headers.get("authorization"), process.env.SYNC_CRON_SECRET)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+  // Reminders run for every club on each scheduled call, even before EA is configured.
+  for (const c of await db.select({ id: schema.clubs.id }).from(schema.clubs)) await runReminders(c.id);
   const clubs = await db.select().from(schema.clubs).where(isNotNull(schema.clubs.eaClubId));
   const results = [];
   for (const c of clubs) {

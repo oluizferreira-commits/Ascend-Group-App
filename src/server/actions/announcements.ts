@@ -23,6 +23,7 @@ export async function createAnnouncementAction(_prev: ActionResult | null, form:
     clubId: ctx.club.id, title: d.title, body: d.body, category: d.category, priority: d.priority,
     visibility: d.visibility, pinned: d.pinned, publishedAt, expiresAt, authorId: ctx.user.id,
   }).returning({ id: schema.announcements.id });
+  if (d.poll) await db.insert(schema.announcementPolls).values({ announcementId: a.id, question: d.poll.question, options: d.poll.options });
   await audit(ctx, "announcement.create", "announcement", a.id, { title: d.title, priority: d.priority, visibility: d.visibility });
   if (publishedAt.getTime() <= Date.now() + 60_000) {
     await notify(ctx.club.id, d.visibility === "staff" ? { kind: "staff" } : { kind: "members" }, {

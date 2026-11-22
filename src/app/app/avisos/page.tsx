@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requirePage } from "@/server/auth/session";
 import { listActiveAnnouncements, listAllAnnouncements, visibleScopes } from "@/server/services/announcements";
+import { pollsFor } from "@/server/services/polls";
 import { deleteAnnouncementAction, expireAnnouncementAction } from "@/server/actions/announcements";
 import { AnnouncementCard } from "@/components/announcement-card";
 import { AnnouncementForm } from "@/components/announcements/form";
@@ -16,13 +17,14 @@ export default async function AnnouncementsPage() {
   const canManage = ctx.permissions.has("announcements.manage");
   const active = await listActiveAnnouncements(ctx.club.id, visibleScopes(ctx), 50);
   const all = canManage ? await listAllAnnouncements(ctx.club.id) : [];
+  const polls = await pollsFor(active.map((a) => a.id), ctx.user.id);
   return (
     <>
       <PageHeader eyebrow="Comunicação" title="Avisos" description="Comunicados oficiais da organização e da comissão técnica." />
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
         <section className="space-y-3">
           <SectionTitle>Ativos</SectionTitle>
-          {active.length === 0 ? <EmptyState title="Nenhum aviso ativo" /> : active.map((a) => <AnnouncementCard key={a.id} a={a} />)}
+          {active.length === 0 ? <EmptyState title="Nenhum aviso ativo" /> : active.map((a) => <AnnouncementCard key={a.id} a={a} poll={polls.get(a.id)} canVote />)}
         </section>
         {canManage && (
           <aside className="space-y-6">

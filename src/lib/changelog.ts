@@ -5,6 +5,17 @@
 export const CHANGELOG: { date: string; title: string; items: string[] }[] = [
   {
     date: "2026-11-22",
+    title: "Dia de jogo",
+    items: [
+      "Modo Dia de Jogo: contagem regressiva, escalação, confirmados e o botão “Tô dentro!”.",
+      "Vote no craque da partida — todo o elenco e a comissão votam.",
+      "Enquetes rápidas nos avisos (Vou / Não vou / Talvez).",
+      "Lembretes automáticos: jogo em 1 hora e presença ainda não confirmada.",
+      "Número de notificações não lidas no ícone do app.",
+    ],
+  },
+  {
+    date: "2026-11-22",
     title: "Seu app, sua camisa",
     items: [
       "Overall agora vem direto da EA e se atualiza sozinho quando você upa o seu jogador — com aviso e tendência na carta.",
