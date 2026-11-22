@@ -25,6 +25,7 @@ async function shrink(file: File): Promise<File> {
 
 export function ApplyForm() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [age, setAge] = useState<string>("");
   const [preview, setPreview] = useState<string | null>(null);
   const [state, action] = useActionState(async (prev: Awaited<ReturnType<typeof submitApplicationAction>> | null, form: FormData) => {
     form.delete("photo");
@@ -116,7 +117,7 @@ export function ApplyForm() {
         <h2 className="eyebrow">Sobre você</h2>
         <div className="grid gap-3 sm:grid-cols-3">
           <Field label="Nome *" name="fullName" error={fe.fullName} className="sm:col-span-2"><input id="fullName" name="fullName" required maxLength={100} autoComplete="name" className="input" /></Field>
-          <Field label="Idade" name="age" error={fe.age}><input id="age" name="age" type="number" min={10} max={99} inputMode="numeric" className="input" /></Field>
+          <Field label="Idade *" name="age" error={fe.age}><input id="age" name="age" type="number" min={13} max={99} inputMode="numeric" required value={age} onChange={(e) => setAge(e.target.value)} className="input" /></Field>
           <Field label="Cidade / estado / país" name="location" className="sm:col-span-3"><input id="location" name="location" maxLength={80} className="input" /></Field>
         </div>
         <p className="text-sm text-ink-400">Contato — informe <b className="text-ink-200">pelo menos um</b>. Usaremos apenas se sua proposta for aceita.</p>
@@ -127,9 +128,19 @@ export function ApplyForm() {
           <Field label="Instagram" name="contactInstagram" error={fe.contactInstagram}><input id="contactInstagram" name="contactInstagram" maxLength={31} className="input" placeholder="@usuario" /></Field>
         </div>
         <Field label="Mensagem para o clube" name="message"><textarea id="message" name="message" rows={3} maxLength={1000} className="input" /></Field>
+        {age !== "" && Number(age) < 18 && (
+          <label className="flex items-start gap-2 rounded-md border border-accent-500/40 bg-accent-500/5 p-3 text-sm text-ink-300">
+            <input type="checkbox" name="guardianConsent" className="mt-1" />
+            <span>Sou menor de 18 anos e <b>meu pai, mãe ou responsável sabe e autoriza</b> o envio desta proposta e dos meus dados de contato.</span>
+          </label>
+        )}
+        {fe.guardianConsent && <p className="text-xs text-loss">{fe.guardianConsent[0]}</p>}
         <label className="flex items-start gap-2 text-sm text-ink-300">
           <input type="checkbox" name="consent" className="mt-1" required />
-          <span>Autorizo o Ascend CF a usar estes dados <b>somente para avaliar minha proposta e entrar em contato</b>. Posso pedir a exclusão a qualquer momento pelos contatos do clube.</span>
+          <span>
+            Li a <a href="/privacidade" target="_blank" className="text-accent-400 underline">Política de Privacidade</a> e autorizo o Ascend CF a usar estes dados <b>somente para avaliar minha proposta e entrar em contato</b>.
+            Propostas recusadas são apagadas em até 6 meses, e posso pedir a exclusão antes disso.
+          </span>
         </label>
         {fe.consent && <p className="text-xs text-loss">{fe.consent[0]}</p>}
       </section>

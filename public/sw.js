@@ -1,7 +1,7 @@
 // Ascend CF service worker — minimal, safe caching.
 // Pages and API responses are NEVER cached (they are user- and permission-specific);
 // only immutable build assets and brand images are cached, plus an offline fallback.
-const CACHE = "ascend-static-v3";
+const CACHE = "ascend-static-v4";
 const OFFLINE_URL = "/offline.html";
 
 self.addEventListener("install", (event) => {
@@ -65,4 +65,9 @@ self.addEventListener("notificationclick", (event) => {
       return self.clients.openWindow(url);
     }),
   );
+});
+
+// Lets the page activate a freshly installed worker right away ("Atualizar").
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
 });

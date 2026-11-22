@@ -10,7 +10,11 @@ const clean = (max: number) => optionalText(max);
 export const applicationSchema = z
   .object({
     fullName: z.string().trim().min(2, "Informe seu nome").max(100),
-    age: optionalInt(10, 99),
+    age: z.preprocess(
+      (v) => (v === "" || v == null ? undefined : Number(v)),
+      z.number({ error: "Informe sua idade" }).int().min(13, "Idade mínima: 13 anos").max(99),
+    ),
+    guardianConsent: z.preprocess((v) => v === "on", z.boolean()).optional(),
     location: clean(80),
     eaName: z.string().trim().min(2, "Informe seu nick na EA").max(40),
     platform: z.enum(Object.keys(PLATFORMS) as [keyof typeof PLATFORMS], { error: "Escolha a plataforma" }),
@@ -34,6 +38,10 @@ export const applicationSchema = z
     videoUrl: z.preprocess((v) => (typeof v === "string" && v.trim() ? v.trim() : null), z.url({ protocol: /^https$/, error: "Use um link https://" }).max(300).nullable()),
     message: clean(1000),
     consent: z.literal("on", { error: "É preciso concordar com o uso dos dados para enviar." }),
+  })
+  .refine((d) => d.age >= 18 || d.guardianConsent === true, {
+    path: ["guardianConsent"],
+    message: "Menores de 18 anos precisam da autorização de um responsável.",
   })
   .refine((d) => d.contactWhatsapp || d.contactDiscord || d.contactEmail || d.contactInstagram, {
     path: ["contactWhatsapp"],

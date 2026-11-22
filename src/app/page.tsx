@@ -99,6 +99,7 @@ export default async function PublicHome() {
       <footer className="scope-dark bg-[#060a16] py-8 text-center text-xs text-ink-400">
         <p className="mb-2 font-display text-sm tracking-[0.4em] text-silver">RISE. CONQUER. ASCEND.</p>
         © {pub.org.name} · {pub.club.name}. EA SPORTS FC é marca da Electronic Arts; esta plataforma não é afiliada à EA.
+        <p className="mt-2"><Link href="/privacidade" className="hover:text-ink-100">Privacidade</Link> · <Link href="/privacidade#cookies" className="hover:text-ink-100">Cookies</Link> · <Link href="/seja-do-ascend" className="hover:text-ink-100">Seja do Ascend</Link></p>
       </footer>
     </main>
   );

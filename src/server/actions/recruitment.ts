@@ -66,8 +66,8 @@ export async function submitApplicationAction(_prev: ActionResult | null, form: 
     }
   }
 
-  const { consent: _c, ...data } = d;
-  void _c;
+  const { consent: _c, guardianConsent: _g, ...data } = d;
+  void _c; void _g;
   const id = await db.transaction(async (tx) => {
     const [a] = await tx.insert(schema.transferApplications).values({
       ...data, secondaryPositions: data.secondaryPositions.filter((p) => p !== data.primaryPosition),
@@ -149,4 +149,12 @@ export async function deleteApplicationAction(id: string) {
   await audit(ctx, "recruitment.delete", "transfer_application", id, { eaName: a.eaName });
   revalidatePath("/app/propostas");
   redirect("/app/propostas");
+}
+
+/** Retention (see /privacidade): rejected applications after 180 days. Called opportunistically. */
+export async function purgeExpiredApplications() {
+  await db.delete(schema.transferApplications).where(and(
+    eq(schema.transferApplications.status, "rejected"),
+    sql`coalesce(${schema.transferApplications.reviewedAt}, ${schema.transferApplications.createdAt}) < now() - interval '180 days'`,
+  ));
 }

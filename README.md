@@ -76,6 +76,17 @@ Passo a passo em **[docs/DEPLOY.md](docs/DEPLOY.md)**: Vercel (site) + Neon (ban
 (CI e sincronização horária com a EA). `vercel.json` já aplica migrações e seed a cada deploy.
 Gere as chaves com `npm run secrets`.
 
+## Atualizações do app
+
+Cada deploy tem uma versão própria (commit). O app verifica `/api/version` a cada minuto e ao voltar para a tela;
+se houver versão nova, mostra **“Nova versão disponível — Atualizar”**. Depois da atualização, exibe uma vez o
+quadro **“O que há de novo”** com a primeira entrada de `src/lib/changelog.ts` — adicione uma entrada ali a cada novidade.
+
+## Privacidade (LGPD)
+
+Política em `/privacidade` (inclui cookies). Defina `PRIVACY_CONTACT_EMAIL` para exibir o e-mail de contato.
+Retenção automática: propostas recusadas (6 meses), tentativas de login (30 dias), sessões e links expirados.
+
 ## Integração com EA FC
 
 Implementada e verificada com o FC 27 (clube **Ascend CF**, `clubId 2292864`, nova geração).

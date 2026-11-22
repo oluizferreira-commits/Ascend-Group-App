@@ -5,6 +5,8 @@ import "@fontsource/barlow-condensed/600.css";
 import "@fontsource/barlow-condensed/700.css";
 import "./globals.css";
 import { ServiceWorkerRegistrar, AppTouchGuards } from "@/components/pwa";
+import { UpdateNotice } from "@/components/update-notice";
+import { CookieNotice } from "@/components/cookie-notice";
 import { getThemeMode } from "@/lib/theme";
 
 export const metadata: Metadata = {
@@ -38,6 +40,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         {children}
         <ServiceWorkerRegistrar />
         <AppTouchGuards />
+        <UpdateNotice />
+        <CookieNotice />
       </body>
     </html>
   );

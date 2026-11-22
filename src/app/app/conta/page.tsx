@@ -22,6 +22,7 @@ export default async function AccountPage() {
           {ctx.playerId && <Link href={`/app/elenco/${ctx.playerId}`} className="btn-secondary mt-4">Ver meu perfil de jogador</Link>}
         </section>
         <section className="card p-5"><SectionTitle>Alterar senha</SectionTitle><ChangePasswordForm /></section>
+        <section className="card p-5"><SectionTitle>Privacidade</SectionTitle><p className="text-sm text-ink-400">Veja como tratamos seus dados e como pedir acesso, correção ou exclusão.</p><Link href="/privacidade" className="btn-secondary mt-3">Política de Privacidade e Cookies</Link></section>
         <section className="card p-5"><SectionTitle>Notificações push</SectionTitle><p className="mb-3 text-sm text-ink-400">Receba convocações, mudanças de horário, resultados e avisos urgentes no celular ou computador.</p><PushToggle /></section>
       </div>
     </>

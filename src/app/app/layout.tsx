@@ -4,6 +4,7 @@ import { requirePage } from "@/server/auth/session";
 import { getThemeMode } from "@/lib/theme";
 import { after } from "next/server";
 import { maybeAutoSync } from "@/server/services/ea-sync";
+import { runRetention } from "@/server/maintenance";
 import { ROLES } from "@/server/auth/permissions";
 import { NAV } from "@/components/shell/nav";
 import { MobileTabBar, Sidebar } from "@/components/shell/sidebar";
@@ -12,6 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const ctx = await requirePage();
   // Keep EA data fresh without any external scheduler (throttled to once per 30 min).
   after(() => maybeAutoSync(ctx.club.id));
+  after(() => runRetention());
   const sections = NAV.map((s) => ({
     section: s.section,
     items: s.items.filter((i) => i.soon || !i.permission || ctx.permissions.has(i.permission)),

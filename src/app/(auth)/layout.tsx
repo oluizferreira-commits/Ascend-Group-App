@@ -15,7 +15,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <span className="font-display text-xs font-semibold tracking-[0.35em] text-ink-400 uppercase">Ascend Group</span>
         </Link>
         <div className="card w-full max-w-sm p-7">{children}</div>
-        <Link href="/" className="mt-6 text-xs text-ink-400 hover:text-accent-400">← Voltar ao site do clube</Link>
+        <p className="mt-6 flex gap-4 text-xs text-ink-400"><Link href="/" className="hover:text-accent-400">← Site do clube</Link><Link href="/privacidade" className="hover:text-accent-400">Privacidade e cookies</Link></p>
       </section>
     </main>
   );

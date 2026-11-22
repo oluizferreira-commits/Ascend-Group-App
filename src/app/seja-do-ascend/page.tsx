@@ -25,7 +25,10 @@ export default function ApplyPage() {
         </div>
       </section>
       <div className="mx-auto max-w-3xl px-4 py-8"><ApplyForm /></div>
-      <footer className="pb-10 text-center font-display text-sm tracking-[0.4em] text-ink-400">RISE. CONQUER. ASCEND.</footer>
+      <footer className="pb-10 text-center text-ink-400">
+        <p className="font-display text-sm tracking-[0.4em]">RISE. CONQUER. ASCEND.</p>
+        <p className="mt-2 text-xs"><Link href="/privacidade" className="hover:text-accent-400">Política de Privacidade e Cookies</Link></p>
+      </footer>
     </main>
   );
 }
