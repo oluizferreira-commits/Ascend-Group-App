@@ -9,7 +9,7 @@
  * Uso:
  *   node ea-sync-agent.mjs --search "Ascend CF"       # descobrir o clubId
  *   node ea-sync-agent.mjs --once                     # uma sincronização
- *   node ea-sync-agent.mjs --every 30                 # a cada 30 minutos
+ *   node ea-sync-agent.mjs --every 15                 # a cada 15 minutos
  *
  * Variáveis de ambiente:
  *   APP_URL         ex.: https://ascend.example.com
@@ -63,7 +63,7 @@ const si = args.indexOf("--search");
 if (si >= 0) {
   await search(args[si + 1] ?? "Ascend");
 } else if (args.includes("--every")) {
-  const minutes = Math.max(15, Number(args[args.indexOf("--every") + 1]) || 30);
+  const minutes = Math.max(15, Number(args[args.indexOf("--every") + 1]) || 15);
   log(`Sincronizando a cada ${minutes} min. Ctrl+C para parar.`);
   for (;;) {
     try { await syncOnce(); } catch (e) { log("ERRO:", e.message); }

@@ -17,7 +17,7 @@ import { getMe } from "@/server/services/player-card";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const ctx = await requirePage();
-  // Keep EA data fresh without any external scheduler (throttled to once per 30 min).
+  // Keep EA data fresh without any external scheduler (throttled to once per 15 min).
   after(() => maybeAutoSync(ctx.club.id));
   after(() => runRetention());
   after(() => runReminders(ctx.club.id));

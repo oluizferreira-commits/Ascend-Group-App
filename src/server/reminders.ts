@@ -16,7 +16,7 @@ async function claim(key: string) {
 const lastRun = new Map<string, number>();
 
 /**
- * Automatic reminders. Runs opportunistically (app visits via `after()`) and from the hourly
+ * Automatic reminders. Runs opportunistically (app visits via `after()`) and from the 15-minute
  * scheduled sync. Throttled per club to once every 2 minutes per instance. Never throws.
  */
 export async function runReminders(clubId: string) {

@@ -1,11 +1,12 @@
-# Free scheduled EA FC sync: calls the app every hour.
+# Free scheduled EA FC sync: calls the app every 15 minutes.
 # Configure in GitHub → Settings → Secrets and variables → Actions:
 #   Variable APP_URL            (e.g. https://ascend-fc.vercel.app)
 #   Secret   SYNC_CRON_SECRET   (same value as in the hosting environment)
 name: EA FC sync
 on:
   schedule:
-    - cron: "17 * * * *"
+    # every 15 min, off the top of the hour (GitHub may delay runs a few minutes under load)
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
 permissions: {}
 jobs:
@@ -27,7 +28,7 @@ jobs:
           code=$(curl -sS -o body.txt -w "%{http_code}" --max-time 120 -H "Authorization: Bearer $SECRET" "$APP_URL/api/integrations/ea-fc/sync" || echo 000)
           cat body.txt 2>/dev/null; echo
           if [ "$code" = "401" ]; then
-            # The app also syncs by itself on visits, so a wrong secret is a warning, not an hourly failure e-mail.
+            # The app also syncs by itself on visits, so a wrong secret is a warning, not a failure e-mail every run.
             echo "::warning::SYNC_CRON_SECRET does not match the value configured on the hosting (HTTP 401). Update the repository secret."
             exit 0
           fi

@@ -73,7 +73,7 @@ export default async function IntegrationPage() {
           <SectionTitle>3 · Automático</SectionTitle>
           <p className="mb-3 text-sm text-ink-400">
             <b className="text-ink-200">Agente local</b> (recomendado): um script roda no PC de um membro da diretoria e envia as partidas
-            ao app a cada 30 min. Veja <code className="text-xs">docs/EA_FC_INTEGRATION.md</code>.
+            ao app a cada 15 min. Veja <code className="text-xs">docs/EA_FC_INTEGRATION.md</code>.
           </p>
           <p className="mb-3 text-sm text-ink-400">
             <b className="text-ink-200">Servidor</b>: a EA costuma bloquear servidores em nuvem (403). Se bloquear, o registro mostra e nada é forçado.

@@ -97,7 +97,7 @@ export async function lastServerFetch(clubId: string) {
   return logs.find((l) => ["server", "auto"].includes(String((l.details as { origin?: string }).origin)));
 }
 
-export const AUTO_SYNC_INTERVAL_MIN = 30;
+export const AUTO_SYNC_INTERVAL_MIN = 15;
 
 /**
  * Opportunistic sync: called (via `after()`) when someone opens the app. Claims the

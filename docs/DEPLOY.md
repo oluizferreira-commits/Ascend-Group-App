@@ -1,7 +1,7 @@
 # Publicar a plataforma (gratuito)
 
 Tudo roda em planos gratuitos: **Vercel Hobby** (site), **Neon Free** (banco PostgreSQL, região São Paulo)
-e **GitHub Actions** (testes e sincronização com a EA a cada hora). Nenhum cartão de crédito é necessário.
+e **GitHub Actions** (testes e sincronização com a EA a cada 15 minutos). Nenhum cartão de crédito é necessário.
 
 ## 1. Vercel + banco (≈ 5 min)
 
@@ -24,7 +24,7 @@ No GitHub, repositório → **Settings → Secrets and variables → Actions**:
 - aba *Secrets* → **New repository secret**: `SYNC_CRON_SECRET` = mesmo valor usado na Vercel;
 - aba *Variables* → **New repository variable**: `APP_URL` = endereço do site.
 
-O workflow `EA FC sync` passa a rodar a cada hora (dá para disparar manualmente em *Actions*).
+O workflow `EA FC sync` passa a rodar a cada 15 minutos (dá para disparar manualmente em *Actions*).
 Depois, no app: **Integração EA FC** → ID do clube `2292864` → *Buscar elenco na EA* → *Criar jogador* → *Sincronizar agora*.
 
 ## 3. Opcional
