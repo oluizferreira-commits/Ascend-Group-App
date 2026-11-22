@@ -4,7 +4,7 @@ import "@fontsource/barlow-condensed/500.css";
 import "@fontsource/barlow-condensed/600.css";
 import "@fontsource/barlow-condensed/700.css";
 import "./globals.css";
-import { ServiceWorkerRegistrar } from "@/components/pwa";
+import { ServiceWorkerRegistrar, AppTouchGuards } from "@/components/pwa";
 import { getThemeMode } from "@/lib/theme";
 
 export const metadata: Metadata = {
@@ -22,6 +22,9 @@ export const viewport: Viewport = {
   ],
   width: "device-width",
   initialScale: 1,
+  // App-like behaviour requested by the club: no pinch / double-tap zoom.
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: "cover",
 };
 
@@ -32,6 +35,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body>
         {children}
         <ServiceWorkerRegistrar />
+        <AppTouchGuards />
       </body>
     </html>
   );
