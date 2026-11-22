@@ -4,6 +4,8 @@ import { useState } from "react";
 import { cn } from "@/lib/cn";
 
 export const CREST_SRC = "/brand/ascend-fc-crest.png";
+/** Same crest with the black backdrop made transparent — for always-dark surfaces only. */
+export const CREST_CLEAR_SRC = "/brand/generated/crest-clear-512.png";
 
 /**
  * Displays the ORIGINAL Ascend CF crest. Next/Image produces resized display
@@ -11,7 +13,7 @@ export const CREST_SRC = "/brand/ascend-fc-crest.png";
  * been added to public/brand yet, a neutral placeholder is shown (no
  * substitute crest is ever drawn).
  */
-export function Crest({ size = 48, className, priority }: { size?: number; className?: string; priority?: boolean }) {
+export function Crest({ size = 48, className, priority, clear }: { size?: number; className?: string; priority?: boolean; clear?: boolean }) {
   const [missing, setMissing] = useState(false);
   if (missing) {
     return (
@@ -28,7 +30,7 @@ export function Crest({ size = 48, className, priority }: { size?: number; class
   }
   return (
     <Image
-      src={CREST_SRC}
+      src={clear ? CREST_CLEAR_SRC : CREST_SRC}
       alt="Escudo oficial do Ascend CF"
       width={size}
       height={size}

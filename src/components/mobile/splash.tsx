@@ -36,7 +36,7 @@ export function Splash({ number }: { number: number | null }) {
             >{number}</motion.span>
           )}
           <div className="relative flex flex-col items-center">
-            <motion.img src="/brand/generated/crest-256.png" alt="" width={150} height={150} className="rounded-2xl"
+            <motion.img src="/brand/generated/crest-clear-256.png" alt="" width={170} height={170} className="drop-shadow-[0_16px_36px_rgb(0_0_0/0.6)]"
               initial={{ opacity: 0, scale: 0.7, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }} />
             <motion.p className="mt-5 font-display text-sm font-semibold tracking-[0.45em] text-[#c9d1dc]"
               initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}>RISE. CONQUER. ASCEND.</motion.p>

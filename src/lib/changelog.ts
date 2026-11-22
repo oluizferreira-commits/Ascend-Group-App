@@ -5,6 +5,17 @@
 export const CHANGELOG: { date: string; title: string; items: string[] }[] = [
   {
     date: "2026-11-22",
+    title: "Visual novo do Ascend CF",
+    items: [
+      "Painel redesenhado: destaques em banners (votações, próxima partida), desempenho do clube e destaques da temporada mais compactos.",
+      "Rankings com fotos, medalhas para o top 3 e barra de comparação.",
+      "Partidas organizadas por mês, com placar colorido pelo resultado e placar novo na página da partida.",
+      "Calendário em linha do tempo e avisos com destaque por prioridade.",
+      "Nova barra de navegação inferior e cabeçalho com o escudo.",
+    ],
+  },
+  {
+    date: "2026-11-22",
     title: "Carta nova do Ascend",
     items: [
       "Carta redesenhada: formato de escudo, borda metálica prateada e luz azul — a nossa cara.",

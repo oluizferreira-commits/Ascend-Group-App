@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { History, Plus } from "lucide-react";
 import { requirePage } from "@/server/auth/session";
 import { listSeasons } from "@/server/services/club";
 import { headToHead, listMatches } from "@/server/services/matches";
 import { listCompetitions } from "@/server/services/reference";
-import { Badge, EmptyState, PageHeader, ResultPill, SectionTitle } from "@/components/ui/basics";
+import { Badge, EmptyState, PageHeader } from "@/components/ui/basics";
+import { DateBadge, Panel, ScoreBox, TeamMonogram } from "@/components/ui/kit";
 import { MATCH_STATUS_LABELS, SOURCE_LABELS, matchResult } from "@/lib/domain";
-import { fmtDateTime } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Partidas" };
+const monthFmt = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", month: "long", year: "numeric" });
+const timeFmt = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
 
 export default async function MatchesPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const ctx = await requirePage("matches.view");
@@ -20,6 +22,11 @@ export default async function MatchesPage({ searchParams }: { searchParams: Prom
   const status = ["scheduled", "finished", "cancelled"].includes(sp.status ?? "") ? (sp.status as "scheduled") : undefined;
   const opponent = sp.q?.slice(0, 80) || undefined;
   const [rows, h2h] = await Promise.all([listMatches(ctx.club.id, { seasonId, competitionId, status, opponent }), headToHead(ctx.club.id)]);
+  const groups = [...rows.reduce((acc, r) => {
+    const k = monthFmt.format(r.match.kickoffAt);
+    acc.set(k, [...(acc.get(k) ?? []), r]);
+    return acc;
+  }, new Map<string, typeof rows>())];
 
   return (
     <>
@@ -28,7 +35,7 @@ export default async function MatchesPage({ searchParams }: { searchParams: Prom
         title="Partidas"
         actions={ctx.permissions.has("matches.manage") && <Link href="/app/partidas/nova" className="btn-primary"><Plus className="size-4" />Nova partida</Link>}
       />
-      <form method="get" className="card mb-5 grid grid-cols-2 gap-3 p-4 lg:grid-cols-5">
+      <form method="get" className="card mb-6 grid grid-cols-2 gap-3 p-4 lg:grid-cols-5">
         <div className="col-span-2 lg:col-span-1">
           <label className="label" htmlFor="q">Adversário</label>
           <input id="q" name="q" defaultValue={opponent} className="input" placeholder="Buscar…" />
@@ -57,30 +64,40 @@ export default async function MatchesPage({ searchParams }: { searchParams: Prom
       {rows.length === 0 ? (
         <EmptyState title="Nenhuma partida encontrada" action={ctx.permissions.has("matches.manage") ? <Link href="/app/partidas/nova" className="btn-primary">Registrar partida</Link> : undefined} />
       ) : (
-        <ul className="card mb-8 divide-y divide-ink-800">
-          {rows.map(({ match: m, competition, season }) => (
-            <li key={m.id}>
-              <Link href={`/app/partidas/${m.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-ink-850">
-                {m.status === "finished" ? <ResultPill result={matchResult(m.goalsFor!, m.goalsAgainst!)} /> : <span className="size-7" />}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">vs {m.opponentName}</p>
-                  <p className="truncate text-xs text-ink-400">{fmtDateTime(m.kickoffAt)} · {competition ?? "Sem competição"}{season ? ` · ${season}` : ""}{m.round ? ` · ${m.round}` : ""}</p>
-                </div>
-                {m.source !== "manual" && <Badge className="hidden sm:inline-flex">{SOURCE_LABELS[m.source]}</Badge>}
-                {m.status === "finished" ? (
-                  <span className="font-display text-2xl font-bold">{m.goalsFor}–{m.goalsAgainst}</span>
-                ) : (
-                  <Badge tone={m.status === "cancelled" ? "loss" : "gold"}>{MATCH_STATUS_LABELS[m.status]}</Badge>
-                )}
-              </Link>
-            </li>
+        <div className="mb-8 space-y-5">
+          {groups.map(([month, list]) => (
+            <section key={month}>
+              <h2 className="kicker mb-2 px-1">{month}</h2>
+              <ul className="card divide-y divide-[var(--line)] overflow-hidden">
+                {list.map(({ match: m, competition, season }) => {
+                  const res = m.status === "finished" ? matchResult(m.goalsFor!, m.goalsAgainst!) : null;
+                  return (
+                    <li key={m.id}>
+                      <Link href={`/app/partidas/${m.id}`} className="flex items-center gap-3 px-3 py-3 transition-colors hover:bg-[var(--surface-2)] sm:px-4">
+                        <DateBadge date={m.kickoffAt} />
+                        <TeamMonogram name={m.opponentName} size={34} />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-display text-[17px] font-bold tracking-wide uppercase">vs {m.opponentName}</p>
+                          <p className="truncate text-xs text-ink-400">{timeFmt.format(m.kickoffAt)} · {competition ?? "Sem competição"}{season ? ` · ${season}` : ""}{m.round ? ` · ${m.round}` : ""}</p>
+                        </div>
+                        {m.source !== "manual" && <Badge className="hidden sm:inline-flex">{SOURCE_LABELS[m.source]}</Badge>}
+                        {res ? (
+                          <ScoreBox gf={m.goalsFor!} ga={m.goalsAgainst!} result={res} />
+                        ) : (
+                          <Badge tone={m.status === "cancelled" ? "loss" : "gold"}>{MATCH_STATUS_LABELS[m.status]}</Badge>
+                        )}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
           ))}
-        </ul>
+        </div>
       )}
 
       {h2h.length > 0 && (
-        <section className="card overflow-x-auto p-5">
-          <SectionTitle>Histórico contra adversários</SectionTitle>
+        <Panel title="Histórico contra adversários" icon={History} bodyClassName="overflow-x-auto p-2 sm:p-3">
           <table className="data-table">
             <thead><tr><th>Adversário</th><th className="text-right">J</th><th className="text-right">V</th><th className="text-right">E</th><th className="text-right">D</th><th className="text-right">GP</th><th className="text-right">GC</th></tr></thead>
             <tbody>
@@ -93,7 +110,7 @@ export default async function MatchesPage({ searchParams }: { searchParams: Prom
               ))}
             </tbody>
           </table>
-        </section>
+        </Panel>
       )}
     </>
   );

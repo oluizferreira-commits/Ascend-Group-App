@@ -74,8 +74,8 @@ assert.ok(found, "1-hour match reminder delivered");
 
 step("MVP vote (cannot vote for self)");
 await m.goto(`${BASE}/app`);
-await m.getByText("Vote no craque da partida").waitFor();
-await m.getByText("Vote no craque da partida").click();
+await m.getByRole("link", { name: /Vote no craque da partida/ }).waitFor();
+await m.getByRole("link", { name: /Vote no craque da partida/ }).click();
 await m.waitForURL(/\/app\/partidas\/[0-9a-f-]{36}#craque$/);
 assert.ok(await m.getByRole("button", { name: /e2e_cm/ }).isDisabled(), "own card disabled");
 await m.getByRole("button", { name: /e2e_st/ }).click();

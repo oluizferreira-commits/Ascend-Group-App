@@ -93,23 +93,27 @@ function UserBox({ name, roles, theme }: { name: string; roles: string; theme: "
   );
 }
 
-function Brand() {
+function Brand({ motto }: { motto?: boolean }) {
   return (
-    <Link href="/app" className="flex items-center gap-3 px-2">
-      <Crest size={42} />
-      <span className="leading-none">
-        <span className="block font-display text-xl font-bold tracking-[0.08em] text-white uppercase">Ascend CF</span>
-        <span className="mt-1 block font-display text-[10px] font-semibold tracking-[0.3em] text-silver uppercase">Ascend Group</span>
+    <Link href="/app" className="flex min-w-0 items-center gap-3 px-1">
+      <Crest size={40} clear />
+      <span aria-hidden className="h-8 w-px bg-gradient-to-b from-transparent via-white/40 to-transparent" />
+      <span className="min-w-0 leading-none">
+        <span className="block truncate font-display text-[21px] font-bold tracking-[0.06em] text-white uppercase italic">Ascend CF</span>
+        <span className="mt-1 block truncate font-display text-[10px] font-semibold tracking-[0.34em] text-silver uppercase">Ascend Group</span>
       </span>
+      {motto && <span className="ml-4 hidden font-display text-[11px] font-semibold tracking-[0.3em] text-silver/80 uppercase sm:inline">Rise. Conquer. Ascend.</span>}
     </Link>
   );
 }
 
+const iconBtn = "relative grid size-10 place-items-center rounded-xl border border-white/10 bg-white/[0.03] text-ink-200 transition hover:border-white/25 hover:text-white active:scale-95";
+
 function BellLink({ unread }: { unread: number }) {
   return (
-    <Link href="/app/notificacoes" className="btn-ghost relative px-2" aria-label={`Notificações${unread ? ` (${unread} não lidas)` : ""}`}>
-      <Bell className="size-5" />
-      {unread > 0 && <span className="absolute -top-0.5 -right-0.5 grid min-w-4 place-items-center rounded-full bg-accent-400 px-1 text-[10px] font-bold text-ink-950">{unread > 99 ? "99+" : unread}</span>}
+    <Link href="/app/notificacoes" className={iconBtn} aria-label={`Notificações${unread ? ` (${unread} não lidas)` : ""}`}>
+      <Bell className="size-[19px]" />
+      {unread > 0 && <span className="absolute -top-1 -right-1 grid h-[18px] min-w-[18px] place-items-center rounded-full border-2 border-[#060a16] bg-[#3a63f0] px-1 text-[10px] leading-none font-bold text-white">{unread > 99 ? "99+" : unread}</span>}
     </Link>
   );
 }
@@ -120,18 +124,18 @@ export function Sidebar({ sections, userName, roleNames, unread, theme }: { sect
     <>
       {/* Desktop */}
       <aside className="scope-dark fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-white/5 bg-[#060a16] px-3 py-5 text-ink-100 lg:flex">
-        <div className="flex items-center justify-between"><Brand /><BellLink unread={unread} /></div>
+        <div className="flex items-center justify-between gap-2"><Brand /><BellLink unread={unread} /></div>
         <div className="accent-rule my-5" />
         <div className="flex-1 overflow-y-auto"><NavList sections={sections} /></div>
         <UserBox name={userName} roles={roleNames} theme={theme} />
       </aside>
 
       {/* Mobile top bar */}
-      <header className="scope-dark glass-dark sticky top-0 z-30 flex items-center justify-between border-b px-4 py-3 text-ink-100 lg:hidden" style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
-        <Brand />
-        <div className="flex items-center gap-1"><BellLink unread={unread} />
-        <button onClick={() => setOpen(true)} className="btn-ghost px-2" aria-label="Abrir menu" aria-expanded={open}>
-          <Menu className="size-6" />
+      <header className="scope-dark glass-dark sticky top-0 z-30 flex items-center justify-between gap-3 border-b px-4 py-2.5 text-ink-100 lg:hidden" style={{ paddingTop: "max(0.625rem, env(safe-area-inset-top))" }}>
+        <Brand motto />
+        <div className="flex shrink-0 items-center gap-2"><BellLink unread={unread} />
+        <button onClick={() => setOpen(true)} className={iconBtn} aria-label="Abrir menu" aria-expanded={open}>
+          <Menu className="size-5" />
         </button></div>
       </header>
 
@@ -157,7 +161,7 @@ export function MobileTabBar({ items }: { items: NavItem[] }) {
   return (
     <nav
       aria-label="Atalhos"
-      className="glass fixed inset-x-3 z-30 grid rounded-2xl p-1.5 lg:hidden"
+      className="scope-dark glass-dark fixed inset-x-3 z-30 grid rounded-[20px] border p-1.5 shadow-[0_18px_40px_-12px_rgb(0_0_0/0.7)] lg:hidden"
       style={{ gridTemplateColumns: `repeat(${items.length}, 1fr)`, bottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
     >
       {items.map((item) => {
@@ -165,11 +169,15 @@ export function MobileTabBar({ items }: { items: NavItem[] }) {
         const active = isActive(pathname, item.href);
         return (
           <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined}
-            className={cn("relative flex flex-col items-center gap-0.5 rounded-xl py-2 text-[10px] font-semibold transition-colors", active ? "text-white" : "text-ink-400 active:text-ink-100")}>
-            {active && <motion.span layoutId="tab-active" className="absolute inset-0 rounded-xl bg-[#1c3fb0] shadow-[0_6px_16px_-6px_rgb(28_63_176/0.8)]" />}
+            className={cn("relative flex flex-col items-center gap-1 rounded-2xl pt-2 pb-1.5 text-[10.5px] font-semibold tracking-wide transition-colors", active ? "text-white" : "text-ink-400 active:text-ink-100")}>
+            {active && (
+              <motion.span layoutId="tab-active" className="absolute inset-0 rounded-2xl border border-[#6f8fff]/40 bg-gradient-to-b from-[#1c3fb0]/80 to-[#0f2566]/80 shadow-[0_0_22px_-6px_rgb(58_99_240/0.9)]">
+                <span className="absolute inset-x-5 -top-px h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+              </motion.span>
+            )}
             {item.number != null
-              ? <span className={cn("relative grid size-5 place-items-center font-display text-[17px] leading-none font-bold", active ? "text-white" : "text-accent-400")}>{item.number}</span>
-              : <Icon className="relative size-5" />}
+              ? <span className={cn("relative grid size-[22px] place-items-center font-display text-[19px] leading-none font-bold", active ? "text-white" : "text-accent-400")}>{item.number}</span>
+              : <Icon className="relative size-[22px]" />}
             <span className="relative">{item.label}</span>
           </Link>
         );

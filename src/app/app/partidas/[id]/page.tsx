@@ -11,7 +11,9 @@ import { callupForMatchAction } from "@/server/actions/calendar";
 import { getMvpVoting } from "@/server/services/mvp";
 import { MvpVote } from "@/components/engagement/mvp-vote";
 import { ShareImageButton } from "@/components/share/share-image";
-import { Badge, PageHeader, ResultPill, SectionTitle } from "@/components/ui/basics";
+import { Badge, PageHeader, SectionTitle } from "@/components/ui/basics";
+import { FormChip, TeamMonogram } from "@/components/ui/kit";
+import { Crest } from "@/components/crest";
 import { ConfirmSubmit } from "@/components/ui/confirm-button";
 import { SheetEditor } from "@/components/matches/sheet-editor";
 import { MATCH_STATUS_LABELS, POSITION_LABELS, SOURCE_LABELS, matchResult, positionGroup } from "@/lib/domain";
@@ -68,27 +70,39 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
         )}
       />
 
-      <section className="card-premium mb-6 grid items-center gap-6 p-6 sm:grid-cols-[1fr_auto_1fr]">
-        <p className="text-center font-display text-2xl font-bold uppercase sm:text-right">Ascend CF</p>
-        <div className="text-center">
-          {finished ? (
-            <>
-              <p className="font-display text-6xl font-bold accent-text">{m.goalsFor} – {m.goalsAgainst}</p>
-              <div className="mt-2 flex justify-center"><ResultPill result={result!} /></div>
-            </>
-          ) : (
-            <Badge tone={m.status === "cancelled" ? "loss" : "gold"}>{MATCH_STATUS_LABELS[m.status]}</Badge>
-          )}
+      <section className="card-premium mb-6 px-4 py-6 sm:px-8 sm:py-8">
+        <div className="relative grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-8">
+          <div className="flex min-w-0 flex-col items-center gap-2 text-center">
+            <Crest size={64} clear />
+            <p className="w-full truncate font-display text-base font-bold tracking-wide text-white uppercase sm:text-2xl">Ascend CF</p>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            {finished ? (
+              <>
+                <p className="font-display text-5xl leading-none font-bold text-white tabular-nums sm:text-7xl">{m.goalsFor}<span className="mx-2 text-[#8fa9ff]">–</span>{m.goalsAgainst}</p>
+                <FormChip result={result!} size={26} />
+              </>
+            ) : (
+              <>
+                <span className="font-display text-3xl font-bold text-[#8fa9ff] italic">VS</span>
+                <Badge tone={m.status === "cancelled" ? "loss" : "gold"}>{MATCH_STATUS_LABELS[m.status]}</Badge>
+              </>
+            )}
+          </div>
+          <div className="flex min-w-0 flex-col items-center gap-2 text-center">
+            <TeamMonogram name={m.opponentName} size={64} />
+            <p className="w-full truncate font-display text-base font-bold tracking-wide text-white uppercase sm:text-2xl">{m.opponentName}</p>
+          </div>
         </div>
-        <p className="text-center font-display text-2xl font-bold uppercase sm:text-left">{m.opponentName}</p>
-        <dl className="flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm text-ink-300 sm:col-span-3">
-          <div><dt className="inline text-ink-400">Data: </dt><dd className="inline">{fmtDateTime(m.kickoffAt)}</dd></div>
-          {detail.season && <div><dt className="inline text-ink-400">Temporada: </dt><dd className="inline">{detail.season}</dd></div>}
-          {m.round && <div><dt className="inline text-ink-400">Rodada: </dt><dd className="inline">{m.round}</dd></div>}
-          {detail.formation && <div><dt className="inline text-ink-400">Formação: </dt><dd className="inline">{detail.formation}</dd></div>}
-          <div><dt className="inline text-ink-400">Origem: </dt><dd className="inline">{SOURCE_LABELS[m.source]}</dd></div>
+        <dl className="relative mt-6 flex flex-wrap justify-center gap-2 text-xs">
+          {[["Data", fmtDateTime(m.kickoffAt)], ["Temporada", detail.season], ["Rodada", m.round], ["Formação", detail.formation], ["Origem", SOURCE_LABELS[m.source]]]
+            .filter(([, v]) => v).map(([k, v]) => (
+              <div key={k as string} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1">
+                <dt className="inline text-ink-400">{k}: </dt><dd className="inline text-ink-100">{v}</dd>
+              </div>
+            ))}
         </dl>
-        {m.notes && <p className="text-center text-sm whitespace-pre-line text-ink-300 sm:col-span-3">{m.notes}</p>}
+        {m.notes && <p className="relative mt-4 text-center text-sm whitespace-pre-line text-ink-300">{m.notes}</p>}
       </section>
 
       {mvp && mvp.candidates.length > 0 && (

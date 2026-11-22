@@ -77,3 +77,13 @@ nota_final     = nota_EA disponível ? w·nota_EA + (1−w)·nota_calculada : no
 | Comunicação | `src/server/services/announcements.ts`, `src/app/app/avisos` |
 | Administração | `src/server/actions/users.ts`, `src/server/actions/admin.ts`, `src/app/app/admin` |
 | Escalações, competições, calendário, integração EA, mídia | tabelas já criadas; telas nas próximas fases |
+
+## Design system
+
+Identidade: azul royal (#1c3fb0), azul elétrico (#3a63f0), azul-marinho, preto e prata. Tipografia Barlow Condensed (títulos e números) + Inter (texto).
+
+- **Tokens** (`src/app/globals.css`): escala `ink-*` (neutros que mudam com o tema), `accent-*`, `brand-*`, `silver`, `win/draw/loss` e superfícies `--surface`, `--surface-2`, `--line`, `--line-strong`, `--hl`. Tema claro (branco e azul) e escuro (preto e azul); `.scope-dark` força o escuro dentro de um bloco.
+- **Utilitários**: `card` (painel padrão), `tile` (bloco interno), `card-premium` (painel azul do clube, sempre escuro), `glass` / `glass-dark`, `kicker`, `eyebrow`, `btn-*`, `input`, `label`, `data-table`.
+- **Componentes** (`src/components/ui/kit.tsx`): `Panel` (cabeçalho com ícone + link), `InfoChip`, `StatStrip`, `FormChip` (V/E/D), `ScoreBox`, `TeamMonogram` (iniciais do adversário — nunca desenhamos escudos de outros clubes), `DateBadge`, `RankMark` (medalhas top 3), `Meter`. Básicos em `src/components/ui/basics.tsx`.
+- **Painel**: `HeroCarousel` + `HeroBanner` (`src/components/dashboard/`).
+- **Escudo**: `public/brand/ascend-fc-crest.png` é o original e nunca é alterado. `public/brand/generated/crest-clear-*.png` é uma cópia com o fundo preto transparente, usada só em superfícies sempre escuras (`<Crest clear />`).

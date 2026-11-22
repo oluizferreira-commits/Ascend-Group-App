@@ -79,15 +79,25 @@
   --win: #15803d;
   --draw: #64748b;
   --loss: #c2283c;
-  --shadow: 0 1px 2px rgb(10 19 48 / 0.06), 0 1px 0 rgb(10 19 48 / 0.04);
+  --shadow: 0 1px 2px rgb(10 19 48 / 0.05), 0 8px 24px -16px rgb(10 19 48 / 0.18);
+  --surface: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+  --surface-2: #f4f7fc;
+  --line: #e1e7f0;
+  --line-strong: #c6d1e3;
+  --hl: inset 0 1px 0 #ffffff;
 }
 
 /* ── Dark: black & blue ──────────────────────────────── */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --ink-950: #04060b; --ink-900: #0a0e17; --ink-850: #0e1320; --ink-800: #131a2a; --ink-700: #1d2638; --ink-600: #2b3650;
-    --ink-500: #4a5672; --ink-400: #8b96ad; --ink-300: #b7c0d1; --ink-200: #dbe1ec; --ink-100: #f1f4f9;
+    --ink-950: #03060d; --ink-900: #080e1c; --ink-850: #0c1324; --ink-800: #111a2f; --ink-700: #1a2541; --ink-600: #283556;
+    --ink-500: #4a5876; --ink-400: #8d99b3; --ink-300: #b9c3d6; --ink-200: #dce2ee; --ink-100: #f2f5fa;
+    --surface: linear-gradient(180deg, rgb(19 30 58 / 0.78) 0%, rgb(9 15 30 / 0.92) 100%);
+    --surface-2: rgb(255 255 255 / 0.035);
+    --line: rgb(128 156 255 / 0.14);
+    --line-strong: rgb(128 156 255 / 0.28);
+    --hl: inset 0 1px 0 rgb(255 255 255 / 0.05);
     --accent-200: #c9d6ff; --accent-300: #9db4ff; --accent-400: #6f8fff; --accent-500: #3a63f0; --accent-600: #2b54d6; --accent-700: #1c3fb0;
     --brand-950: #1a0a10; --brand-900: #0c1d4f; --brand-800: #0f2566; --brand-700: #15318a; --brand-600: #1c3fb0; --brand-400: #6f8fff;
     --silver: #c9d1dc; --win: #34c37a; --draw: #9aa4b6; --loss: #ff5d73;
@@ -97,8 +107,13 @@
 :root[data-theme="dark"],
 .scope-dark {
   color-scheme: dark;
-  --ink-950: #04060b; --ink-900: #0a0e17; --ink-850: #0e1320; --ink-800: #131a2a; --ink-700: #1d2638; --ink-600: #2b3650;
-  --ink-500: #4a5672; --ink-400: #8b96ad; --ink-300: #b7c0d1; --ink-200: #dbe1ec; --ink-100: #f1f4f9;
+  --ink-950: #03060d; --ink-900: #080e1c; --ink-850: #0c1324; --ink-800: #111a2f; --ink-700: #1a2541; --ink-600: #283556;
+  --ink-500: #4a5876; --ink-400: #8d99b3; --ink-300: #b9c3d6; --ink-200: #dce2ee; --ink-100: #f2f5fa;
+  --surface: linear-gradient(180deg, rgb(19 30 58 / 0.78) 0%, rgb(9 15 30 / 0.92) 100%);
+  --surface-2: rgb(255 255 255 / 0.035);
+  --line: rgb(128 156 255 / 0.14);
+  --line-strong: rgb(128 156 255 / 0.28);
+  --hl: inset 0 1px 0 rgb(255 255 255 / 0.05);
   --accent-200: #c9d6ff; --accent-300: #9db4ff; --accent-400: #6f8fff; --accent-500: #3a63f0; --accent-600: #2b54d6; --accent-700: #1c3fb0;
   --brand-950: #1a0a10; --brand-900: #0c1d4f; --brand-800: #0f2566; --brand-700: #15318a; --brand-600: #1c3fb0; --brand-400: #6f8fff;
   --silver: #c9d1dc; --win: #34c37a; --draw: #9aa4b6; --loss: #ff5d73;
@@ -121,8 +136,8 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(60vmax 45vmax at 85% -10%, color-mix(in oklab, #1c3fb0 22%, transparent), transparent 70%),
-    radial-gradient(50vmax 40vmax at -10% 105%, color-mix(in oklab, #3a63f0 14%, transparent), transparent 70%);
+    radial-gradient(70vmax 40vmax at 80% -12%, color-mix(in oklab, #1c3fb0 26%, transparent), transparent 70%),
+    radial-gradient(50vmax 40vmax at -10% 105%, color-mix(in oklab, #3a63f0 10%, transparent), transparent 70%);
 }
 :root[data-theme="light"] body::before {
   opacity: 0.55;
@@ -205,16 +220,38 @@ code.select-all {
 }
 
 @utility card {
-  @apply rounded-lg border border-ink-700 bg-ink-900;
-  box-shadow: var(--shadow);
+  @apply rounded-xl border;
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: var(--hl), var(--shadow);
+}
+
+/* Inner tile inside a card (stats, list groups). */
+@utility tile {
+  @apply rounded-lg border;
+  border-color: var(--line);
+  background: var(--surface-2);
+}
+
+/* Hairline divider that follows the theme. */
+@utility hairline {
+  border-color: var(--line);
+}
+
+/* Small uppercase label used across stat components. */
+@utility kicker {
+  @apply font-display text-[11px] font-semibold tracking-[0.14em] text-ink-400 uppercase;
 }
 
 /* Blue club panel — same look in both themes (content uses dark tokens). */
 @utility card-premium {
-  @apply scope-dark relative overflow-hidden rounded-lg border border-[#1c3fb0]/60 text-ink-100;
+  @apply scope-dark relative overflow-hidden rounded-xl border text-ink-100;
+  border-color: rgb(111 143 255 / 0.32);
   background:
-    linear-gradient(115deg, transparent 0 62%, rgb(255 255 255 / 0.035) 62% 64%, transparent 64% 70%, rgb(255 255 255 / 0.03) 70% 71%, transparent 71%),
-    linear-gradient(135deg, #15318a 0%, #0c1d4f 55%, #060c22 100%);
+    linear-gradient(115deg, transparent 0 62%, rgb(255 255 255 / 0.03) 62% 64%, transparent 64% 70%, rgb(255 255 255 / 0.025) 70% 71%, transparent 71%),
+    radial-gradient(90% 120% at 100% 0%, rgb(58 99 240 / 0.28) 0%, transparent 60%),
+    linear-gradient(140deg, #13296f 0%, #0a1740 45%, #050a1c 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 18px 40px -24px rgb(10 30 110 / 0.7);
 }
 
 /* ── Glassmorphism ───────────────────────────────────────── */
@@ -240,8 +277,13 @@ code.select-all {
 
 @utility scope-dark {
   color-scheme: dark;
-  --ink-950: #04060b; --ink-900: #0a0e17; --ink-850: #0e1320; --ink-800: #131a2a; --ink-700: #1d2638; --ink-600: #2b3650;
-  --ink-500: #4a5672; --ink-400: #8b96ad; --ink-300: #b7c0d1; --ink-200: #dbe1ec; --ink-100: #f1f4f9;
+  --ink-950: #03060d; --ink-900: #080e1c; --ink-850: #0c1324; --ink-800: #111a2f; --ink-700: #1a2541; --ink-600: #283556;
+  --ink-500: #4a5876; --ink-400: #8d99b3; --ink-300: #b9c3d6; --ink-200: #dce2ee; --ink-100: #f2f5fa;
+  --surface: linear-gradient(180deg, rgb(19 30 58 / 0.78) 0%, rgb(9 15 30 / 0.92) 100%);
+  --surface-2: rgb(255 255 255 / 0.035);
+  --line: rgb(128 156 255 / 0.14);
+  --line-strong: rgb(128 156 255 / 0.28);
+  --hl: inset 0 1px 0 rgb(255 255 255 / 0.05);
   --accent-200: #c9d6ff; --accent-300: #b8c8ff; --accent-400: #8fa9ff; --accent-500: #3a63f0; --accent-600: #2b54d6; --accent-700: #3a5bc4;
   --brand-950: #1a0a10; --brand-900: #0c1d4f; --brand-800: #0f2566; --brand-700: #15318a; --brand-600: #1c3fb0; --brand-400: #6f8fff;
   --silver: #c9d1dc; --win: #34c37a; --draw: #9aa4b6; --loss: #ff5d73;
@@ -261,7 +303,7 @@ code.select-all {
 }
 
 @utility input {
-  @apply w-full rounded-md border border-ink-600 bg-ink-900 px-3 py-2 text-sm text-ink-100 placeholder:text-ink-500
+  @apply w-full rounded-lg border border-ink-600 bg-ink-900 px-3 py-2 text-sm text-ink-100 placeholder:text-ink-500
     focus:border-accent-500 focus:ring-2 focus:ring-accent-500/25 focus:outline-none disabled:opacity-60;
 }
 
@@ -270,16 +312,22 @@ code.select-all {
 }
 
 @utility btn {
-  @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4 py-2 font-display text-[15px] font-semibold tracking-[0.06em] uppercase transition
+  @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2 font-display text-[15px] font-semibold tracking-[0.06em] uppercase transition
     focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 @utility btn-primary {
-  @apply btn bg-[#1c3fb0] text-white hover:bg-[#2347c5] active:bg-[#15318a];
+  @apply btn text-white;
+  background: linear-gradient(180deg, #2a52d6 0%, #1c3fb0 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), 0 6px 18px -8px rgb(28 63 176 / 0.8);
+  &:hover { background: linear-gradient(180deg, #3460ea 0%, #2347c5 100%); }
+  &:active { background: #15318a; }
 }
 
 @utility btn-secondary {
-  @apply btn border border-ink-600 bg-ink-900 text-ink-100 hover:border-accent-500 hover:text-accent-400;
+  @apply btn border text-ink-100 hover:border-accent-500 hover:text-accent-400;
+  border-color: var(--line-strong);
+  background: var(--surface-2);
 }
 
 @utility btn-danger {

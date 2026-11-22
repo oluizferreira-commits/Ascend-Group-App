@@ -5,7 +5,9 @@ import { pollsFor } from "@/server/services/polls";
 import { deleteAnnouncementAction, expireAnnouncementAction } from "@/server/actions/announcements";
 import { AnnouncementCard } from "@/components/announcement-card";
 import { AnnouncementForm } from "@/components/announcements/form";
-import { Badge, EmptyState, PageHeader, SectionTitle } from "@/components/ui/basics";
+import { Badge, EmptyState, PageHeader } from "@/components/ui/basics";
+import { Panel } from "@/components/ui/kit";
+import { ListChecks, Megaphone, PenSquare } from "lucide-react";
 import { ConfirmSubmit } from "@/components/ui/confirm-button";
 import { VISIBILITY_LABELS } from "@/lib/domain";
 import { fmtDateTime } from "@/lib/format";
@@ -23,16 +25,15 @@ export default async function AnnouncementsPage() {
       <PageHeader eyebrow="Comunicação" title="Avisos" description="Comunicados oficiais da organização e da comissão técnica." />
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
         <section className="space-y-3">
-          <SectionTitle>Ativos</SectionTitle>
+          <h2 className="kicker flex items-center gap-2 px-1"><Megaphone className="size-3.5 text-accent-400" />Ativos · {active.length}</h2>
           {active.length === 0 ? <EmptyState title="Nenhum aviso ativo" /> : active.map((a) => <AnnouncementCard key={a.id} a={a} poll={polls.get(a.id)} canVote />)}
         </section>
         {canManage && (
           <aside className="space-y-6">
-            <section className="card p-5"><SectionTitle>Novo comunicado</SectionTitle><AnnouncementForm /></section>
-            <section className="card p-5">
-              <SectionTitle>Gerenciar</SectionTitle>
+            <Panel title="Novo comunicado" icon={PenSquare}><AnnouncementForm /></Panel>
+            <Panel title="Gerenciar" icon={ListChecks} bodyClassName="px-4 py-1 sm:px-5">
               {all.length === 0 ? <p className="text-sm text-ink-400">Nenhum comunicado.</p> : (
-                <ul className="divide-y divide-ink-800 text-sm">
+                <ul className="divide-y divide-[var(--line)] text-sm">
                   {all.map((a) => {
                     const scheduled = a.state === "scheduled";
                     const expired = a.state === "expired";
@@ -54,7 +55,7 @@ export default async function AnnouncementsPage() {
                   })}
                 </ul>
               )}
-            </section>
+            </Panel>
           </aside>
         )}
       </div>

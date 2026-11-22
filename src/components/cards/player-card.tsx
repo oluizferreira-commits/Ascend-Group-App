@@ -131,7 +131,7 @@ export function PlayerCard(p: PlayerCardProps) {
               <span style={{ fontSize: u(19), color: t.rim, letterSpacing: "0.06em", marginTop: u(2) }}>{POSITION_LABELS[p.position]}</span>
               <span aria-hidden style={{ width: u(30), height: u(1.5), background: t.metal, margin: `${u(7)} 0` }} />
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/brand/generated/crest-128.png" alt="" draggable={false} style={{ width: u(30), height: "auto", filter: `drop-shadow(0 0 ${u(4)} ${t.glow})` }} />
+              <img src="/brand/generated/crest-clear-128.png" alt="" draggable={false} style={{ width: u(30), height: "auto", filter: `drop-shadow(0 0 ${u(4)} ${t.glow})` }} />
               {p.shirtNumber != null && <span className="tabular-nums" style={{ fontSize: u(15), marginTop: u(8), color: "#dbe4ff" }}>#{p.shirtNumber}</span>}
             </div>
 
