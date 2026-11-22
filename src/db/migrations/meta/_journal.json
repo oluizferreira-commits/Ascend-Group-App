@@ -29,6 +29,13 @@
       "when": 1795324576037,
       "tag": "0003_recruitment",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795348633135,
+      "tag": "0004_overall_sync",
+      "breakpoints": true
     }
   ]
 }

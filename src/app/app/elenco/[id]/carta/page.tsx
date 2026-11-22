@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { GitCompareArrows } from "lucide-react";
 import { requirePage } from "@/server/auth/session";
-import { currentSeasonInfo, getCardsData } from "@/server/services/player-card";
+import { currentSeasonInfo, getCardsData, overallTrend } from "@/server/services/player-card";
+import { OverallTrend } from "@/components/cards/overall-trend";
 import { PlayerCard } from "@/components/cards/player-card";
 import { ShareImageButton } from "@/components/share/share-image";
 import { PageHeader } from "@/components/ui/basics";
@@ -20,6 +21,7 @@ export default async function CardPage({ params }: { params: Promise<{ id: strin
   const c = cards.get(id);
   if (!c) notFound();
   const p = c.player;
+  const trend = await overallTrend(p.id, p.overall);
   return (
     <>
       <PageHeader eyebrow="Carta" title={p.nickname} actions={<>
@@ -30,6 +32,7 @@ export default async function CardPage({ params }: { params: Promise<{ id: strin
         <div className="mx-auto"><PlayerCard nickname={p.nickname} position={p.primaryPosition} shirtNumber={p.shirtNumber} avatarUrl={p.avatarUrl}
           ovr={c.ovr.value} ovrSource={c.ovr.source} attributes={c.attributes} seasonLabel={seasonName ? `Temporada ${seasonName}` : "Ascend CF"} size="lg" tilt /></div>
         <section className="card p-5">
+          <OverallTrend trend={trend} synced={p.overallSource === "ea" ? p.overallSyncedAt : null} className="mb-3 text-ink-400" />
           <p className="mb-3 text-sm text-ink-400">
             {c.ovr.source === "ea" ? "O número grande é o overall informado do EA FC." : c.ovr.source === "rating" ? "O número grande é a nota média da temporada × 10." : "Ainda sem partidas registradas."}{" "}
             Os atributos mostram a posição do jogador <b className="text-ink-200">em relação ao elenco</b> (30 = menor, 99 = maior) e só usam estatísticas registradas.

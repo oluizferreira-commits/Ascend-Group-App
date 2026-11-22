@@ -3,7 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { GitCompareArrows, Pencil } from "lucide-react";
 import { requirePage } from "@/server/auth/session";
-import { currentSeasonInfo, getCardsData, getMe } from "@/server/services/player-card";
+import { currentSeasonInfo, getCardsData, getMe, overallTrend } from "@/server/services/player-card";
+import { OverallTrend } from "@/components/cards/overall-trend";
 import { pendingCallupsFor } from "@/server/services/calendar";
 import { PlayerCard } from "@/components/cards/player-card";
 import { ShareImageButton } from "@/components/share/share-image";
@@ -22,6 +23,7 @@ export default async function MePage() {
   const { seasonId, seasonName } = await currentSeasonInfo(ctx.club.id);
   const [{ cards }, callups] = await Promise.all([getCardsData(ctx.club.id, seasonId), pendingCallupsFor(me.id)]);
   const c = cards.get(me.id)!;
+  const trend = await overallTrend(me.id, me.overall);
   const s = c.summary;
 
   return (
@@ -38,6 +40,7 @@ export default async function MePage() {
             <p className="font-display text-sm font-semibold tracking-[0.35em] text-silver uppercase">{me.shirtNumber != null ? `Camisa ${me.shirtNumber}` : "Ascend CF"}</p>
             <h1 className="mt-1 font-display text-5xl leading-none font-bold tracking-[0.03em] text-white uppercase sm:text-6xl">{me.nickname}</h1>
             <p className="mt-2 text-ink-300">{POSITION_NAMES[me.primaryPosition]}</p>
+            <OverallTrend trend={trend} synced={me.overallSource === "ea" ? me.overallSyncedAt : null} className="mt-2 justify-center text-ink-300 md:justify-start" />
             <p className="mt-1 text-xs text-ink-400">{c.ovr.source === "ea" ? "Geral = overall do EA FC" : c.ovr.source === "rating" ? "Geral = nota média × 10" : "Sem jogos registrados ainda"} · atributos comparados ao elenco</p>
             <div className="mt-5 flex flex-wrap justify-center gap-2 md:justify-start">
               <ShareImageButton url={`/api/card/${me.id}`} filename={`ascend-carta-${me.shirtNumber ?? me.nickname}.png`} title={`Minha carta no Ascend CF`} label="Compartilhar carta"

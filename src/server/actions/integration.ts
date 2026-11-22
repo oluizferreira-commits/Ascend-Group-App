@@ -6,8 +6,8 @@ import { db, schema } from "@/db";
 import { requireAction } from "../auth/session";
 import { audit } from "../audit";
 import type { ActionResult } from "../errors";
-import { EA_MATCH_TYPES, EA_PLATFORMS, type EaMatchType } from "@/integrations/ea-fc/types";
-import { MIN_SYNC_INTERVAL_MS, PROVIDER, fetchAllMatchTypes, fetchMembers, getEaConfig, lastServerFetch, latestMembersSnapshot, runLoggedImport, storeMembersSnapshot } from "../services/ea-sync";
+import { EA_MATCH_TYPES, EA_PLATFORMS, eaMembersResponseSchema, type EaMatchType } from "@/integrations/ea-fc/types";
+import { MIN_SYNC_INTERVAL_MS, PROVIDER, fetchAllMatchTypes, fetchMembers, getEaConfig, syncMembersFromEa, applyMembersPayload, lastServerFetch, latestMembersSnapshot, runLoggedImport } from "../services/ea-sync";
 import { EA_LINE_TO_POSITION } from "@/integrations/ea-fc/mapper";
 import { pgErrorCode } from "../errors";
 import { sql } from "drizzle-orm";
@@ -49,9 +49,11 @@ export async function syncNowAction(_prev: ActionResult | null): Promise<ActionR
     clubId: ctx.club.id, eaClubId: cfg.eaClubId, trigger: "manual", userId: ctx.user.id, origin: "server",
     batches: () => fetchAllMatchTypes(cfg.platform!, cfg.eaClubId!),
   });
-  await audit(ctx, "integration.sync", "synchronization_log", log.id, { status: log.status });
+  const changes = await syncMembersFromEa(ctx.club.id, cfg.platform, cfg.eaClubId).catch(() => []);
+  await audit(ctx, "integration.sync", "synchronization_log", log.id, { status: log.status, overallChanges: changes.length });
   revalidatePath("/app", "layout");
-  return summarize(log);
+  const r = summarize(log);
+  return r.ok && changes.length ? { ...r, message: `${r.message} Overall atualizado de ${changes.length} jogador(es).` } : r;
 }
 
 export async function importJsonAction(_prev: ActionResult | null, form: FormData): Promise<ActionResult> {
@@ -76,8 +78,9 @@ export async function importJsonAction(_prev: ActionResult | null, form: FormDat
   }
   if (payload && typeof payload === "object" && !Array.isArray(payload) && "members" in payload) {
     try {
-      const snap = await storeMembersSnapshot(ctx.club.id, ctx.user.id, payload, "json");
-      await audit(ctx, "integration.import_members", "synchronization_log", snap.id, { members: snap.itemsFound });
+      if (!eaMembersResponseSchema.safeParse(payload).success) return { ok: false, error: "Formato de membros da EA não reconhecido. Envie a resposta do endpoint members/stats." };
+      const changes = await applyMembersPayload(ctx.club.id, payload, "json");
+      await audit(ctx, "integration.import_members", "club", ctx.club.id, { overallChanges: changes.length });
     } catch (e) {
       return { ok: false, error: (e as Error).message };
     }
@@ -111,14 +114,15 @@ export async function fetchMembersAction(_prev: ActionResult | null): Promise<Ac
   const ctx = await requireAction("integration.manage");
   const cfg = await getEaConfig(ctx.club.id);
   if (!cfg.platform || !cfg.eaClubId) return { ok: false, error: "Configure a plataforma e o ID do clube na EA primeiro." };
+  let changes: Awaited<ReturnType<typeof applyMembersPayload>> = [];
   try {
-    const snap = await storeMembersSnapshot(ctx.club.id, ctx.user.id, await fetchMembers(cfg.platform, cfg.eaClubId), "server");
-    await audit(ctx, "integration.import_members", "synchronization_log", snap.id, { members: snap.itemsFound });
+    changes = await applyMembersPayload(ctx.club.id, await fetchMembers(cfg.platform, cfg.eaClubId), "server");
+    await audit(ctx, "integration.import_members", "club", ctx.club.id, { overallChanges: changes.length });
   } catch (e) {
     return { ok: false, error: (e as Error).message };
   }
-  revalidatePath("/app/integracao");
-  return { ok: true, message: "Elenco da EA atualizado." };
+  revalidatePath("/app", "layout");
+  return { ok: true, message: changes.length ? `Elenco atualizado · overall de ${changes.length} jogador(es) mudou.` : "Elenco da EA atualizado." };
 }
 
 /** Creates a roster player from an EA member of the latest snapshot (linked by EA name). */
@@ -135,6 +139,7 @@ export async function createPlayerFromEaAction(eaName: string): Promise<void> {
     const [p] = await db.insert(schema.players).values({
       clubId: ctx.club.id, fullName: m.name, nickname: m.name.slice(0, 40), eaName: m.name, primaryPosition: position,
       overall: m.proOverall != null && m.proOverall >= 1 && m.proOverall <= 99 ? m.proOverall : null, status: "available",
+      overallSource: m.proOverall != null ? "ea" : "manual", overallSyncedAt: m.proOverall != null ? new Date() : null,
     }).returning({ id: schema.players.id });
     await audit(ctx, "player.create_from_ea", "player", p.id, { eaName: m.name });
   } catch (e) {

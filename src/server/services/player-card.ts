@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq, gt } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { getSeasonStats } from "./stats";
 import { getClubOverview } from "./club";
@@ -33,4 +33,15 @@ export async function getMe(ctx: AuthContext) {
   if (!ctx.playerId) return null;
   const [p] = await db.select().from(schema.players).where(and(eq(schema.players.id, ctx.playerId), eq(schema.players.clubId, ctx.club.id)));
   return p ?? null;
+}
+
+/** Overall change in the last `days` (EA or manual), e.g. +2. null when unchanged / no history. */
+export async function overallTrend(playerId: string, current: number | null, days = 14) {
+  if (current == null) return null;
+  const [first] = await db.select().from(schema.playerOverallHistory)
+    .where(and(eq(schema.playerOverallHistory.playerId, playerId), gt(schema.playerOverallHistory.recordedAt, new Date(Date.now() - days * 86400_000))))
+    .orderBy(asc(schema.playerOverallHistory.recordedAt)).limit(1);
+  if (!first || first.previous == null) return null;
+  const delta = current - first.previous;
+  return delta === 0 ? null : { delta, days };
 }

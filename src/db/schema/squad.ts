@@ -25,6 +25,9 @@ export const players = pgTable(
     secondaryPositions: positionEnum("secondary_positions").array().notNull().default(sql`'{}'::field_position[]`),
     preferredFoot: preferredFootEnum("preferred_foot"),
     overall: smallint("overall"),
+    // "ea" when the value comes from the EA members sync, "manual" when typed by staff.
+    overallSource: text("overall_source").notNull().default("manual"),
+    overallSyncedAt: timestamp("overall_synced_at", { withTimezone: true }),
     playStyle: text("play_style"),
     joinedOn: date("joined_on"),
     status: playerStatusEnum("status").notNull().default("available"),
@@ -65,3 +68,17 @@ export const ratingSettings = pgTable("rating_settings", {
   minMatchesPct: integer("min_matches_pct").notNull().default(30),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/** Every overall change detected from EA (or set manually) — powers trends like "+2 in 14 days". */
+export const playerOverallHistory = pgTable(
+  "player_overall_history",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    playerId: uuid("player_id").notNull().references(() => players.id, { onDelete: "cascade" }),
+    overall: smallint("overall").notNull(),
+    previous: smallint("previous"),
+    source: text("source").notNull(),
+    recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("overall_history_player_time_idx").on(t.playerId, t.recordedAt)],
+);

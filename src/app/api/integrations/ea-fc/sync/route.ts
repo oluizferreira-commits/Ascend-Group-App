@@ -8,7 +8,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { isNotNull } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { bearerMatches } from "@/server/token-auth";
-import { MIN_SYNC_INTERVAL_MS, fetchAllMatchTypes, lastServerFetch, runLoggedImport } from "@/server/services/ea-sync";
+import { MIN_SYNC_INTERVAL_MS, fetchAllMatchTypes, lastServerFetch, runLoggedImport, syncMembersFromEa } from "@/server/services/ea-sync";
 import { EA_PLATFORMS, type EaPlatform } from "@/integrations/ea-fc/types";
 
 export async function GET(req: NextRequest) {
@@ -28,7 +28,8 @@ export async function GET(req: NextRequest) {
       clubId: c.id, eaClubId: c.eaClubId!, trigger: "scheduled", userId: null, origin: "server",
       batches: () => fetchAllMatchTypes(c.eaPlatform as EaPlatform, c.eaClubId!),
     });
-    results.push({ club: c.slug, status: log.status, created: log.itemsCreated, error: log.errorMessage });
+    const changes = await syncMembersFromEa(c.id, c.eaPlatform as EaPlatform, c.eaClubId!);
+    results.push({ club: c.slug, status: log.status, created: log.itemsCreated, overallChanges: changes.length, error: log.errorMessage });
   }
   return NextResponse.json({ results });
 }

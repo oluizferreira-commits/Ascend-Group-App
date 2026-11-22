@@ -58,6 +58,13 @@ automática ("EA · Liga (divisões)", "EA · Playoffs", "EA · Amistosos").
    ```
    Ele envia para `POST /api/integrations/ea-fc/ingest` (Bearer `EA_SYNC_TOKEN`).
 
+## 3.1 Overall automático
+
+A cada sincronização (automática, manual, agendada ou pelo agente) o app também lê `members/stats` e atualiza o
+`overall` de todo jogador cujo **Nome / ID no EA FC** bate com um membro da EA (`proOverall`). Cada mudança vai para
+`player_overall_history` (usada no indicador “▲ +2 em 14 dias”) e, quando o overall sobe, o jogador recebe uma
+notificação. O valor da EA prevalece sobre edições manuais (`players.overall_source` = `ea`).
+
 ## 4. Riscos e limites (honestos)
 
 - Endpoints não oficiais podem mudar ou ser bloqueados sem aviso. O app continua funcionando pelo cadastro manual.

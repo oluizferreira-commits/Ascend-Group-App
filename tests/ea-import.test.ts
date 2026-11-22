@@ -60,3 +60,31 @@ d("EA import pipeline", () => {
     await expect(importEaMatches(db, { clubId, eaClubId: "111", matchType: "leagueMatch", payload: { error: "x" } })).rejects.toThrow(/não reconhecido/);
   });
 });
+
+import { syncOveralls } from "@/integrations/ea-fc/overalls";
+
+d("EA overall sync", () => {
+  const sql = postgres(url!, { max: 1, onnotice: () => {} });
+  const db = drizzle(sql, { schema });
+  afterAll(() => sql.end());
+
+  it("updates linked players, records history and is idempotent", async () => {
+    const [club] = await db.select().from(schema.clubs);
+    const payload = { members: [{ name: "TESTEST", proOverall: "88" }, { name: "Desconhecido", proOverall: "70" }, { name: "TesteCM", proOverall: "" }] };
+    const first = await syncOveralls(db, club.id, payload);
+    expect(first.map((c) => c.to)).toEqual([88]);
+    const [p] = await db.select().from(schema.players).where(eq(schema.players.eaName, "testest"));
+    expect(p.overall).toBe(88);
+    expect(p.overallSource).toBe("ea");
+    expect(await syncOveralls(db, club.id, payload)).toEqual([]);
+    const up = await syncOveralls(db, club.id, { members: [{ name: "testest", proOverall: 90 }] });
+    expect(up[0]).toMatchObject({ from: 88, to: 90 });
+    const hist = await db.select().from(schema.playerOverallHistory).where(eq(schema.playerOverallHistory.playerId, p.id));
+    expect(hist.map((h) => h.overall).sort()).toEqual([88, 90]);
+  });
+
+  it("rejects a payload that is not a members list", async () => {
+    const [club] = await db.select().from(schema.clubs);
+    await expect(syncOveralls(db, club.id, [{}])).rejects.toThrow();
+  });
+});

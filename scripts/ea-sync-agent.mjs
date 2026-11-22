@@ -47,14 +47,15 @@ async function syncOnce() {
     batches.push({ matchType, payload: await eaGet("clubs/matches", { clubIds: EA_FC_CLUB_ID, matchType, maxResultCount: "10" }) });
     await sleep(2000); // be gentle with EA
   }
+  const members = await eaGet("members/stats", { clubId: EA_FC_CLUB_ID }).catch(() => undefined); // overall sync
   const res = await fetch(new URL("/api/integrations/ea-fc/ingest", APP_URL), {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${EA_SYNC_TOKEN}` },
-    body: JSON.stringify({ eaClubId: EA_FC_CLUB_ID, batches }),
+    body: JSON.stringify({ eaClubId: EA_FC_CLUB_ID, batches, members }),
   });
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(`Plataforma respondeu HTTP ${res.status}: ${JSON.stringify(body)}`);
-  log(`OK — status=${body.status} encontradas=${body.found} novas=${body.created} existentes=${body.skipped}`);
+  log(`OK — status=${body.status} encontradas=${body.found} novas=${body.created} existentes=${body.skipped} overall atualizados=${body.overallChanges ?? 0}`);
   if (body.unmatchedPlayers?.length) log("Sem vínculo no elenco:", body.unmatchedPlayers.map((u) => u.eaName).join(", "));
 }
 

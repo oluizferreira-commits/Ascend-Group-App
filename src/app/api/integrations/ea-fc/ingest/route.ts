@@ -8,12 +8,13 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { bearerMatches } from "@/server/token-auth";
-import { runLoggedImport } from "@/server/services/ea-sync";
+import { applyMembersPayload, runLoggedImport } from "@/server/services/ea-sync";
 import { EA_MATCH_TYPES } from "@/integrations/ea-fc/types";
 
 const bodySchema = z.object({
   eaClubId: z.string().regex(/^\d{1,15}$/),
   batches: z.array(z.object({ matchType: z.enum(EA_MATCH_TYPES), payload: z.unknown() })).min(1).max(5),
+  members: z.unknown().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -31,9 +32,10 @@ export async function POST(req: NextRequest) {
   const [club] = await db.select({ id: schema.clubs.id }).from(schema.clubs).where(eq(schema.clubs.eaClubId, body.eaClubId));
   if (!club) return NextResponse.json({ error: "club not configured" }, { status: 404 });
   const log = await runLoggedImport({ clubId: club.id, eaClubId: body.eaClubId, trigger: "scheduled", userId: null, origin: "agent", batches: body.batches });
-  await db.insert(schema.auditLogs).values({ clubId: club.id, action: "integration.agent_ingest", entityType: "synchronization_log", entityId: log.id, metadata: { status: log.status } });
+  const changes = body.members ? await applyMembersPayload(club.id, body.members, "agent") : [];
+  await db.insert(schema.auditLogs).values({ clubId: club.id, action: "integration.agent_ingest", entityType: "synchronization_log", entityId: log.id, metadata: { status: log.status, overallChanges: changes.length } });
   return NextResponse.json({
-    status: log.status, found: log.itemsFound, created: log.itemsCreated, skipped: log.itemsSkipped, error: log.errorMessage,
+    status: log.status, overallChanges: changes.length, found: log.itemsFound, created: log.itemsCreated, skipped: log.itemsSkipped, error: log.errorMessage,
     unmatchedPlayers: (log.details as { unmatchedPlayers?: unknown }).unmatchedPlayers ?? [],
   });
 }

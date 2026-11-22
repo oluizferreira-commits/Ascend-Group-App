@@ -54,7 +54,12 @@ export async function updatePlayerAction(playerId: string, _prev: ActionResult |
     await assertUserInClub(parsed.data.userId, ctx.club.id);
     const [before] = await db.select().from(schema.players).where(and(eq(schema.players.id, playerId), eq(schema.players.clubId, ctx.club.id)));
     if (!before) return { ok: false, error: "Jogador não encontrado." };
-    await db.update(schema.players).set(toRow(parsed.data)).where(and(eq(schema.players.id, playerId), eq(schema.players.clubId, ctx.club.id)));
+    const overallChanged = before.overall !== parsed.data.overall;
+    await db.update(schema.players).set({ ...toRow(parsed.data), ...(overallChanged ? { overallSource: "manual" } : {}) })
+      .where(and(eq(schema.players.id, playerId), eq(schema.players.clubId, ctx.club.id)));
+    if (overallChanged && parsed.data.overall != null) {
+      await db.insert(schema.playerOverallHistory).values({ playerId, overall: parsed.data.overall, previous: before.overall, source: "manual" });
+    }
     const changed = Object.keys(parsed.data).filter((k) => JSON.stringify((before as Record<string, unknown>)[k]) !== JSON.stringify((parsed.data as Record<string, unknown>)[k]));
     await audit(ctx, "player.update", "player", playerId, { changed });
   } catch (e) {

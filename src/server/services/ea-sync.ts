@@ -4,6 +4,7 @@ import { db, schema } from "@/db";
 import { notify } from "../notify";
 import { eaGet, eaUrl, matchesUrl, EaBlockedError } from "@/integrations/ea-fc/client";
 import { importEaMatches, type ImportSummary } from "@/integrations/ea-fc/importer";
+import { syncOveralls } from "@/integrations/ea-fc/overalls";
 import { EA_MATCH_TYPES, EA_PLATFORMS, eaMembersResponseSchema, type EaMatchType, type EaPlatform } from "@/integrations/ea-fc/types";
 
 export const PROVIDER = "ea_fc";
@@ -127,6 +128,7 @@ export async function maybeAutoSync(clubId: string) {
       clubId, eaClubId: cfg.eaClubId, trigger: "scheduled", userId: null, origin: "auto", logId,
       batches: () => fetchAllMatchTypes(cfg.platform!, cfg.eaClubId!),
     });
+    await syncMembersFromEa(clubId, cfg.platform, cfg.eaClubId);
   } catch (e) {
     console.error("[auto-sync] failed", e);
   }
@@ -157,4 +159,30 @@ export async function latestMembersSnapshot(clubId: string) {
   const logs = await listSyncLogs(clubId, 50);
   const log = logs.find((l) => String((l.details as { origin?: string }).origin ?? "").startsWith("members:"));
   return log ? { at: log.startedAt, members: (log.details as { members: MemberSnapshot[] }).members } : null;
+}
+
+/**
+ * Members refresh: stores the snapshot (roster linking screen) and updates every linked
+ * player's overall from EA. Players whose overall went UP get a notification. Never throws.
+ */
+export async function applyMembersPayload(clubId: string, payload: unknown, origin: string) {
+  try {
+    await storeMembersSnapshot(clubId, null, payload, origin);
+    const changes = await syncOveralls(db, clubId, payload);
+    for (const c of changes) {
+      if (c.from != null && c.to > c.from) {
+        await notify(clubId, { kind: "players", playerIds: [c.playerId] }, {
+          type: "overall.up", title: `Seu overall subiu para ${c.to}! (+${c.to - c.from})`, body: "Sua carta já foi atualizada.", link: "/app/eu",
+        });
+      }
+    }
+    return changes;
+  } catch (e) {
+    console.error("[overall-sync] failed", e);
+    return [];
+  }
+}
+
+export async function syncMembersFromEa(clubId: string, platform: EaPlatform, eaClubId: string) {
+  return applyMembersPayload(clubId, await fetchMembers(platform, eaClubId), "server");
 }

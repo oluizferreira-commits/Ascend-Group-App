@@ -7,6 +7,7 @@ export const CHANGELOG: { date: string; title: string; items: string[] }[] = [
     date: "2026-11-22",
     title: "Seu app, sua camisa",
     items: [
+      "Overall agora vem direto da EA e se atualiza sozinho quando você upa o seu jogador — com aviso e tendência na carta.",
       "O app agora é personalizado com o número da sua camisa — no painel, no menu e na aba “Eu”.",
       "Carta de jogador estilo FUT com atributos calculados das suas estatísticas reais. Arraste para girar!",
       "Compartilhe sua carta no Instagram e no WhatsApp direto do app.",

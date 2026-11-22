@@ -9,6 +9,7 @@ export type PlayerFormValues = {
   fullName?: string; nickname?: string; eaName?: string | null; avatarUrl?: string | null; shirtNumber?: number | null;
   primaryPosition?: string; secondaryPositions?: string[]; preferredFoot?: string | null; overall?: number | null;
   playStyle?: string | null; joinedOn?: string | null; status?: string; userId?: string | null;
+  overallSource?: string; overallSyncedAt?: Date | null;
 };
 
 export function PlayerForm({
@@ -67,7 +68,8 @@ export function PlayerForm({
             {FEET.map((f) => <option key={f} value={f}>{FOOT_LABELS[f]}</option>)}
           </select>
         </Field>
-        <Field label="Overall" name="overall" error={fe.overall} hint="Somente se informado no jogo.">
+        <Field label="Overall" name="overall" error={fe.overall}
+          hint={initial.overallSource === "ea" ? `Atualizado automaticamente pela EA${initial.overallSyncedAt ? ` em ${new Date(initial.overallSyncedAt).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}` : ""}. Alterações manuais serão substituídas na próxima sincronização.` : "Preenchido automaticamente quando o nome do EA FC estiver vinculado."}>
           <input id="overall" name="overall" type="number" min={1} max={99} defaultValue={initial.overall ?? ""} className="input" />
         </Field>
         <div className="sm:col-span-3">
