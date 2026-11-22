@@ -40,7 +40,7 @@ export default async function PublicHome() {
   const theme = await getThemeMode();
   return (
     <main className="min-h-dvh">
-      <header className="scope-dark sticky top-0 z-20 border-b border-white/5 bg-[#060a16] text-ink-100">
+      <header className="scope-dark glass-dark sticky top-0 z-20 border-b text-ink-100">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-3">
             <Crest size={40} priority />

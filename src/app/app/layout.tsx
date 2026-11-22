@@ -8,6 +8,7 @@ import { runRetention } from "@/server/maintenance";
 import { ROLES } from "@/server/auth/permissions";
 import { NAV } from "@/components/shell/nav";
 import { MobileTabBar, Sidebar } from "@/components/shell/sidebar";
+import { PullToRefresh } from "@/components/pull-to-refresh";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const ctx = await requirePage();
@@ -26,10 +27,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-dvh">
       <Sidebar sections={sections} userName={ctx.user.displayName} roleNames={roleNames} unread={unread} theme={await getThemeMode()} />
-      <main className="px-4 pt-6 pb-28 sm:px-6 lg:ml-64 lg:px-10 lg:pt-10 lg:pb-12">
+      <main className="px-4 pt-5 pb-32 sm:px-6 lg:ml-64 lg:px-10 lg:pt-10 lg:pb-12">
         <div className="mx-auto max-w-7xl min-w-0">{children}</div>
       </main>
       <MobileTabBar items={tabs} />
+      <PullToRefresh />
     </div>
   );
 }

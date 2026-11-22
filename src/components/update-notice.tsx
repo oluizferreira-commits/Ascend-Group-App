@@ -52,7 +52,7 @@ export function UpdateNotice() {
   return (
     <>
       {available && (
-        <div role="status" className="scope-dark fixed inset-x-3 bottom-20 z-50 mx-auto flex max-w-md items-center gap-3 rounded-lg border border-white/10 bg-[#0c1d4f] p-3 text-ink-100 shadow-2xl lg:bottom-6" style={{ marginBottom: "env(safe-area-inset-bottom)" }}>
+        <div role="status" className="scope-dark glass-dark fixed inset-x-3 bottom-24 z-50 mx-auto flex max-w-md items-center gap-3 rounded-2xl border p-3 text-ink-100 lg:bottom-6" style={{ marginBottom: "env(safe-area-inset-bottom)" }}>
           <RefreshCw className="size-5 shrink-0 text-accent-300" />
           <p className="flex-1 text-sm"><b>Nova versão disponível.</b> Atualize para ver as novidades.</p>
           <button className="btn bg-white text-[#0c1d4f] hover:bg-[#e6ecfd]" disabled={busy} onClick={() => { setBusy(true); hardReload(); }}>
@@ -61,8 +61,8 @@ export function UpdateNotice() {
         </div>
       )}
       {showNews && latest && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" role="dialog" aria-modal="true" aria-labelledby="news-title">
-          <div className="card w-full max-w-md p-6">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="news-title">
+          <div className="glass w-full max-w-md rounded-2xl p-6">
             <div className="mb-3 flex items-start justify-between gap-2">
               <div>
                 <p className="eyebrow flex items-center gap-1.5"><Sparkles className="size-3.5" />App atualizado</p>

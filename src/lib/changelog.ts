@@ -5,8 +5,10 @@
 export const CHANGELOG: { date: string; title: string; items: string[] }[] = [
   {
     date: "2026-11-22",
-    title: "Visual com animações",
+    title: "Visual novo no celular",
     items: [
+      "Barra de navegação de vidro flutuante e menus com efeito vidro fosco.",
+      "Puxe a tela para baixo para atualizar os dados.",
       "Números do painel contam subindo e o aproveitamento ganhou um anel animado.",
       "Destaques com brilho ao passar o mouse e feixe de luz no topo do painel.",
       "Faixa rolante com os últimos resultados no site do clube.",

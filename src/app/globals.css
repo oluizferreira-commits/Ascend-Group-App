@@ -105,10 +105,35 @@
   --shadow: none;
 }
 
-html,
-body {
+html {
   background: var(--ink-950);
   color: var(--ink-100);
+}
+body {
+  color: var(--ink-100);
+}
+
+/* Ambient brand glow behind everything — gives the glass something to blur. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60vmax 45vmax at 85% -10%, color-mix(in oklab, #1c3fb0 22%, transparent), transparent 70%),
+    radial-gradient(50vmax 40vmax at -10% 105%, color-mix(in oklab, #3a63f0 14%, transparent), transparent 70%);
+}
+:root[data-theme="light"] body::before {
+  opacity: 0.55;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) body::before { opacity: 0.55; }
+}
+/* No support for backdrop blur → fall back to solid surfaces. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { background: var(--ink-900); }
+  .glass-dark { background: #060a16; }
 }
 
 body {
@@ -190,6 +215,26 @@ code.select-all {
   background:
     linear-gradient(115deg, transparent 0 62%, rgb(255 255 255 / 0.035) 62% 64%, transparent 64% 70%, rgb(255 255 255 / 0.03) 70% 71%, transparent 71%),
     linear-gradient(135deg, #15318a 0%, #0c1d4f 55%, #060c22 100%);
+}
+
+/* ── Glassmorphism ───────────────────────────────────────── */
+/* Frosted glass that follows the theme (use on nav bars, sheets, notices, modals). */
+@utility glass {
+  background: color-mix(in oklab, var(--ink-900) 70%, transparent);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid color-mix(in oklab, var(--ink-100) 9%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, #fff 10%, transparent),
+    0 10px 30px -12px rgb(2 6 23 / 0.45);
+}
+/* Always-dark glass (headers and bars that sit on the navy identity). */
+@utility glass-dark {
+  background: rgb(6 10 22 / 0.9);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+  border-color: rgb(255 255 255 / 0.08);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
 }
 
 @utility scope-dark {

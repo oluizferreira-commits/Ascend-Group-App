@@ -15,7 +15,7 @@ export function CookieNotice() {
   }, []);
   if (!show) return null;
   return (
-    <div role="region" aria-label="Aviso de cookies" className="scope-dark fixed inset-x-3 bottom-20 z-40 mx-auto flex max-w-lg flex-col gap-3 rounded-lg border border-white/10 bg-[#0a0e17] p-4 text-sm text-ink-300 shadow-2xl sm:flex-row sm:items-center lg:bottom-6" style={{ marginBottom: "env(safe-area-inset-bottom)" }}>
+    <div role="region" aria-label="Aviso de cookies" className="scope-dark glass-dark fixed inset-x-3 bottom-24 z-40 mx-auto flex max-w-lg flex-col gap-3 rounded-2xl border p-4 text-sm text-ink-300 sm:flex-row sm:items-center lg:bottom-6" style={{ marginBottom: "env(safe-area-inset-bottom)" }}>
       <p className="flex-1">
         Usamos apenas <b className="text-ink-100">cookies essenciais</b> para login e preferências — sem anúncios ou rastreamento.{" "}
         <Link href="/privacidade#cookies" className="text-accent-300 underline">Saiba mais</Link>

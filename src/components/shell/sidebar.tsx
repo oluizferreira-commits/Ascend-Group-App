@@ -124,7 +124,7 @@ export function Sidebar({ sections, userName, roleNames, unread, theme }: { sect
       </aside>
 
       {/* Mobile top bar */}
-      <header className="scope-dark sticky top-0 z-30 flex items-center justify-between border-b border-white/5 bg-[#060a16] px-4 py-3 text-ink-100 lg:hidden" style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
+      <header className="scope-dark glass-dark sticky top-0 z-30 flex items-center justify-between border-b px-4 py-3 text-ink-100 lg:hidden" style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
         <Brand />
         <div className="flex items-center gap-1"><BellLink unread={unread} />
         <button onClick={() => setOpen(true)} className="btn-ghost px-2" aria-label="Abrir menu" aria-expanded={open}>
@@ -134,8 +134,8 @@ export function Sidebar({ sections, userName, roleNames, unread, theme }: { sect
 
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setOpen(false)} />
-          <div className="scope-dark absolute inset-y-0 right-0 flex w-80 max-w-[85vw] flex-col bg-[#060a16] px-3 py-5 text-ink-100 animate-rise">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
+          <div className="scope-dark glass-dark absolute inset-y-2 right-2 flex w-80 max-w-[85vw] flex-col rounded-2xl border px-3 py-5 text-ink-100 animate-rise">
             <div className="mb-4 flex items-center justify-between">
               <Brand />
               <button onClick={() => setOpen(false)} className="btn-ghost px-2" aria-label="Fechar menu"><X className="size-5" /></button>
@@ -152,15 +152,20 @@ export function Sidebar({ sections, userName, roleNames, unread, theme }: { sect
 export function MobileTabBar({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 grid border-t border-ink-700 bg-ink-900/95 backdrop-blur lg:hidden" style={{ gridTemplateColumns: `repeat(${items.length}, 1fr)`, paddingBottom: "env(safe-area-inset-bottom)" }} aria-label="Atalhos">
+    <nav
+      aria-label="Atalhos"
+      className="glass fixed inset-x-3 z-30 grid rounded-2xl p-1.5 lg:hidden"
+      style={{ gridTemplateColumns: `repeat(${items.length}, 1fr)`, bottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+    >
       {items.map((item) => {
         const Icon = ICONS[item.icon] ?? LayoutDashboard;
         const active = isActive(pathname, item.href);
         return (
-          <Link key={item.href} href={item.href} className={cn("relative flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium", active ? "text-accent-400" : "text-ink-400")}>
-            {active && <motion.span layoutId="tab-active" className="absolute inset-x-4 top-0 h-[3px] rounded-b bg-accent-500" />}
-            <Icon className="size-5" />
-            {item.label}
+          <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined}
+            className={cn("relative flex flex-col items-center gap-0.5 rounded-xl py-2 text-[10px] font-semibold transition-colors", active ? "text-white" : "text-ink-400 active:text-ink-100")}>
+            {active && <motion.span layoutId="tab-active" className="absolute inset-0 rounded-xl bg-[#1c3fb0] shadow-[0_6px_16px_-6px_rgb(28_63_176/0.8)]" />}
+            <Icon className="relative size-5" />
+            <span className="relative">{item.label}</span>
           </Link>
         );
       })}
