@@ -119,7 +119,7 @@ export default async function DashboardPage() {
       {me && mySummary && myAttrs && myOvr && (
         <Reveal>
           <section className="card flex flex-col items-center gap-5 overflow-hidden p-5 sm:flex-row">
-            <Link href="/app/eu" aria-label="Abrir meu espaço"><PlayerCard nickname={me.nickname} position={me.primaryPosition} shirtNumber={me.shirtNumber} avatarUrl={me.avatarUrl}
+            <Link href="/app/eu" aria-label="Abrir meu espaço"><PlayerCard nickname={me.nickname} position={me.primaryPosition} shirtNumber={me.shirtNumber} avatarUrl={me.avatarUrl} photoX={me.photoX} photoY={me.photoY} photoZoom={me.photoZoom}
               ovr={myOvr.value} ovrSource={myOvr.source} attributes={myAttrs} size="sm" /></Link>
             <div className="w-full flex-1">
               <p className="eyebrow">Minha temporada</p>

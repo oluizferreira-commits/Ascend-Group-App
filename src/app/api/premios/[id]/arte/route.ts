@@ -18,7 +18,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   if (!c) return NextResponse.json({ error: "Jogador não encontrado." }, { status: 404 });
   const img = await renderShareCard({
     nickname: c.player.nickname, position: c.player.primaryPosition, shirtNumber: c.player.shirtNumber,
-    photo: await avatarDataUrl(c.player.avatarUrl), ovr: c.ovr.value, attributes: c.attributes,
+    photo: await avatarDataUrl(c.player.avatarUrl), photoX: c.player.photoX, photoY: c.player.photoY, photoZoom: c.player.photoZoom, ovr: c.ovr.value, attributes: c.attributes,
     seasonLabel: e.label.replace("Semana de ", ""), // award name is already in the header
   }, `${AWARD_LABELS[e.kind].toUpperCase()} · ${e.label.toUpperCase()}`);
   const h = new Headers(img.headers);

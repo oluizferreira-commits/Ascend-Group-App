@@ -96,7 +96,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
 
       <section className="card-premium mt-6 px-3 py-8 sm:px-8">
         <div className="relative grid grid-cols-[1fr_auto_1fr] items-center gap-2 sm:gap-6">
-          <Reveal className="flex min-w-0 justify-center"><PlayerCard nickname={A.player.nickname} position={A.player.primaryPosition} shirtNumber={A.player.shirtNumber} avatarUrl={A.player.avatarUrl}
+          <Reveal className="flex min-w-0 justify-center"><PlayerCard nickname={A.player.nickname} position={A.player.primaryPosition} shirtNumber={A.player.shirtNumber} avatarUrl={A.player.avatarUrl} photoX={A.player.photoX} photoY={A.player.photoY} photoZoom={A.player.photoZoom}
             ovr={A.ovr.value} ovrSource={A.ovr.source} attributes={A.attributes} size="md" tilt
             highlight={Object.fromEntries((Object.keys(ATTRIBUTES) as AttributeKey[]).map((k) => [k, attrWinner(k, "a")]))} /></Reveal>
           <div className="flex flex-col items-center text-center">
@@ -108,7 +108,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
             {leader && <span className="mt-3 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-white sm:text-xs">Vantagem: {leader}</span>}
             {score.ties > 0 && <span className="mt-1 text-[11px] text-ink-400">{score.ties} empate(s)</span>}
           </div>
-          <Reveal delay={0.1} className="flex min-w-0 justify-center"><PlayerCard nickname={B.player.nickname} position={B.player.primaryPosition} shirtNumber={B.player.shirtNumber} avatarUrl={B.player.avatarUrl}
+          <Reveal delay={0.1} className="flex min-w-0 justify-center"><PlayerCard nickname={B.player.nickname} position={B.player.primaryPosition} shirtNumber={B.player.shirtNumber} avatarUrl={B.player.avatarUrl} photoX={B.player.photoX} photoY={B.player.photoY} photoZoom={B.player.photoZoom}
             ovr={B.ovr.value} ovrSource={B.ovr.source} attributes={B.attributes} size="md" tilt
             highlight={Object.fromEntries((Object.keys(ATTRIBUTES) as AttributeKey[]).map((k) => [k, attrWinner(k, "b")]))} /></Reveal>
         </div>

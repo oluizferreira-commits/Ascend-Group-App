@@ -5,10 +5,10 @@ import { GitCompareArrows } from "lucide-react";
 import { requirePage } from "@/server/auth/session";
 import { currentSeasonInfo, getCardsData, overallTrend } from "@/server/services/player-card";
 import { OverallTrend } from "@/components/cards/overall-trend";
-import { PlayerCard } from "@/components/cards/player-card";
+import { CARD_ATTRS, PlayerCard } from "@/components/cards/player-card";
 import { ShareImageButton } from "@/components/share/share-image";
 import { PageHeader } from "@/components/ui/basics";
-import { ATTRIBUTES, type AttributeKey } from "@/lib/attributes";
+import { ATTRIBUTES } from "@/lib/attributes";
 
 export const metadata: Metadata = { title: "Carta do jogador" };
 
@@ -29,7 +29,7 @@ export default async function CardPage({ params }: { params: Promise<{ id: strin
         <Link href={`/app/comparar?a=${id}`} className="btn-secondary"><GitCompareArrows className="size-4" />Comparar</Link>
       </>} />
       <div className="grid items-start gap-8 md:grid-cols-[auto_1fr]">
-        <div className="mx-auto"><PlayerCard nickname={p.nickname} position={p.primaryPosition} shirtNumber={p.shirtNumber} avatarUrl={p.avatarUrl}
+        <div className="mx-auto"><PlayerCard nickname={p.nickname} position={p.primaryPosition} shirtNumber={p.shirtNumber} avatarUrl={p.avatarUrl} photoX={p.photoX} photoY={p.photoY} photoZoom={p.photoZoom}
           ovr={c.ovr.value} ovrSource={c.ovr.source} attributes={c.attributes} seasonLabel={seasonName ? `Temporada ${seasonName}` : "Ascend CF"} size="lg" tilt /></div>
         <section className="card p-5">
           <OverallTrend trend={trend} synced={p.overallSource === "ea" ? p.overallSyncedAt : null} className="mb-3 text-ink-400" />
@@ -38,7 +38,7 @@ export default async function CardPage({ params }: { params: Promise<{ id: strin
             Os atributos mostram a posição do jogador <b className="text-ink-200">em relação ao elenco</b> (30 = menor, 99 = maior) e só usam estatísticas registradas.
           </p>
           <dl className="divide-y divide-ink-800">
-            {(Object.keys(ATTRIBUTES) as AttributeKey[]).map((k) => (
+            {CARD_ATTRS.map((k) => (
               <div key={k} className="flex items-center gap-3 py-2.5">
                 <dt className="w-10 font-display font-bold text-accent-400">{k}</dt>
                 <dd className="flex-1 text-sm"><span className="text-ink-100">{ATTRIBUTES[k].label}</span> <span className="text-xs text-ink-400">· {ATTRIBUTES[k].hint}</span></dd>

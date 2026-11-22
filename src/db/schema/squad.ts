@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
-  date, index, integer, jsonb, pgTable, smallint, text, timestamp, uniqueIndex, uuid, check,
+  customType, date, index, integer, jsonb, pgTable, smallint, text, timestamp, uniqueIndex, uuid, check,
 } from "drizzle-orm/pg-core";
 import { clubs, users } from "./core";
 import { playerStatusEnum, positionEnum, positionGroupEnum, preferredFootEnum } from "./enums";
@@ -19,6 +19,10 @@ export const players = pgTable(
     fullName: text("full_name").notNull(),
     nickname: text("nickname").notNull(),
     avatarUrl: text("avatar_url"),
+    // Photo framing on the card: focus point (0–100 %) and zoom (100 = fit).
+    photoX: smallint("photo_x").notNull().default(50),
+    photoY: smallint("photo_y").notNull().default(20),
+    photoZoom: smallint("photo_zoom").notNull().default(100),
     eaName: text("ea_name"),
     shirtNumber: smallint("shirt_number"),
     primaryPosition: positionEnum("primary_position").notNull(),
@@ -82,3 +86,14 @@ export const playerOverallHistory = pgTable(
   },
   (t) => [index("overall_history_player_time_idx").on(t.playerId, t.recordedAt)],
 );
+
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({ dataType: () => "bytea" });
+
+/** Player photo uploaded by staff (cut-out PNG/WebP with transparency is preserved). */
+export const playerPhotos = pgTable("player_photos", {
+  playerId: uuid("player_id").primaryKey().references(() => players.id, { onDelete: "cascade" }),
+  mime: text("mime").notNull(),
+  data: bytea("data").notNull(),
+  hasAlpha: integer("has_alpha").notNull().default(0),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

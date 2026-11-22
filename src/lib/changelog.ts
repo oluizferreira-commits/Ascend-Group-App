@@ -5,6 +5,16 @@
 export const CHANGELOG: { date: string; title: string; items: string[] }[] = [
   {
     date: "2026-11-22",
+    title: "Carta nova do Ascend",
+    items: [
+      "Carta redesenhada: formato de escudo, borda metálica prateada e luz azul — a nossa cara.",
+      "Cada jogador com a própria foto recortada, só o jogador, sem fundo.",
+      "Na edição do jogador: “Remover fundo” recorta a foto no próprio celular, e dá para ajustar posição e zoom vendo a carta ao vivo.",
+      "As artes de compartilhar a carta e o comparativo usam o novo visual.",
+    ],
+  },
+  {
+    date: "2026-11-22",
     title: "Bola de Prata e Bola de Ouro",
     items: [
       "Nova aba Premiações: Bola de Prata da semana e Bola de Ouro do mês.",

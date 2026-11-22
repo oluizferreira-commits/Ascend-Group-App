@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   if (!A || !B) return NextResponse.json({ error: "Jogador não encontrado." }, { status: 404 });
   const toShare = async (c: typeof A): Promise<ShareCard> => ({
     nickname: c.player.nickname, position: c.player.primaryPosition, shirtNumber: c.player.shirtNumber,
-    photo: await avatarDataUrl(c.player.avatarUrl), ovr: c.ovr.value, attributes: c.attributes, seasonLabel: label,
+    photo: await avatarDataUrl(c.player.avatarUrl), photoX: c.player.photoX, photoY: c.player.photoY, photoZoom: c.player.photoZoom, ovr: c.ovr.value, attributes: c.attributes, seasonLabel: label,
   });
   const { rows, score } = compareSummaries(A.summary, B.summary);
   const img = await renderShareCompare(await toShare(A), await toShare(B), score, rows);

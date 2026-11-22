@@ -9,7 +9,7 @@ export const playerSchema = z.object({
   // https link, or the internal photo of an approved "Seja do Ascend" application.
   avatarUrl: z.preprocess(
     (v) => (typeof v === "string" && v.trim() === "" ? null : v),
-    z.union([z.string().regex(/^\/api\/propostas\/[0-9a-f-]{36}\/foto$/i), z.url({ protocol: /^https$/, error: "Use um endereço https://" }).max(500)]).nullable(),
+    z.union([z.string().regex(/^\/api\/(propostas\/[0-9a-f-]{36}\/foto|jogadores\/[0-9a-f-]{36}\/foto(\?v=[a-z0-9]+)?)$/i), z.url({ protocol: /^https$/, error: "Use um endereço https://" }).max(500)]).nullable(),
   ),
   shirtNumber: optionalInt(1, 99),
   primaryPosition: z.enum(POSITIONS, { error: "Escolha a posição principal" }),

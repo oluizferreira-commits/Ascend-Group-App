@@ -9,6 +9,10 @@ export type PlayerCardProps = {
   position: Position;
   shirtNumber: number | null;
   avatarUrl: string | null;
+  /** Photo framing: focus point in % (object-position) and zoom (100 = fit). */
+  photoX?: number;
+  photoY?: number;
+  photoZoom?: number;
   ovr: number | null;
   ovrSource: "ea" | "rating" | null;
   attributes: Attributes;
@@ -18,38 +22,47 @@ export type PlayerCardProps = {
   highlight?: Partial<Record<AttributeKey, boolean>>;
 };
 
+/** Attribute order on the card (two rows of three). */
+export const CARD_ATTRS: AttributeKey[] = ["FIN", "DEC", "DEF", "CRI", "PAS", "REG"];
+
 const TIERS = {
-  lenda: {
-    bg: "linear-gradient(155deg,#8fa9ff 0%,#3a63f0 22%,#1c3fb0 48%,#0c1d4f 75%,#04060b 100%)",
-    ink: "#ffffff", sub: "#e6ecfd", line: "rgba(255,255,255,0.4)",
-  },
-  ascend: {
-    bg: "linear-gradient(155deg,#3a63f0 0%,#1c3fb0 40%,#0c1d4f 100%)",
-    ink: "#ffffff", sub: "#c9d6ff", line: "rgba(255,255,255,0.25)",
-  },
-  base: {
-    bg: "linear-gradient(155deg,#1d2638 0%,#0e1320 55%,#04060b 100%)",
-    ink: "#f1f4f9", sub: "#9db4ff", line: "rgba(255,255,255,0.15)",
-  },
+  lenda: { rim: "#bcd0ff", glow: "rgba(111,143,255,0.75)", metal: "linear-gradient(160deg,#ffffff 0%,#c9d1dc 18%,#7d8aa3 38%,#f4f7ff 52%,#8f9bb3 70%,#e6ecfd 100%)", label: "Lenda" },
+  ascend: { rim: "#8fa9ff", glow: "rgba(58,99,240,0.6)", metal: "linear-gradient(160deg,#e6ecfd 0%,#9aa6bd 25%,#56627a 45%,#d5dceb 60%,#6d7891 80%,#c9d1dc 100%)", label: "Ascend" },
+  base: { rim: "#5a6f9e", glow: "rgba(28,63,176,0.45)", metal: "linear-gradient(160deg,#9aa6bd 0%,#4a5672 35%,#7d8aa3 55%,#3a4560 80%,#8b96ad 100%)", label: "Base" },
 } as const;
 
 const SIZES = { sm: 180, md: 250, lg: 320 } as const;
+// Shield silhouette (echoes the club crest): peaked top, angled shoulders, pointed base.
+const SHIELD = "polygon(50% 0%, 93% 3.2%, 100% 9.5%, 100% 83%, 50% 100%, 0% 83%, 0% 9.5%, 7% 3.2%)";
 
-/** FUT-style player card. Pointer drag tilts it in 3D; "Lenda" tier gets a holographic sheen. */
+/** Font size that keeps long names on one line (≈ 10 chars at full size). */
+function nameSize(name: string) {
+  const len = [...name].length;
+  return Math.max(13, Math.min(27, 27 * (10 / Math.max(10, len))));
+}
+
+/**
+ * Ascend CF player card — our own FUT-inspired design: shield shape, silver metallic rim,
+ * blue rim light, cut-out player that fades into the card, crest, number watermark and six
+ * stat attributes. Every value comes from props (real player data). Scales fluidly to any width.
+ */
 export function PlayerCard(p: PlayerCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const tier = cardTier(p.ovr);
   const t = TIERS[tier];
   const w = SIZES[p.size ?? "md"];
-  // Fluid unit: 1/250 of the card's rendered width, so the card scales to any column (container query units).
   const u = (n: number) => `calc(${n} * 100cqw / 250)`;
+  const ovrText = p.ovr == null ? "—" : String(p.ovr);
+  const ovrSize = ovrText.length >= 3 ? 40 : 54;
+  const x = p.photoX ?? 50, y = p.photoY ?? 20, zoom = (p.photoZoom ?? 100) / 100;
+
   const onMove = (e: React.PointerEvent) => {
     if (!p.tilt || !ref.current) return;
     const r = ref.current.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
-    ref.current.style.setProperty("--rx", `${(-y * 14).toFixed(2)}deg`);
-    ref.current.style.setProperty("--ry", `${(x * 18).toFixed(2)}deg`);
-    ref.current.style.setProperty("--gx", `${((x + 0.5) * 100).toFixed(1)}%`);
+    const px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+    ref.current.style.setProperty("--rx", `${(-py * 14).toFixed(2)}deg`);
+    ref.current.style.setProperty("--ry", `${(px * 18).toFixed(2)}deg`);
+    ref.current.style.setProperty("--gx", `${((px + 0.5) * 100).toFixed(1)}%`);
   };
   const reset = () => {
     ref.current?.style.setProperty("--rx", "0deg");
@@ -59,69 +72,103 @@ export function PlayerCard(p: PlayerCardProps) {
   return (
     <div className="[perspective:900px]" style={{ width: w, maxWidth: "100%" }}>
       <div style={{ containerType: "inline-size" }}>
-      <div
-        ref={ref}
-        onPointerMove={onMove}
-        onPointerLeave={reset}
-        onPointerUp={reset}
-        className={cn("relative select-none transition-transform duration-200 ease-out will-change-transform", p.tilt && "touch-none")}
-        style={{
-          aspectRatio: "250 / 350",
-          transform: "rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))",
-          transformStyle: "preserve-3d",
-          filter: "drop-shadow(0 18px 30px rgb(4 10 40 / 0.45))",
-        }}
-        role="img"
-        aria-label={`Carta de ${p.nickname}: ${p.ovr ?? "sem nota"} geral, ${POSITION_LABELS[p.position]}`}
-      >
         <div
-          className="absolute inset-0 overflow-hidden"
-          style={{ background: t.bg, clipPath: "polygon(50% 0, 100% 7%, 100% 86%, 50% 100%, 0 86%, 0 7%)", color: t.ink }}
+          ref={ref}
+          onPointerMove={onMove}
+          onPointerLeave={reset}
+          onPointerUp={reset}
+          className={cn("relative select-none transition-transform duration-200 ease-out will-change-transform", p.tilt && "touch-none")}
+          style={{
+            aspectRatio: "250 / 352",
+            transform: "rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))",
+            transformStyle: "preserve-3d",
+            filter: `drop-shadow(0 ${u(14)} ${u(22)} rgb(2 6 23 / 0.55)) drop-shadow(0 0 ${u(10)} ${t.glow})`,
+          }}
+          role="img"
+          aria-label={`Carta de ${p.nickname}: ${p.ovr ?? "sem nota"} geral, ${POSITION_LABELS[p.position]}${p.shirtNumber != null ? `, camisa ${p.shirtNumber}` : ""}`}
         >
-          {p.shirtNumber != null && (
-            <span aria-hidden className="absolute font-display font-bold leading-none"
-              style={{ right: u(-6), top: u(70), fontSize: u(190), color: "transparent", WebkitTextStroke: `${u(1.5)} ${t.line}` }}>
-              {p.shirtNumber}
-            </span>
-          )}
-          {tier === "lenda" && (
-            <span aria-hidden className="absolute inset-0 mix-blend-overlay motion-safe:animate-[holo_5s_ease-in-out_3]"
-              style={{ background: "linear-gradient(115deg,transparent 20%,rgba(255,255,255,0.55) 40%,rgba(111,143,255,0.35) 50%,transparent 70%)", backgroundSize: "250% 100%" }} />
-          )}
-          <div className="absolute flex flex-col items-center font-display font-bold leading-none" style={{ left: u(22), top: u(34) }}>
-            <span style={{ fontSize: u(52) }}>{p.ovr ?? "—"}</span>
-            <span style={{ fontSize: u(20), color: t.sub, letterSpacing: "0.06em" }}>{POSITION_LABELS[p.position]}</span>
-            {p.shirtNumber != null && <span style={{ fontSize: u(15), marginTop: u(6), opacity: 0.85 }}>#{p.shirtNumber}</span>}
-          </div>
-          <div className="absolute overflow-hidden" style={{ right: u(18), top: u(30), width: u(140), height: u(140), borderRadius: u(12) }}>
-            {p.avatarUrl
-              ? // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.avatarUrl} alt="" draggable={false} className="h-full w-full object-cover" />
-              : <div className="grid h-full w-full place-items-center font-display font-bold" style={{ fontSize: u(64), color: t.sub, background: "rgb(255 255 255 / 0.06)" }}>
+          {/* metallic rim */}
+          <div className="absolute inset-0" style={{ clipPath: SHIELD, background: t.metal }} />
+          {/* card body */}
+          <div
+            className="absolute overflow-hidden text-white"
+            style={{
+              inset: u(4.5),
+              clipPath: SHIELD,
+              background: [
+                `radial-gradient(120% 70% at 62% 30%, ${t.glow} 0%, transparent 55%)`,
+                "radial-gradient(90% 50% at 50% 110%, rgba(28,63,176,0.55) 0%, transparent 70%)",
+                "repeating-linear-gradient(115deg, transparent 0 18px, rgba(255,255,255,0.025) 18px 19px)",
+                "linear-gradient(180deg,#0c1d4f 0%,#081236 38%,#04060b 78%)",
+              ].join(","),
+            }}
+          >
+            {/* light beams */}
+            <span aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(105deg, transparent 38%, rgba(143,169,255,0.10) 44%, transparent 50%), linear-gradient(105deg, transparent 58%, rgba(143,169,255,0.07) 62%, transparent 66%)" }} />
+            {/* shirt number watermark */}
+            {p.shirtNumber != null && (
+              <span aria-hidden className="absolute font-display leading-none font-bold" style={{ right: u(-4), top: u(22), fontSize: u(150), color: "transparent", WebkitTextStroke: `${u(1.2)} rgba(201,209,220,0.16)` }}>
+                {p.shirtNumber}
+              </span>
+            )}
+            {/* rim light behind the player */}
+            <span aria-hidden className="absolute rounded-full" style={{ left: u(70), top: u(40), width: u(170), height: u(170), background: `radial-gradient(circle, ${t.glow} 0%, transparent 65%)`, filter: `blur(${u(6)})` }} />
+
+            {/* player photo (cut-out PNG preferred) — cover + configurable focus, fades into the card */}
+            <div className="absolute" style={{ left: u(52), right: u(0), top: u(12), height: u(184), WebkitMaskImage: "linear-gradient(180deg,#000 62%,transparent 98%)", maskImage: "linear-gradient(180deg,#000 62%,transparent 98%)" }}>
+              {p.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={p.avatarUrl} alt="" draggable={false} className="h-full w-full object-cover"
+                  style={{ objectPosition: `${x}% ${y}%`, transform: `scale(${zoom})`, transformOrigin: `${x}% ${y}%`, filter: "drop-shadow(0 0 6px rgba(111,143,255,0.35)) contrast(1.05) saturate(1.05)" }} />
+              ) : (
+                <div className="grid h-full w-full place-items-center font-display font-bold" style={{ fontSize: u(84), color: "rgba(201,214,255,0.85)", textShadow: `0 0 ${u(12)} ${t.glow}` }}>
                   {p.shirtNumber ?? p.nickname.slice(0, 2).toUpperCase()}
-                </div>}
-          </div>
-          <div className="absolute inset-x-0 text-center font-display font-bold uppercase" style={{ top: u(182), fontSize: u(26), letterSpacing: "0.04em" }}>
-            <span className="block truncate px-4">{p.nickname}</span>
-            <span className="mx-auto mt-1 block" style={{ height: 1, width: "70%", background: t.line }} />
-          </div>
-          <div className="absolute grid grid-cols-2 font-display" style={{ top: u(226), left: u(34), right: u(34), columnGap: u(18), rowGap: u(2) }}>
-            {(Object.keys(ATTRIBUTES) as AttributeKey[]).map((k) => (
-              <div key={k} className="flex items-baseline gap-1.5" title={`${ATTRIBUTES[k].label}: ${ATTRIBUTES[k].hint}`}>
-                <span className={cn("font-bold tabular-nums", p.highlight?.[k] && "underline decoration-2 underline-offset-2")} style={{ fontSize: u(19), minWidth: u(24) }}>
-                  {p.attributes[k] ?? "—"}
-                </span>
-                <span style={{ fontSize: u(14), color: t.sub, letterSpacing: "0.08em" }}>{k}</span>
-              </div>
-            ))}
-          </div>
-          {p.seasonLabel && (
-            <div className="absolute inset-x-0 text-center font-display uppercase" style={{ bottom: u(26), fontSize: u(10), letterSpacing: "0.3em", color: t.sub }}>
-              {p.seasonLabel}
+                </div>
+              )}
             </div>
-          )}
+
+            {/* left column: overall, position, crest, number */}
+            <div className="absolute flex flex-col items-center font-display font-bold leading-none" style={{ left: u(14), top: u(26), width: u(56) }}>
+              <span className="tabular-nums" style={{ fontSize: u(ovrSize), textShadow: `0 ${u(2)} ${u(8)} rgba(0,0,0,0.6)` }}>{ovrText}</span>
+              <span style={{ fontSize: u(19), color: t.rim, letterSpacing: "0.06em", marginTop: u(2) }}>{POSITION_LABELS[p.position]}</span>
+              <span aria-hidden style={{ width: u(30), height: u(1.5), background: t.metal, margin: `${u(7)} 0` }} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/brand/generated/crest-128.png" alt="" draggable={false} style={{ width: u(30), height: "auto", filter: `drop-shadow(0 0 ${u(4)} ${t.glow})` }} />
+              {p.shirtNumber != null && <span className="tabular-nums" style={{ fontSize: u(15), marginTop: u(8), color: "#dbe4ff" }}>#{p.shirtNumber}</span>}
+            </div>
+
+            {/* name */}
+            <div className="absolute inset-x-0 text-center" style={{ top: u(183) }}>
+              <span className="block truncate px-[8%] font-display font-bold uppercase"
+                style={{ fontSize: u(nameSize(p.nickname)), letterSpacing: "0.05em", background: "linear-gradient(180deg,#ffffff 20%,#c9d1dc 60%,#8b96ad 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent", lineHeight: 1.15 }}>
+                {p.nickname}
+              </span>
+              <span aria-hidden className="mx-auto mt-1 block" style={{ height: u(1.5), width: "74%", background: `linear-gradient(90deg, transparent, ${t.rim}, transparent)` }} />
+            </div>
+
+            {/* attributes: FIN DEC DEF / CRI PAS REG */}
+            <div className="absolute grid grid-cols-3 font-display" style={{ top: u(222), left: u(26), right: u(26), rowGap: u(6), columnGap: u(6) }}>
+              {CARD_ATTRS.map((k) => (
+                <div key={k} className="flex flex-col items-center leading-none" title={`${ATTRIBUTES[k].label}: ${ATTRIBUTES[k].hint}`}>
+                  <span className={cn("font-bold tabular-nums", p.highlight?.[k] && "underline decoration-2 underline-offset-2")} style={{ fontSize: u(20) }}>{p.attributes[k] ?? "—"}</span>
+                  <span style={{ fontSize: u(10.5), color: t.rim, letterSpacing: "0.14em", marginTop: u(2) }}>{k}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* footer */}
+            <div className="absolute inset-x-0 flex flex-col items-center font-display uppercase" style={{ bottom: u(16), gap: u(2) }}>
+              <span style={{ fontSize: u(9), letterSpacing: "0.32em", color: "#c9d1dc" }}>Ascend CF</span>
+              {p.seasonLabel && <span className="max-w-[70%] truncate" style={{ fontSize: u(7), letterSpacing: "0.22em", color: "rgba(201,209,220,0.6)" }}>{p.seasonLabel}</span>}
+            </div>
+
+            {/* holographic sheen for the top tier */}
+            {tier === "lenda" && (
+              <span aria-hidden className="absolute inset-0 mix-blend-overlay motion-safe:animate-[holo_5s_ease-in-out_3]"
+                style={{ background: "linear-gradient(115deg,transparent 20%,rgba(255,255,255,0.45) 40%,rgba(111,143,255,0.3) 50%,transparent 70%)", backgroundSize: "250% 100%" }} />
+            )}
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );

@@ -37,7 +37,7 @@ export default async function MePage() {
             style={{ WebkitTextStroke: "2px rgb(255 255 255 / 0.12)" }}>{me.shirtNumber}</span>
         )}
         <div className="relative flex flex-col items-center gap-8 md:flex-row md:items-center">
-          <Reveal><PlayerCard nickname={me.nickname} position={me.primaryPosition} shirtNumber={me.shirtNumber} avatarUrl={me.avatarUrl}
+          <Reveal><PlayerCard nickname={me.nickname} position={me.primaryPosition} shirtNumber={me.shirtNumber} avatarUrl={me.avatarUrl} photoX={me.photoX} photoY={me.photoY} photoZoom={me.photoZoom}
             ovr={c.ovr.value} ovrSource={c.ovr.source} attributes={c.attributes} seasonLabel={seasonName ? `Temporada ${seasonName}` : "Ascend CF"} size="lg" tilt /></Reveal>
           <div className="text-center md:text-left">
             <p className="font-display text-sm font-semibold tracking-[0.35em] text-silver uppercase">{me.shirtNumber != null ? `Camisa ${me.shirtNumber}` : "Ascend CF"}</p>
