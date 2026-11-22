@@ -1,6 +1,6 @@
 import "server-only";
 import { and, eq, inArray, isNotNull, ne } from "drizzle-orm";
-import webpush from "web-push";
+import * as webpush from "web-push";
 import { db, schema } from "@/db";
 
 export type NotifyAudience =

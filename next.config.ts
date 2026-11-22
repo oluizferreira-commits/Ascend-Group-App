@@ -12,7 +12,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
-  serverExternalPackages: ["@node-rs/argon2"],
+  serverExternalPackages: ["@node-rs/argon2", "web-push"],
   // Fonts and crest read from disk by the media generator must ship with the function.
   outputFileTracingIncludes: { "/api/media/[template]": ["./assets/fonts/**", "./public/brand/generated/crest-256.png"] },
   turbopack: {

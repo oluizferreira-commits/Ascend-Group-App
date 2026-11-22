@@ -18,12 +18,13 @@ Legenda: ✅ pronto e testado · 🟡 parcial · ⏳ não iniciado
 - ✅ Usuários e cargos (criação de conta com senha temporária, edição de cargos, remoção)
 - ✅ Temporadas
 
-## Fase 3 — Sistema esportivo 🟡
+## Fase 3 — Sistema esportivo ✅
 - ✅ Partidas: cadastro, resultado, estatísticas coletivas, súmula individual, exclusão auditada
 - ✅ Histórico: filtros por temporada/competição/adversário, confronto direto
 - ✅ Avaliação configurável por posição + 9 rankings
-- ⏳ Campo tático interativo, escalações, estratégias por adversário (tabelas `lineups`/`lineup_players`/`formations` prontas)
-- ⏳ Histórico de vencedores por temporada (premiações fechadas)
+- ✅ Campo tático interativo (tocar/arrastar), 6 formações, titulares, reservas, capitão e cobradores, estratégias por adversário
+- ✅ Histórico de vencedores por temporada
+- ⏳ Editor de formações personalizadas (estrutura no banco pronta)
 
 ## Fase 4 — Integração EA FC ✅
 - ✅ Endpoints verificados com o FC 27 (Ascend CF, clubId 2292864)
@@ -32,12 +33,16 @@ Legenda: ✅ pronto e testado · 🟡 parcial · ⏳ não iniciado
 - ✅ Importação do elenco da EA (criar/vincular jogadores)
 - ⏳ Atualizar divisão/posição da temporada automaticamente a partir da EA
 
-## Fase 5 — Competições e calendário ⏳
-Tabelas `competitions`, `competition_teams`, `competition_fixtures`, view `standings` (testada) e `calendar_events` prontas.
+## Fase 5 — Competições e calendário ✅
+- ✅ Competições (formatos, pontuação, grupos), participantes, jogos/rodadas, classificação automática, artilharia
+- ✅ Jogo do Ascend vinculado à partida → placar entra na tabela automaticamente
+- ✅ Calendário (partidas, treinos, reuniões)
 
-## Fase 6 — Comunicação 🟡
+## Fase 6 — Comunicação ✅
 - ✅ Avisos com prioridade, categoria, visibilidade (público/membros/comissão), agendamento e validade
-- ⏳ Convocações, confirmação de presença, disponibilidade, notificações no app e push
+- ✅ Convocações, confirmação/recusa pelo jogador, presença/ausência, disponibilidade por período
+- ✅ Notificações no app (sino) e Web Push: convocação, mudança de horário, nova partida, resultado, comunicado, aviso urgente
 
-## Fase 7 — Expansão ⏳
-Central de mídia (artes), IA, scouting, relatórios avançados.
+## Fase 7 — Expansão 🟡
+- ✅ Central de mídia: 10 modelos (resultado, MVP, escalação, convocação, artilheiro, assistente, melhor jogador, premiações, contratação, apresentação) em 4 formatos
+- ⏳ IA, scouting, relatórios avançados

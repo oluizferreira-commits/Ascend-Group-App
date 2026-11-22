@@ -26,7 +26,7 @@ const AV = { available: ["Disponível", "text-green-300"], unavailable: ["Indisp
 
 export function CallupForm({ eventId, players }: { eventId: string; players: Opt[] }) {
   const [state, action] = useActionState(callupPlayersAction.bind(null, eventId), null);
-  if (players.length === 0) return <p className="text-sm text-ink-400">Todos os jogadores ativos já foram convocados.</p>;
+  if (players.length === 0) return <div className="space-y-2"><FormMessage state={state} /><p className="text-sm text-ink-400">Todos os jogadores ativos já foram convocados.</p></div>;
   return (
     <form action={action} className="space-y-3">
       <ul className="grid max-h-80 gap-1 overflow-y-auto sm:grid-cols-2">

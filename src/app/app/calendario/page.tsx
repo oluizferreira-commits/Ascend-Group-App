@@ -14,7 +14,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   const past = (await searchParams).passados === "1";
   const now = new Date();
   const from = past ? new Date(now.getTime() - 60 * 86400_000) : new Date(now.getTime() - 6 * 3600_000);
-  const to = past ? now : new Date(now.getTime() + 90 * 86400_000);
+  const to = past ? now : new Date(now.getTime() + 3 * 365 * 86400_000);
   const items = await listAgenda(ctx.club.id, from, to);
   const byDay = new Map<string, typeof items>();
   for (const it of past ? [...items].reverse() : items) {

@@ -71,17 +71,11 @@ com `pg_restore`.
 | `npm test` | Testes unitários + integração (integração só roda com `TEST_DATABASE_URL`) |
 | `node tests/e2e/smoke.mjs` | Teste ponta a ponta com Playwright (ver cabeçalho do arquivo; use banco descartável) |
 
-## Implantação (baixo custo)
+## Implantação (gratuita)
 
-Opção recomendada, gratuita para começar:
-
-1. **Banco**: Supabase (plano Free) ou Neon (Free). Crie o projeto e copie a connection string.
-2. **App**: Vercel (plano Hobby) ou qualquer host Node.js (`npm run build && npm start`).
-3. Configure as variáveis de ambiente no host, rode `npm run db:setup` uma vez apontando para o banco de produção.
-4. Configure SMTP (ex.: Resend, Brevo — possuem planos gratuitos) para recuperação de senha.
-
-Custos: R$ 0 nos planos gratuitos para o tamanho de um clube. Limites e preços dos provedores
-mudam — confira antes de contratar. Nenhum serviço pago é exigido pelo código.
+Passo a passo em **[docs/DEPLOY.md](docs/DEPLOY.md)**: Vercel (site) + Neon (banco, São Paulo) + GitHub Actions
+(CI e sincronização horária com a EA). `vercel.json` já aplica migrações e seed a cada deploy.
+Gere as chaves com `npm run secrets`.
 
 ## Integração com EA FC
 
