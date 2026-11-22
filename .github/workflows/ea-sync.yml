@@ -20,7 +20,7 @@ jobs:
         run: |
           # Tolerate stray whitespace/newlines and a trailing slash pasted into the settings.
           APP_URL="$(printf '%s' "$APP_URL" | tr -d '[:space:]')"; APP_URL="${APP_URL%/}"
-          SECRET="$(printf '%s' "$SECRET" | tr -d '[:space:]')"
+          SECRET="$(printf '%s' "$SECRET" | tr -d '[:space:]')"; SECRET="${SECRET#SYNC_CRON_SECRET=}"
           if [ -z "$APP_URL" ] || [ -z "$SECRET" ]; then
             echo "APP_URL/SYNC_CRON_SECRET not configured yet — skipping."; exit 0
           fi
