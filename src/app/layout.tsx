@@ -8,6 +8,8 @@ import { ServiceWorkerRegistrar, AppTouchGuards } from "@/components/pwa";
 import { getThemeMode } from "@/lib/theme";
 
 export const metadata: Metadata = {
+  // Absolute base for Open Graph images in link previews (WhatsApp, Instagram, TikTok…).
+  metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
   title: { default: "Ascend CF — Ascend Group", template: "%s · Ascend CF" },
   description: "Plataforma oficial de gestão esportiva do Ascend CF. RISE. CONQUER. ASCEND.",
   applicationName: "Ascend CF",

@@ -2,12 +2,14 @@ import "server-only";
 import { and, eq, inArray, isNotNull, ne } from "drizzle-orm";
 import * as webpush from "web-push";
 import { db, schema } from "@/db";
+import { ROLES, ROLE_KEYS, type Permission } from "./auth/permissions";
 
 export type NotifyAudience =
   | { kind: "members" } // everyone with a role other than visitor
   | { kind: "staff" }
   | { kind: "users"; userIds: string[] }
-  | { kind: "players"; playerIds: string[] };
+  | { kind: "players"; playerIds: string[] }
+  | { kind: "permission"; permission: Permission };
 
 const STAFF = ["president", "admin", "coach", "assistant_coach", "analyst"] as const;
 
@@ -18,6 +20,13 @@ async function resolveUsers(clubId: string, a: NotifyAudience): Promise<string[]
     const rows = await db.select({ u: schema.players.userId }).from(schema.players)
       .where(and(eq(schema.players.clubId, clubId), inArray(schema.players.id, a.playerIds), isNotNull(schema.players.userId)));
     return [...new Set(rows.map((r) => r.u!))];
+  }
+  if (a.kind === "permission") {
+    const keys = ROLE_KEYS.filter((k) => ROLES[k].permissions.includes(a.permission));
+    const rows = await db.selectDistinct({ u: schema.memberships.userId }).from(schema.memberships)
+      .innerJoin(schema.roles, eq(schema.roles.id, schema.memberships.roleId))
+      .where(and(eq(schema.memberships.clubId, clubId), inArray(schema.roles.key, keys)));
+    return rows.map((r) => r.u);
   }
   const rows = await db.selectDistinct({ u: schema.memberships.userId }).from(schema.memberships)
     .innerJoin(schema.roles, eq(schema.roles.id, schema.memberships.roleId))

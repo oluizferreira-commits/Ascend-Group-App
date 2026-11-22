@@ -59,6 +59,7 @@ export default async function PublicHome() {
             <p className="font-display text-sm font-semibold tracking-[0.4em] text-silver uppercase">EA SPORTS FC™ Pro Clubs</p>
             <h1 className="mt-2 font-display text-7xl leading-[0.9] font-bold tracking-[0.03em] text-white uppercase sm:text-8xl">{pub.club.name}</h1>
             <p className="mt-4 font-display text-lg font-medium tracking-[0.45em] text-silver">{pub.org.motto}</p>
+            <Link href="/seja-do-ascend" className="btn mt-6 bg-white text-[#0c1d4f] hover:bg-[#e6ecfd]">Seja do Ascend</Link>
             <p className="mt-6 text-sm text-ink-300">{season ? `Temporada ${season.name}` : "Temporada em definição"}{season?.division ? ` · ${season.division}` : ""}</p>
           </div>
         </div>

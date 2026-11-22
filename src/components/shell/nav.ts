@@ -20,6 +20,7 @@ export const NAV: { section: string; items: NavItem[] }[] = [
   {
     section: "Administração",
     items: [
+      { href: "/app/propostas", label: "Seja do Ascend", icon: "user-plus", permission: "recruitment.manage" },
       { href: "/app/midia", label: "Central de mídia", icon: "image", permission: "media.manage" },
       { href: "/app/integracao", label: "Integração EA FC", icon: "refresh", permission: "integration.manage" },
       { href: "/app/admin/usuarios", label: "Usuários e cargos", icon: "shield", permission: "users.manage" },

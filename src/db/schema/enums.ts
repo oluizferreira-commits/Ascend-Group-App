@@ -65,3 +65,6 @@ export const visibilityEnum = pgEnum("visibility", ["public", "members", "staff"
 
 export const syncStatusEnum = pgEnum("sync_status", ["running", "success", "partial", "failed"]);
 export const syncTriggerEnum = pgEnum("sync_trigger", ["manual", "scheduled", "file"]);
+
+export const applicationStatusEnum = pgEnum("application_status", ["new", "reviewing", "approved", "rejected"]);
+export { positionEnum as fieldPositionEnumRef };

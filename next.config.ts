@@ -12,6 +12,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // "Seja do Ascend" photo uploads are resized in the browser (~200 KB); keep headroom below Vercel's 4.5 MB.
+  experimental: { serverActions: { bodySizeLimit: "3mb" } },
   serverExternalPackages: ["@node-rs/argon2", "web-push"],
   // Fonts and crest read from disk by the media generator must ship with the function.
   outputFileTracingIncludes: { "/api/media/[template]": ["./assets/fonts/**", "./public/brand/generated/crest-256.png"] },

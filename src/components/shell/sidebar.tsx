@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   Bell, CalendarDays, CalendarRange, ClipboardList, Image as ImageIcon, LayoutDashboard, LogOut, Medal, Megaphone, Menu,
-  RefreshCw, ScrollText, Shield, SlidersHorizontal, Swords, Trophy, UserCheck, UserCircle, Users, X,
+  RefreshCw, ScrollText, Shield, SlidersHorizontal, Swords, Trophy, UserCheck, UserCircle, UserPlus, Users, X,
 } from "lucide-react";
 import { Crest } from "@/components/crest";
 import { cn } from "@/lib/cn";
@@ -15,7 +15,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "layout-dashboard": LayoutDashboard, users: Users, swords: Swords, trophy: Trophy, megaphone: Megaphone,
   clipboard: ClipboardList, refresh: RefreshCw, medal: Medal, calendar: CalendarDays, image: ImageIcon,
-  shield: Shield, "calendar-range": CalendarRange, sliders: SlidersHorizontal, scroll: ScrollText, "user-check": UserCheck,
+  shield: Shield, "calendar-range": CalendarRange, sliders: SlidersHorizontal, scroll: ScrollText, "user-check": UserCheck, "user-plus": UserPlus,
 };
 
 type Section = { section: string; items: NavItem[] };

@@ -1,0 +1,90 @@
+// E2E for "Seja do Ascend". Run after smoke.mjs + modules.mjs on a DISPOSABLE database.
+import { createRequire } from "node:module";
+import assert from "node:assert/strict";
+const require = createRequire(import.meta.url);
+const { chromium, devices } = require("playwright");
+const sharp = require(process.cwd() + "/node_modules/sharp");
+
+const BASE = process.env.BASE_URL ?? "http://localhost:3100";
+const SHOTS = process.env.SHOTS_DIR;
+const step = (m) => console.log("•", m);
+const photoPath = `${process.env.TMPDIR ?? "/tmp"}/ascend-e2e-avatar.png`;
+await sharp({ create: { width: 1600, height: 2000, channels: 3, background: "#1c3fb0" } }).png().toFile(photoPath);
+
+const browser = await chromium.launch();
+const errors = [];
+
+step("public form on a phone, with photo");
+const phone = await browser.newContext({ ...devices["iPhone 13"] });
+const p = await phone.newPage();
+p.on("pageerror", (e) => errors.push(e.message));
+await p.goto(`${BASE}/seja-do-ascend`);
+await p.getByRole("button", { name: "Enviar proposta" }).click();
+await p.getByText("Confira os campos destacados.").waitFor();
+await p.locator("input[type=file]").setInputFiles(photoPath);
+await p.getByAltText("Foto do jogador").waitFor();
+await p.fill("#eaName", "Recruta_E2E");
+await p.selectOption("#platform", "ps5");
+await p.selectOption("#primaryPosition", "CAM");
+await p.fill("#overall", "88");
+await p.fill("#fullName", "Recruta de Teste");
+await p.fill("#contactWhatsapp", "(11) 91234-5678");
+await p.fill("#availability", "seg a sex 21h");
+await p.locator("input[name=consent]").check();
+if (SHOTS) await p.screenshot({ path: `${SHOTS}/apply-mobile.png`, fullPage: true });
+await p.getByRole("button", { name: "Enviar proposta" }).click();
+await p.getByRole("heading", { name: "Proposta enviada!" }).waitFor({ timeout: 60000 });
+
+step("duplicate nick is refused");
+await p.goto(`${BASE}/seja-do-ascend`);
+await p.fill("#eaName", "recruta_e2e");
+await p.selectOption("#platform", "pc");
+await p.selectOption("#primaryPosition", "ST");
+await p.fill("#fullName", "Outro");
+await p.fill("#contactDiscord", "outro");
+await p.locator("input[name=consent]").check();
+await p.getByRole("button", { name: "Enviar proposta" }).click();
+await p.getByText(/Já existe uma proposta em análise/).waitFor();
+
+step("staff reviews and approves");
+const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+page.on("pageerror", (e) => errors.push(e.message));
+await page.goto(`${BASE}/login`);
+await page.fill("#email", process.env.E2E_EMAIL); await page.fill("#password", process.env.E2E_PASSWORD);
+await page.click("button[type=submit]"); await page.waitForURL(`${BASE}/app`);
+await page.goto(`${BASE}/app/propostas`);
+await page.getByText("RECRUTA_E2E", { exact: false }).first().click();
+await page.waitForURL(/\/app\/propostas\/[0-9a-f-]{36}$/);
+const appId = page.url().split("/").pop();
+const img = await page.request.get(`${BASE}/api/propostas/${appId}/foto`);
+assert.equal(img.status(), 200);
+assert.equal(img.headers()["content-type"], "image/webp");
+const meta = await sharp(await img.body()).metadata();
+assert.ok(meta.width <= 800 && meta.height <= 1000, `photo resized (${meta.width}x${meta.height})`);
+assert.ok((await page.getByRole("link", { name: "WhatsApp" }).getAttribute("href")).startsWith("https://wa.me/5511912345678"));
+if (SHOTS) await page.screenshot({ path: `${SHOTS}/application-staff.png`, fullPage: true });
+page.once("dialog", (d) => d.accept());
+await page.getByRole("button", { name: /Aprovar e cadastrar/ }).click();
+await page.waitForURL(/\/app\/elenco\/[0-9a-f-]{36}\/editar$/);
+assert.equal(await page.inputValue("#nickname"), "Recruta_E2E");
+assert.equal(await page.inputValue("#overall"), "88");
+
+step("player accounts cannot see applications");
+await page.goto(`${BASE}/app/admin/usuarios`);
+await page.fill("#displayName", "Jogador Recrut");
+await page.fill("#email", "jogador.recrut@ascend.test");
+await page.getByRole("button", { name: "Adicionar membro" }).click();
+const tmp = (await page.locator("code.select-all").textContent()).trim();
+const pl = await browser.newContext();
+const pp = await pl.newPage();
+await pp.goto(`${BASE}/login`);
+await pp.fill("#email", "jogador.recrut@ascend.test");
+await pp.fill("#password", tmp);
+await pp.click("button[type=submit]"); await pp.waitForURL(`${BASE}/app`);
+await pp.goto(`${BASE}/app/propostas`);
+await pp.waitForURL(`${BASE}/app/sem-permissao`);
+assert.equal((await pp.request.get(`${BASE}/api/propostas/${appId}/foto`)).status(), 200, "approved photo visible to members (roster avatar)");
+
+assert.deepEqual(errors, [], "no client-side errors");
+console.log("✔ E2E recruitment passed");
+await browser.close();

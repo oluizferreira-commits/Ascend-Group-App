@@ -29,6 +29,7 @@ export const PERMISSIONS = {
   "reports.view": "Consultar relatórios técnicos",
   "integration.manage": "Gerenciar a integração EA SPORTS FC",
   "media.manage": "Gerar artes na central de mídia",
+  "recruitment.manage": "Ver e avaliar propostas do “Seja do Ascend” (inclui contatos)",
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;
@@ -47,7 +48,7 @@ export const ROLES: Record<RoleKey, { name: string; rank: number; permissions: P
       "players.view", "players.manage", "matches.view", "matches.manage",
       "stats.view", "stats.manage", "lineups.view", "competitions.view", "competitions.manage",
       "announcements.view", "announcements.manage", "calendar.manage", "callups.manage",
-      "reports.view", "integration.manage", "media.manage",
+      "reports.view", "integration.manage", "media.manage", "recruitment.manage",
     ],
   },
   coach: {
@@ -56,7 +57,7 @@ export const ROLES: Record<RoleKey, { name: string; rank: number; permissions: P
     permissions: [
       "dashboard.view", "players.view", "matches.view", "stats.view", "stats.manage", "ratings.configure",
       "lineups.view", "lineups.manage", "competitions.view", "announcements.view", "announcements.manage",
-      "calendar.manage", "callups.manage", "reports.view", "media.manage",
+      "calendar.manage", "callups.manage", "reports.view", "media.manage", "recruitment.manage",
     ],
   },
   assistant_coach: {
