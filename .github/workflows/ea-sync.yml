@@ -18,7 +18,11 @@ jobs:
           APP_URL: ${{ vars.APP_URL }}
           SECRET: ${{ secrets.SYNC_CRON_SECRET }}
         run: |
+          # Tolerate stray whitespace/newlines and a trailing slash pasted into the settings.
+          APP_URL="$(printf '%s' "$APP_URL" | tr -d '[:space:]')"; APP_URL="${APP_URL%/}"
+          SECRET="$(printf '%s' "$SECRET" | tr -d '[:space:]')"
           if [ -z "$APP_URL" ] || [ -z "$SECRET" ]; then
             echo "APP_URL/SYNC_CRON_SECRET not configured yet — skipping."; exit 0
           fi
           curl -fsS --max-time 120 -H "Authorization: Bearer $SECRET" "$APP_URL/api/integrations/ea-fc/sync"
+          echo
