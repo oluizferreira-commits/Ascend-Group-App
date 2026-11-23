@@ -5,6 +5,17 @@
 export const CHANGELOG: { date: string; title: string; items: string[] }[] = [
   {
     date: "2026-11-23",
+    title: "Ascend Performance Lab",
+    items: [
+      "Nova aba Lab: seu centro de desenvolvimento individual.",
+      "Analista automático: encontra tendências nas suas partidas e explica com números, causas e recomendações.",
+      "Treinador: escolha o que quer melhorar e receba um plano com atributos, estilos de jogo, dicas e metas.",
+      "Construtor de builds: gere prioridades a partir do seu estilo, salve, compare e acompanhe o antes e depois.",
+      "Tudo privado: só você e a comissão técnica veem o seu Lab.",
+    ],
+  },
+  {
+    date: "2026-11-23",
     title: "Atualizar agora",
     items: [
       "Novo botão “Atualizar agora” no Painel e em Partidas: busca as partidas na EA na hora.",

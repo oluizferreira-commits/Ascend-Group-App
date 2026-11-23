@@ -57,6 +57,13 @@
       "when": 1795379719352,
       "tag": "0007_player_photos",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795393589923,
+      "tag": "0008_performance_lab",
+      "breakpoints": true
     }
   ]
 }

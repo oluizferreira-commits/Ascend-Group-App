@@ -3,7 +3,7 @@
  * local agent, pasted JSON). Safe to re-run: existing matches are never
  * duplicated or overwritten; only stats for newly linked players are added.
  */
-import { and, eq, isNotNull, sql } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "@/db/schema";
 import { eaMatchListSchema, EA_MATCH_TYPE_LABELS, type EaMatchType } from "./types";
@@ -113,6 +113,12 @@ export async function importEaMatches(db: AnyDb, input: ImportInput): Promise<Im
         const inserted = await tx.insert(schema.playerStatistics).values(statRow(matchId, playerId, { ...line, goals, assists }))
           .onConflictDoNothing().returning({ id: schema.playerStatistics.id });
         summary.statsAdded += inserted.length;
+        if (inserted.length === 0) {
+          // Existing EA line imported before these fields existed → backfill only the new raw fields.
+          await tx.update(schema.playerStatistics).set({ tacklesAttempted: line.tacklesAttempted, extra: line.extra })
+            .where(and(eq(schema.playerStatistics.matchId, matchId), eq(schema.playerStatistics.playerId, playerId),
+              eq(schema.playerStatistics.source, "ea_fc"), isNull(schema.playerStatistics.tacklesAttempted)));
+        }
       }
     });
   }

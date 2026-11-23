@@ -10,6 +10,7 @@ export type MappedPlayerLine = {
   passesAttempted: number | null;
   passesCompleted: number | null;
   tackles: number | null;
+  tacklesAttempted: number | null;
   interceptions: null;
   clearances: null;
   saves: number | null;
@@ -19,6 +20,8 @@ export type MappedPlayerLine = {
   redCards: number | null;
   externalRating: number | null;
   isMotm: boolean | null;
+  /** Raw EA extras (archetype id, goalkeeper save types). */
+  extra: Record<string, number>;
   /** Stored on match_players, not player_statistics. */
   minutesPlayed: number | null;
 };
@@ -44,6 +47,13 @@ export function mapPlayer(name: string, s: EaPlayerStats): MappedPlayerLine {
     attempted = null;
     completed = null;
   }
+  const tackles = int(s.tacklesmade, 200);
+  let tackleAttempts = int(s.tackleattempts, 200);
+  if (tackles != null && tackleAttempts != null && tackles > tackleAttempts) tackleAttempts = null; // inconsistent → drop the attempts only
+  const extra: Record<string, number> = {};
+  const ex = (k: string, v: number | null | undefined) => { const n = int(v, 999); if (n != null) extra[k] = n; };
+  ex("archetypeId", s.archetypeid);
+  for (const k of ["reflexSaves", "parrySaves", "punchSaves", "ballDiveSaves", "crossSaves", "goodDirectionSaves"] as const) ex(k, s[k]);
   const rating = s.rating == null || s.rating < 0 || s.rating > 10 ? null : Math.round(s.rating * 10) / 10;
   return {
     eaName: (s.playername ?? name).trim(),
@@ -53,7 +63,8 @@ export function mapPlayer(name: string, s: EaPlayerStats): MappedPlayerLine {
     shotsOnTarget: null,
     passesAttempted: attempted,
     passesCompleted: completed,
-    tackles: int(s.tacklesmade, 200),
+    tackles: tackles,
+    tacklesAttempted: tackleAttempts,
     interceptions: null,
     clearances: null,
     saves: int(s.saves, 200),
@@ -63,6 +74,7 @@ export function mapPlayer(name: string, s: EaPlayerStats): MappedPlayerLine {
     redCards: s.redcards == null ? null : Math.min(int(s.redcards, 1) ?? 0, 1),
     externalRating: rating,
     isMotm: s.mom == null ? null : s.mom > 0,
+    extra,
     minutesPlayed: s.secondsPlayed == null || s.secondsPlayed < 0 ? null : Math.min(Math.round(s.secondsPlayed / 60), 130),
   };
 }

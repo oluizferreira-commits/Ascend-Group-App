@@ -27,8 +27,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   })).filter((s) => s.items.length > 0);
   const me = await getMe(ctx);
   // Players get a personal "Eu" tab showing their shirt number; staff keep "Elenco".
-  const TAB_HREFS = me ? ["/app", "/app/partidas", "/app/calendario", "/app/avisos"] : ["/app", "/app/elenco", "/app/partidas", "/app/calendario", "/app/avisos"];
-  const tabs = NAV[0].items.filter((i) => TAB_HREFS.includes(i.href) && (!i.permission || ctx.permissions.has(i.permission)));
+  // Bottom bar: Lab sits in the middle. Order follows TAB_HREFS (not the sidebar order).
+  const TAB_HREFS = me ? ["/app", "/app/partidas", "/app/lab", "/app/calendario", "/app/avisos"] : ["/app", "/app/elenco", "/app/partidas", "/app/lab", "/app/calendario", "/app/avisos"];
+  const tabs = TAB_HREFS.map((h) => NAV[0].items.find((i) => i.href === h)!).filter((i) => i && (!i.permission || ctx.permissions.has(i.permission)));
   if (me) tabs.push({ href: "/app/eu", label: "Eu", icon: "user", number: me.shirtNumber });
   const sectionsWithMe = me
     ? [{ section: "Meu espaço", items: [{ href: "/app/eu", label: me.shirtNumber != null ? `Camisa ${me.shirtNumber}` : "Minha carta", icon: "user", number: me.shirtNumber }] }, ...sections]

@@ -1,6 +1,6 @@
 import type { Permission } from "@/server/auth/permissions";
 
-export type NavItem = { href: string; label: string; icon: string; permission?: Permission; soon?: string; number?: number | null };
+export type NavItem = { href: string; label: string; short?: string; icon: string; permission?: Permission; soon?: string; number?: number | null };
 
 export const NAV: { section: string; items: NavItem[] }[] = [
   {
@@ -9,6 +9,7 @@ export const NAV: { section: string; items: NavItem[] }[] = [
       { href: "/app", label: "Painel", icon: "layout-dashboard", permission: "dashboard.view" },
       { href: "/app/elenco", label: "Elenco", icon: "users", permission: "players.view" },
       { href: "/app/partidas", label: "Partidas", icon: "swords", permission: "matches.view" },
+      { href: "/app/lab", label: "Performance Lab", short: "Lab", icon: "activity", permission: "dashboard.view" },
       { href: "/app/escalacoes", label: "Escalações", icon: "clipboard", permission: "lineups.view" },
       { href: "/app/comparar", label: "Comparar", icon: "compare", permission: "stats.view" },
       { href: "/app/premios", label: "Premiações", icon: "award", permission: "dashboard.view" },

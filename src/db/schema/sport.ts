@@ -128,6 +128,8 @@ export const playerStatistics = pgTable(
     passesAttempted: smallint("passes_attempted"),
     passesCompleted: smallint("passes_completed"),
     tackles: smallint("tackles"),
+    /** Tackles attempted (EA FC 27 `tackleattempts`); with `tackles` gives tackle success. */
+    tacklesAttempted: smallint("tackles_attempted"),
     interceptions: smallint("interceptions"),
     clearances: smallint("clearances"),
     saves: smallint("saves"),
@@ -137,6 +139,8 @@ export const playerStatistics = pgTable(
     redCards: smallint("red_cards"),
     externalRating: numeric("external_rating", { precision: 3, scale: 1, mode: "number" }),
     isMotm: boolean("is_motm"),
+    /** Source-specific raw extras (e.g. EA archetype id, goalkeeper save types). Never interpreted beyond documented fields. */
+    extra: jsonb("extra").$type<Record<string, number | string>>().notNull().default({}),
     source: dataSourceEnum("source").notNull().default("manual"),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -149,6 +153,7 @@ export const playerStatistics = pgTable(
       "ps_passes_consistent",
       sql`${t.passesAttempted} is null or ${t.passesCompleted} is null or ${t.passesCompleted} <= ${t.passesAttempted}`,
     ),
+    check("ps_tackles_consistent", sql`${t.tacklesAttempted} is null or ${t.tackles} is null or ${t.tackles} <= ${t.tacklesAttempted}`),
     check("ps_rating_range", sql`${t.externalRating} is null or ${t.externalRating} between 0 and 10`),
   ],
 );

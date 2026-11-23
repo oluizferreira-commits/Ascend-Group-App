@@ -87,3 +87,9 @@ Identidade: azul royal (#1c3fb0), azul elétrico (#3a63f0), azul-marinho, preto 
 - **Componentes** (`src/components/ui/kit.tsx`): `Panel` (cabeçalho com ícone + link), `InfoChip`, `StatStrip`, `FormChip` (V/E/D), `ScoreBox`, `TeamMonogram` (iniciais do adversário — nunca desenhamos escudos de outros clubes), `DateBadge`, `RankMark` (medalhas top 3), `Meter`. Básicos em `src/components/ui/basics.tsx`.
 - **Painel**: `HeroCarousel` + `HeroBanner` (`src/components/dashboard/`).
 - **Escudo**: `public/brand/ascend-fc-crest.png` é o original e nunca é alterado. `public/brand/generated/crest-clear-*.png` é uma cópia com o fundo preto transparente, usada só em superfícies sempre escuras (`<Crest clear />`).
+
+## Performance Lab
+
+Módulo independente de desenvolvimento individual (`/app/lab`). Lógica pura em `src/lib/lab/`, acesso e dados em
+`src/server/services/lab.ts`, ações em `src/server/actions/lab.ts`. Detalhes, método e extensões em
+[`docs/PERFORMANCE_LAB.md`](./PERFORMANCE_LAB.md).

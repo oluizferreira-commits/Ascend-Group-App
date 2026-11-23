@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
-  Award, Bell, CalendarDays, GitCompareArrows, CalendarRange, ClipboardList, Image as ImageIcon, LayoutDashboard, LogOut, Medal, Megaphone, Menu,
+  Activity, Award, Bell, CalendarDays, GitCompareArrows, CalendarRange, ClipboardList, Image as ImageIcon, LayoutDashboard, LogOut, Medal, Megaphone, Menu,
   RefreshCw, ScrollText, Shield, SlidersHorizontal, Swords, Trophy, User, UserCheck, UserCircle, UserPlus, Users, X,
 } from "lucide-react";
 import { Crest } from "@/components/crest";
@@ -16,7 +16,7 @@ import { motion } from "motion/react";
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "layout-dashboard": LayoutDashboard, users: Users, swords: Swords, trophy: Trophy, megaphone: Megaphone,
   clipboard: ClipboardList, refresh: RefreshCw, medal: Medal, calendar: CalendarDays, image: ImageIcon,
-  shield: Shield, "calendar-range": CalendarRange, sliders: SlidersHorizontal, scroll: ScrollText, "user-check": UserCheck, "user-plus": UserPlus, user: User, compare: GitCompareArrows, award: Award,
+  shield: Shield, "calendar-range": CalendarRange, sliders: SlidersHorizontal, scroll: ScrollText, "user-check": UserCheck, "user-plus": UserPlus, user: User, compare: GitCompareArrows, award: Award, activity: Activity,
 };
 
 type Section = { section: string; items: NavItem[] };
@@ -169,7 +169,7 @@ export function MobileTabBar({ items }: { items: NavItem[] }) {
         const active = isActive(pathname, item.href);
         return (
           <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined}
-            className={cn("relative flex flex-col items-center gap-1 rounded-2xl pt-2 pb-1.5 text-[10.5px] font-semibold tracking-wide transition-colors", active ? "text-white" : "text-ink-400 active:text-ink-100")}>
+            className={cn("relative flex min-w-0 flex-col items-center gap-1 rounded-2xl pt-2 pb-1.5 font-semibold transition-colors", items.length > 5 ? "text-[10px]" : "text-[10.5px] tracking-wide", active ? "text-white" : "text-ink-400 active:text-ink-100")}>
             {active && (
               <motion.span layoutId="tab-active" className="absolute inset-0 rounded-2xl border border-[#6f8fff]/40 bg-gradient-to-b from-[#1c3fb0]/80 to-[#0f2566]/80 shadow-[0_0_22px_-6px_rgb(58_99_240/0.9)]">
                 <span className="absolute inset-x-5 -top-px h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
@@ -178,7 +178,7 @@ export function MobileTabBar({ items }: { items: NavItem[] }) {
             {item.number != null
               ? <span className={cn("relative grid size-[22px] place-items-center font-display text-[19px] leading-none font-bold", active ? "text-white" : "text-accent-400")}>{item.number}</span>
               : <Icon className="relative size-[22px]" />}
-            <span className="relative">{item.label}</span>
+            <span className="relative max-w-full truncate px-0.5">{item.short ?? item.label}</span>
           </Link>
         );
       })}
