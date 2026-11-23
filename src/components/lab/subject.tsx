@@ -11,12 +11,12 @@ export function SubjectBar({ player, own, canPick, players, path }: { player: La
       <Avatar name={player.nickname} src={player.avatarUrl} size={40} className="ring-2 ring-accent-500/30" />
       <div className="min-w-0 flex-1">
         <p className="truncate font-display text-lg leading-tight font-bold text-ink-100 uppercase">{player.nickname}{player.shirtNumber != null && <span className="ml-2 text-accent-400">#{player.shirtNumber}</span>}</p>
-        <p className="text-xs text-ink-400">{POSITION_NAMES[player.primaryPosition]} · {own ? "Seu laboratório — só você e a comissão técnica veem" : "Relatório individual"}</p>
+        <p className="truncate text-xs text-ink-400">{POSITION_NAMES[player.primaryPosition]} · {own ? "Seu laboratório · privado" : "Relatório individual"}</p>
       </div>
-      {!own && <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-500"><Eye className="size-3.5" />Somente leitura</span>}
+      {!own && <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-500"><Eye className="size-3.5" />Somente leitura</span>}
       {canPick && players && (
-        <form method="get" action={path} className="flex gap-2">
-          <select name="jogador" defaultValue={player.id} className="input min-h-9 py-1 text-sm" aria-label="Ver o Lab de outro jogador">
+        <form method="get" action={path} className="flex w-full gap-2 sm:w-auto">
+          <select name="jogador" defaultValue={player.id} className="input min-h-9 min-w-0 flex-1 py-1 text-sm sm:w-56 sm:flex-none" aria-label="Ver o Lab de outro jogador">
             {players.map((p) => <option key={p.id} value={p.id}>{p.shirtNumber != null ? `#${p.shirtNumber} ` : ""}{p.nickname} ({POSITION_LABELS[p.primaryPosition]})</option>)}
           </select>
           <button className="btn-secondary min-h-9 px-3 text-sm">Ver</button>
