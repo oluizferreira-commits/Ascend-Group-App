@@ -29,6 +29,8 @@ import { NumberTicker } from "@/components/fx/number-ticker";
 import { ProgressRing } from "@/components/fx/progress-ring";
 import { Reveal } from "@/components/fx/reveal";
 import { fmtDate, fmtPct, fmtWeekdayTime } from "@/lib/format";
+import { getEaConfig, lastEaUpdate } from "@/server/services/ea-sync";
+import { RefreshEaButton } from "@/components/integration/refresh-ea-button";
 
 export const metadata: Metadata = { title: "Painel" };
 
@@ -39,14 +41,16 @@ export default async function DashboardPage() {
     getMe(ctx), getMatchday(ctx), recentMvpPrompt(ctx), openAwardPrompt(ctx),
     ctx.playerId ? pendingCallupsFor(ctx.playerId) : Promise.resolve([] as Awaited<ReturnType<typeof pendingCallupsFor>>),
     nextMatch(ctx.club.id), listActiveAnnouncements(ctx.club.id, visibleScopes(ctx), 5),
+    getEaConfig(ctx.club.id), lastEaUpdate(ctx.club.id),
   ]);
   const overview = await getClubOverview(ctx.club.id);
   const season = overview.currentSeason;
-  const [[me, matchday, mvpPrompt, awardPrompt, callups, upcoming, announcements], stats, recent] = await Promise.all([
+  const [[me, matchday, mvpPrompt, awardPrompt, callups, upcoming, announcements, eaCfg, eaLast], stats, recent] = await Promise.all([
     independent,
     getSeasonStats({ clubId: ctx.club.id, seasonId: season?.id ?? null }),
     recentResults(ctx.club.id, 5, season?.id ?? null),
   ]);
+  const serverNow = matchday?.serverNow ?? new Date().getTime();
   const polls = await pollsFor(announcements.map((a) => a.id), ctx.user.id);
   const mySummary = me ? stats.summaryMap.get(me.id) : undefined;
   const myAttrs = me ? squadAttributes(stats.summaries).get(me.id) : undefined;
@@ -188,6 +192,9 @@ export default async function DashboardPage() {
         </Reveal>
 
         <Panel title="Últimos resultados" icon={History} link={{ href: "/app/partidas", label: "Histórico" }} bodyClassName="p-2 sm:p-2">
+          {eaCfg.eaClubId && eaCfg.platform && (
+            <RefreshEaButton compact className="px-2 pt-1 pb-2" lastAt={eaLast?.toISOString() ?? null} serverNow={serverNow} />
+          )}
           {recent.length === 0 ? (
             <p className="py-6 text-center text-sm text-ink-400">Nenhum resultado registrado {season ? "nesta temporada" : ""}.</p>
           ) : (

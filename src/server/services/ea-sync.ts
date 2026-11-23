@@ -94,10 +94,64 @@ export async function fetchAllMatchTypes(platform: EaPlatform, eaClubId: string)
 
 export async function lastServerFetch(clubId: string) {
   const logs = await listSyncLogs(clubId, 20);
-  return logs.find((l) => ["server", "auto"].includes(String((l.details as { origin?: string }).origin)));
+  return logs.find((l) => FETCH_ORIGINS.includes(String((l.details as { origin?: string }).origin)));
 }
 
 export const AUTO_SYNC_INTERVAL_MIN = 15;
+/** Club-wide pause between "Atualizar agora" presses (protects the EA endpoints). */
+export const BUTTON_COOLDOWN_S = 60;
+/** Log origins that mean "the server fetched EA" (cron, visits, button). */
+const FETCH_ORIGINS = ["server", "auto", "button"];
+
+/**
+ * Atomically claims a fetch slot: inserts a running log only if no server-side fetch
+ * started in the last `seconds`. Returns the new log id, or null when throttled.
+ */
+async function claimFetchSlot(clubId: string, seconds: number, origin: string, trigger: "manual" | "scheduled", userId: string | null) {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${"ea-auto-sync:" + clubId}))`);
+    const rows = await tx.execute<{ id: string }>(sql`
+      insert into synchronization_logs (club_id, provider, trigger, triggered_by, details)
+      select ${clubId}::uuid, ${PROVIDER}::text, ${trigger}::sync_trigger, ${userId}::uuid, jsonb_build_object('origin', ${origin}::text)
+      where not exists (
+        select 1 from synchronization_logs
+        where club_id = ${clubId} and provider = ${PROVIDER}
+          and details->>'origin' in ('server', 'auto', 'button')
+          and started_at > now() - make_interval(secs => ${seconds})
+      )
+      returning id`);
+    return [...rows][0]?.id ?? null;
+  });
+}
+
+/** Last time EA data was fetched successfully (any origin, including the local agent). */
+export async function lastEaUpdate(clubId: string) {
+  const [r] = await db.select({ at: sql<Date | null>`max(coalesce(${schema.synchronizationLogs.finishedAt}, ${schema.synchronizationLogs.startedAt}))` })
+    .from(schema.synchronizationLogs)
+    .where(and(eq(schema.synchronizationLogs.clubId, clubId), eq(schema.synchronizationLogs.provider, PROVIDER), sql`${schema.synchronizationLogs.status} in ('success', 'partial')`));
+  return r?.at ? new Date(r.at) : null;
+}
+
+export type RefreshResult = { status: "done"; created: number; overallChanges: number } | { status: "throttled"; retryInS: number } | { status: "failed"; error: string } | { status: "not_configured" };
+
+/** "Atualizar agora": immediate EA fetch for any club member, at most once per BUTTON_COOLDOWN_S per club. */
+export async function refreshFromEa(clubId: string, userId: string): Promise<RefreshResult> {
+  const cfg = await getEaConfig(clubId);
+  if (!cfg.platform || !cfg.eaClubId) return { status: "not_configured" };
+  const logId = await claimFetchSlot(clubId, BUTTON_COOLDOWN_S, "button", "manual", userId);
+  if (!logId) {
+    const last = await lastServerFetch(clubId);
+    const left = last ? BUTTON_COOLDOWN_S - Math.floor((Date.now() - last.startedAt.getTime()) / 1000) : BUTTON_COOLDOWN_S;
+    return { status: "throttled", retryInS: Math.max(1, left) };
+  }
+  const log = await runLoggedImport({
+    clubId, eaClubId: cfg.eaClubId, trigger: "manual", userId, origin: "button", logId,
+    batches: () => fetchAllMatchTypes(cfg.platform!, cfg.eaClubId!),
+  });
+  if (log.status === "failed") return { status: "failed", error: log.errorMessage ?? "A EA não respondeu." };
+  const changes = await syncMembersFromEa(clubId, cfg.platform, cfg.eaClubId).catch(() => []);
+  return { status: "done", created: log.itemsCreated, overallChanges: changes.length };
+}
 
 /**
  * Opportunistic sync: called (via `after()`) when someone opens the app. Claims the
@@ -108,21 +162,7 @@ export async function maybeAutoSync(clubId: string) {
   try {
     const cfg = await getEaConfig(clubId);
     if (!cfg.platform || !cfg.eaClubId) return;
-    // Transaction-scoped advisory lock serialises concurrent visits (safe with poolers).
-    const claimed = await db.transaction(async (tx) => {
-      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${"ea-auto-sync:" + clubId}))`);
-      return tx.execute<{ id: string }>(sql`
-        insert into synchronization_logs (club_id, provider, trigger, details)
-        select ${clubId}, ${PROVIDER}, 'scheduled', '{"origin":"auto"}'::jsonb
-        where not exists (
-          select 1 from synchronization_logs
-          where club_id = ${clubId} and provider = ${PROVIDER}
-            and details->>'origin' in ('server', 'auto')
-            and started_at > now() - make_interval(mins => ${AUTO_SYNC_INTERVAL_MIN})
-        )
-        returning id`);
-    });
-    const logId = [...claimed][0]?.id;
+    const logId = await claimFetchSlot(clubId, AUTO_SYNC_INTERVAL_MIN * 60, "auto", "scheduled", null);
     if (!logId) return;
     await runLoggedImport({
       clubId, eaClubId: cfg.eaClubId, trigger: "scheduled", userId: null, origin: "auto", logId,

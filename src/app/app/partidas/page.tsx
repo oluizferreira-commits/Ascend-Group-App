@@ -5,6 +5,8 @@ import { requirePage } from "@/server/auth/session";
 import { listSeasons } from "@/server/services/club";
 import { headToHead, listMatches } from "@/server/services/matches";
 import { listCompetitions } from "@/server/services/reference";
+import { getEaConfig, lastEaUpdate } from "@/server/services/ea-sync";
+import { RefreshEaButton } from "@/components/integration/refresh-ea-button";
 import { Badge, EmptyState, PageHeader } from "@/components/ui/basics";
 import { DateBadge, Panel, ScoreBox, TeamMonogram } from "@/components/ui/kit";
 import { MATCH_STATUS_LABELS, SOURCE_LABELS, matchResult } from "@/lib/domain";
@@ -21,7 +23,7 @@ export default async function MatchesPage({ searchParams }: { searchParams: Prom
   const competitionId = competitions.some((c) => c.id === sp.competition) ? sp.competition : undefined;
   const status = ["scheduled", "finished", "cancelled"].includes(sp.status ?? "") ? (sp.status as "scheduled") : undefined;
   const opponent = sp.q?.slice(0, 80) || undefined;
-  const [rows, h2h] = await Promise.all([listMatches(ctx.club.id, { seasonId, competitionId, status, opponent }), headToHead(ctx.club.id)]);
+  const [rows, h2h, eaCfg, eaLast] = await Promise.all([listMatches(ctx.club.id, { seasonId, competitionId, status, opponent }), headToHead(ctx.club.id), getEaConfig(ctx.club.id), lastEaUpdate(ctx.club.id)]);
   const groups = [...rows.reduce((acc, r) => {
     const k = monthFmt.format(r.match.kickoffAt);
     acc.set(k, [...(acc.get(k) ?? []), r]);
@@ -33,7 +35,10 @@ export default async function MatchesPage({ searchParams }: { searchParams: Prom
       <PageHeader
         eyebrow="Sistema esportivo"
         title="Partidas"
-        actions={ctx.permissions.has("matches.manage") && <Link href="/app/partidas/nova" className="btn-primary"><Plus className="size-4" />Nova partida</Link>}
+        actions={<>
+          {eaCfg.eaClubId && eaCfg.platform && <RefreshEaButton lastAt={eaLast?.toISOString() ?? null} serverNow={new Date().getTime()} className="items-start sm:items-end" />}
+          {ctx.permissions.has("matches.manage") && <Link href="/app/partidas/nova" className="btn-primary self-start"><Plus className="size-4" />Nova partida</Link>}
+        </>}
       />
       <form method="get" className="card mb-6 grid grid-cols-2 gap-3 p-4 lg:grid-cols-5">
         <div className="col-span-2 lg:col-span-1">

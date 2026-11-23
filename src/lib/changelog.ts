@@ -4,6 +4,15 @@
  */
 export const CHANGELOG: { date: string; title: string; items: string[] }[] = [
   {
+    date: "2026-11-23",
+    title: "Atualizar agora",
+    items: [
+      "Novo botão “Atualizar agora” no Painel e em Partidas: busca as partidas na EA na hora.",
+      "Mostra quando os dados da EA foram atualizados pela última vez.",
+      "O app também atualiza sozinho a cada 15 minutos.",
+    ],
+  },
+  {
     date: "2026-11-22",
     title: "Visual novo do Ascend CF",
     items: [
