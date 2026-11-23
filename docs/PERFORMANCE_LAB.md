@@ -62,11 +62,39 @@ Analista detecta → alerta com link “Ver plano de desenvolvimento” → Trei
 “Salvar plano” (metas calculadas a partir das últimas 10 partidas) → “Melhorar minha build” abre o
 construtor com o foco do plano → build salva → “Comecei a usar” → Evolução compara antes × depois.
 
-## Como validar custos no futuro
+## Motor de pontos (AP)
 
-Preencher `COSTS` em `game-data.ts` com `{ source, verifiedOn, costPerStep(attr, from, archetype) }`
-a partir de uma fonte verificada. O construtor passa automaticamente a mostrar pontos utilizados/restantes
-e o comparador passa a comparar orçamentos. Nada mais precisa mudar.
+Módulo puro e independente da interface: `src/lib/lab/ap-engine.ts` (testes em `tests/ap-engine.test.ts`).
+
+- **Tabelas por (versão do jogo, temporada, arquétipo, revisão)** — `lab_cost_tables`. Cada atributo tem
+  `base` (valor inicial do arquétipo), `max` (limite do arquétipo) e `costs[]` (custo de cada +1, de `base` até `max`).
+  Arquétipos diferentes têm tabelas diferentes; nada é compartilhado por suposição.
+- **Custo de A→B** = soma de `costs` de cada incremento entre A e B, consultando a tabela passo a passo.
+  Remover níveis devolve exatamente o custo deles.
+- **Orçamento** = `levelBudget[nível]` da tabela verificada. Nível sem valor → orçamento desconhecido (nunca extrapolado).
+- **Valores**: `base` + níveis **comprados** (o que custa AP) + **modificadores** de altura/peso/especialização
+  (só os declarados na tabela) = valor **exibido**. Modificadores nunca alteram custo nem níveis comprados.
+- **Validação**: impede compras acima do limite do arquétipo e acima dos pontos disponíveis (no editor e de novo
+  no servidor ao salvar). Uma build só é “validada” com tabela verificada, sem erros, cobrindo todos os atributos e
+  com o orçamento do nível.
+- **Otimizador**: programação dinâmica exata (mochila de múltipla escolha) que maximiza a soma ponderada de níveis
+  comprados pelas prioridades do gerador, respeitando orçamento, limites e mínimos. Como os custos são progressivos,
+  a distribuição segue a curva real de custos — sem porcentagens fixas.
+
+### Painel de tabelas (Administração → Custos de builds)
+
+Permissão `gamedata.manage` (presidência, administração, analista).
+
+1. **Baixar modelo** (JSON com todos os atributos) e preencher só com valores de fonte verificada.
+2. **Importar** → entra como **rascunho** (próxima revisão para aquela versão/temporada/arquétipo). Revisão automática
+   aponta erros (faixas, tamanho da lista de custos, custos negativos) e avisos (atributos sem regra, custos que
+   diminuem, sem orçamento).
+3. **Marcar como verificada** exige fonte, data e confirmação explícita. Tabelas verificadas são **imutáveis**
+   (trigger no banco); correções são **nova revisão**. Rascunhos não podem ser usados em builds salvas.
+4. Builds guardam a revisão exata usada (`lab_builds.cost_table_id`) e o resultado do cálculo (`validation`).
+   Arquivar ou publicar uma revisão nova não muda builds antigas; a tela avisa que existe revisão mais nova.
+
+O antigo `COSTS` de `game-data.ts` continua `null`: sem tabela selecionada o construtor fica em modo planejamento.
 
 ## Extensões previstas
 

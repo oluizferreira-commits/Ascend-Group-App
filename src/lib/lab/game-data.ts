@@ -130,7 +130,7 @@ export type CostTable = { source: string; verifiedOn: string; costPerStep: (attr
 export const COSTS = null as CostTable | null;
 export const COSTS_STATUS = COSTS
   ? { verified: true as const, note: `Custos verificados (${COSTS.source}).` }
-  : { verified: false as const, note: "Ainda não existe uma tabela de custos verificada do FC 27 Clubs. Use o planejamento como guia de prioridades — o jogo é quem confirma os pontos." };
+  : { verified: false as const, note: "Nenhuma tabela de custos verificada selecionada. Use o planejamento como guia de prioridades — o jogo é quem confirma os pontos." };
 
 /** Planned point cost of a build — null when no verified cost table exists (never a guess). */
 export function buildCost(attrs: Partial<Record<AttrKey, { initial: number | null; planned: number | null }>>, archetype: string | null): number | null {

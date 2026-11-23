@@ -85,4 +85,32 @@ d("database guards", () => {
     expect(rows[0]).toMatchObject({ team_name: "Ascend CF", played: 2, won: 1, drawn: 1, lost: 0, goals_for: 3, goals_against: 1, points: 4 });
     expect(rows.find((r) => r.team_name === "B")).toMatchObject({ played: 1, lost: 1, points: 0 });
   });
+
+  it("AP cost tables: verified revisions are immutable and old builds keep their table", async () => {
+    const data = { attrs: { vision: { base: 60, max: 63, costs: [1, 2, 3] } }, levelBudget: { "10": 10 } };
+    const key = { gameVersion: "TEST", season: "S1", archetype: "X" };
+    const [v1] = await db.insert(schema.labCostTables).values({ ...key, revision: 1, data }).returning();
+    // verifying requires a source and a date
+    await expect(db.update(schema.labCostTables).set({ status: "verified" }).where(eq(schema.labCostTables.id, v1.id))).rejects.toThrow();
+    await db.update(schema.labCostTables).set({ status: "verified", source: "fixture", verifiedOn: "2026-11-23" }).where(eq(schema.labCostTables.id, v1.id));
+    // data can no longer change, nor can it be deleted or go back to draft
+    await expect(db.update(schema.labCostTables).set({ data: { ...data, levelBudget: { "10": 99 } } }).where(eq(schema.labCostTables.id, v1.id))).rejects.toThrow();
+    await expect(db.update(schema.labCostTables).set({ status: "draft" }).where(eq(schema.labCostTables.id, v1.id))).rejects.toThrow();
+    await expect(db.delete(schema.labCostTables).where(eq(schema.labCostTables.id, v1.id))).rejects.toThrow();
+    // same revision twice is refused; a new revision is the way to correct a table
+    await expect(db.insert(schema.labCostTables).values({ ...key, revision: 1, data })).rejects.toThrow();
+    const [v2] = await db.insert(schema.labCostTables).values({ ...key, revision: 2, data: { ...data, attrs: { vision: { base: 60, max: 63, costs: [5, 5, 5] } } } }).returning();
+    // a build made with v1 keeps pointing to v1 (and v1 cannot be removed while in use)
+    const [p] = await db.insert(schema.players).values({ clubId, fullName: "B", nickname: "builder", primaryPosition: "CAM" }).returning();
+    const [b] = await db.insert(schema.labBuilds).values({ playerId: p.id, name: "Old", gameVersion: "TEST", costTableId: v1.id, purchases: { vision: 2 } }).returning();
+    await db.update(schema.labCostTables).set({ status: "archived" }).where(eq(schema.labCostTables.id, v1.id));
+    const [again] = await db.select().from(schema.labBuilds).where(eq(schema.labBuilds.id, b.id));
+    expect(again.costTableId).toBe(v1.id);
+    const [old] = await db.select().from(schema.labCostTables).where(eq(schema.labCostTables.id, v1.id));
+    expect(old.data).toEqual(data);
+    expect(v2.revision).toBe(2);
+    // drafts are editable and deletable
+    await db.update(schema.labCostTables).set({ notes: "ok", data }).where(eq(schema.labCostTables.id, v2.id));
+    await db.delete(schema.labCostTables).where(eq(schema.labCostTables.id, v2.id));
+  });
 });

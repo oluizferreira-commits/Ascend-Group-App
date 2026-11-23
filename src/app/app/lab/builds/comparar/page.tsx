@@ -7,7 +7,7 @@ import { LabGate } from "@/components/lab/subject";
 import { Panel } from "@/components/ui/kit";
 import { EmptyState } from "@/components/ui/basics";
 import { compareBuilds } from "@/lib/lab/builder";
-import { COSTS_STATUS, PLAYSTYLE_BY_KEY, type PlaystyleKey } from "@/lib/lab/game-data";
+import { PLAYSTYLE_BY_KEY, type PlaystyleKey } from "@/lib/lab/game-data";
 import { cn } from "@/lib/cn";
 
 export const metadata: Metadata = { title: "Comparar builds · Performance Lab" };
@@ -81,8 +81,17 @@ export default async function CompareBuilds({ searchParams }: { searchParams: Pr
             <p className="kicker mb-1">Nas duas</p><p className="text-sm">{c.both.map(ps).join(", ") || "—"}</p>
           </Panel>
           <Panel title="Pontos">
-            <p className="text-sm text-ink-300">A: {A.pointsAvailable ?? "—"} disponíveis · B: {B.pointsAvailable ?? "—"} disponíveis</p>
-            {!COSTS_STATUS.verified && <p className="mt-2 text-xs text-amber-500">Pontos utilizados e restantes não são calculados: orçamento não validado.</p>}
+            {[["A", A], ["B", B]].map(([k, x]) => {
+              const b = x as typeof A;
+              return (
+                <p key={k as string} className="text-sm text-ink-300">
+                  <b className="text-ink-100">{k as string}:</b>{" "}
+                  {b.validation ? <>{b.validation.spent} AP gastos{b.validation.budget != null ? ` de ${b.validation.budget} · restam ${b.validation.budget - b.validation.spent}` : ""} · <span className={b.validation.validated ? "text-win" : "text-amber-500"}>{b.validation.validated ? "validada" : "não validada"}</span></>
+                    : <span className="text-amber-500">modo planejamento — pontos não calculados</span>}
+                </p>
+              );
+            })}
+            {A.costTableId && B.costTableId && A.costTableId !== B.costTableId && <p className="mt-2 text-xs text-ink-400">As builds usam tabelas diferentes (arquétipo ou revisão) — custos não são diretamente comparáveis.</p>}
           </Panel>
         </div>
       </div>

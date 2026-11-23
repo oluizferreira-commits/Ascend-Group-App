@@ -5,6 +5,16 @@
 export const CHANGELOG: { date: string; title: string; items: string[] }[] = [
   {
     date: "2026-11-23",
+    title: "Builds com cálculo de pontos",
+    items: [
+      "Construtor de builds com cálculo exato de pontos (AP) quando há tabela de custos verificada do arquétipo.",
+      "Comprar e remover níveis respeita o limite do arquétipo e o orçamento do seu nível — e devolve exatamente o que custou.",
+      "“Distribuir pontos automaticamente” encontra a melhor distribuição para os seus objetivos dentro do orçamento.",
+      "Sem tabela verificada, nada é inventado: o construtor continua em modo planejamento.",
+    ],
+  },
+  {
+    date: "2026-11-23",
     title: "Ascend Performance Lab",
     items: [
       "Nova aba Lab: seu centro de desenvolvimento individual.",

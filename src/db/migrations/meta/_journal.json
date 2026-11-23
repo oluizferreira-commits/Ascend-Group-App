@@ -64,6 +64,13 @@
       "when": 1795393589923,
       "tag": "0008_performance_lab",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795395508084,
+      "tag": "0009_ap_cost_tables",
+      "breakpoints": true
     }
   ]
 }

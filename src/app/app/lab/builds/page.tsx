@@ -5,7 +5,7 @@ import { requirePage } from "@/server/auth/session";
 import { labSubject, listBuilds, listLabPlayers } from "@/server/services/lab";
 import { LabGate, SubjectBar } from "@/components/lab/subject";
 import { EmptyState } from "@/components/ui/basics";
-import { COSTS_STATUS } from "@/lib/lab/game-data";
+import { editorCostTables } from "@/server/services/cost-tables";
 import { isTopic, TOPICS } from "@/lib/lab/trainer";
 
 export const metadata: Metadata = { title: "Builds · Performance Lab" };
@@ -17,7 +17,7 @@ export default async function BuildsPage({ searchParams }: { searchParams: Promi
   if (subj.kind !== "player") return <LabGate subj={subj} path="/app/lab/builds" />;
   const { player, own } = subj;
   const q = own ? "" : `?jogador=${player.id}`;
-  const [builds, players] = await Promise.all([listBuilds(player.id), subj.canPick ? listLabPlayers(ctx.club.id) : Promise.resolve(undefined)]);
+  const [builds, players, verified] = await Promise.all([listBuilds(player.id), subj.canPick ? listLabPlayers(ctx.club.id) : Promise.resolve(undefined), editorCostTables({ includeDrafts: false })]);
   return (
     <div className="space-y-5">
       <SubjectBar player={player} own={own} canPick={subj.canPick} players={players} path="/app/lab/builds" />
@@ -50,6 +50,7 @@ export default async function BuildsPage({ searchParams }: { searchParams: Promi
                     {b.focusTopic && isTopic(b.focusTopic.split(":")[0]) && <span>Foco: {TOPICS[b.focusTopic.split(":")[0] as keyof typeof TOPICS].short}</span>}
                     <span>Atualizada {day(b.updatedAt)}</span>
                     {b.startedUsingOn && <span className="text-win">Em uso desde {b.startedUsingOn.split("-").reverse().join("/")}</span>}
+                    {b.validation && <span className={b.validation.validated ? "text-win" : "text-amber-500"}>{b.validation.spent} AP{b.validation.budget != null ? `/${b.validation.budget}` : ""} · {b.validation.validated ? "validada" : "não validada"}</span>}
                   </span>
                 </Link>
               </li>
@@ -57,7 +58,7 @@ export default async function BuildsPage({ searchParams }: { searchParams: Promi
           })}
         </ul>
       )}
-      {!COSTS_STATUS.verified && <p className="text-[11px] text-ink-400">Orçamento não validado: o Lab ainda não tem a tabela de custos verificada do FC 27 Clubs.</p>}
+      {verified.length === 0 && <p className="text-[11px] text-ink-400">Orçamento não validado: ainda não há tabela de custos verificada cadastrada — as builds ficam em modo planejamento.</p>}
     </div>
   );
 }

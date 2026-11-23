@@ -9,6 +9,8 @@ import {
   PLAYSTYLES_VERIFIED, TACTICAL_ROLES, type AttrCategory, type AttrKey,
 } from "@/lib/lab/game-data";
 import { budget, generatePlan, type GeneratedPlan } from "@/lib/lab/builder";
+import { evaluateBuild, optimize, type CostTable, type EngineBuild } from "@/lib/lab/ap-engine";
+import { EngineAttrList, EngineBudget } from "./engine-panel";
 import { TOPICS, TOPIC_KEYS, isTopic } from "@/lib/lab/trainer";
 import { cn } from "@/lib/cn";
 
@@ -17,7 +19,9 @@ export type BuildInitial = {
   name: string; archetype: string | null; level: number | null; position: string | null; role: string | null;
   heightCm: number | null; weightKg: number | null; pointsAvailable: number | null; specializations: string | null; notes: string | null;
   brief: string | null; focusTopic: string | null; isPrimary: boolean; attributes: Attrs; playstyles: { key: string; plus: boolean }[];
+  costTableId: string | null; purchases: Partial<Record<AttrKey, number>>;
 };
+export type EditorTable = Omit<CostTable, "data"> & { data: CostTable["data"] };
 
 const TIER_STYLE = {
   max: "border-accent-500/60 bg-accent-500/15 text-accent-300",
@@ -30,22 +34,40 @@ const TIER_LABEL = { max: "Máxima", high: "Alta", mid: "Compl.", low: "" } as c
 const clamp = (v: number) => Math.max(ATTR_MIN, Math.min(ATTR_MAX, Math.round(v)));
 const num = (s: string) => (s.trim() === "" ? null : Number.isFinite(Number(s)) ? Number(s) : null);
 
-export function BuildEditor({ initial, action, readOnly, defaultPosition, archetypeIdHint, autoGenerate }: {
+export function BuildEditor({ initial, action, readOnly, defaultPosition, archetypeIdHint, autoGenerate, tables = [] }: {
   initial: BuildInitial; action?: (prev: ActionResult | null, form: FormData) => Promise<ActionResult>; readOnly?: boolean;
-  defaultPosition: Position; archetypeIdHint: number | null; autoGenerate?: boolean;
+  defaultPosition: Position; archetypeIdHint: number | null; autoGenerate?: boolean; tables?: EditorTable[];
 }) {
   const [state, formAction] = useActionState(action ?? (async () => ({ ok: false, error: "Somente leitura." }) as ActionResult), null);
   const [b, setB] = useState(initial);
   const [cat, setCat] = useState<AttrCategory>("pace");
   const [plan, setPlan] = useState<GeneratedPlan | null>(null);
+  const [engineMsg, setEngineMsg] = useState<string | null>(null);
+  const [optNote, setOptNote] = useState<string | null>(null);
+  const table = tables.find((t) => t.id === b.costTableId) ?? null;
   const position = (POSITIONS as readonly string[]).includes(b.position ?? "") ? (b.position as Position) : defaultPosition;
   const group = positionGroup(position);
   const [focusTopic, focusVariant] = (b.focusTopic ?? "").split(":");
 
-  const runGenerator = () => setPlan(generatePlan({
+  const makePlan = () => generatePlan({
     group, brief: b.brief ?? "", positionLabel: POSITION_NAMES[position],
     focus: isTopic(focusTopic) ? { topic: focusTopic, variant: focusVariant || null } : null,
-  }));
+  });
+  const runGenerator = () => setPlan(makePlan());
+  const specs = (b.specializations ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+  const engineBuild: EngineBuild = { level: b.level, heightCm: b.heightCm, weightKg: b.weightKg, specializations: specs, purchases: b.purchases };
+  const evaluation = table ? evaluateBuild(table, engineBuild) : null;
+  const runOptimizer = () => {
+    if (!table) return;
+    if (b.level == null) { setOptNote("Informe o nível do jogador para saber o orçamento."); return; }
+    const p = plan ?? makePlan();
+    if (!plan) setPlan(p);
+    const weights = Object.fromEntries(p.ranked.filter((r) => r.score > 0).map((r) => [r.key, r.score]));
+    const r = optimize({ table, level: b.level, weights, body: { heightCm: b.heightCm, weightKg: b.weightKg, specializations: specs } });
+    if (!r.ok) { setOptNote(r.reason); return; }
+    setB((x) => ({ ...x, purchases: r.build.purchases }));
+    setOptNote(`${r.method} ${r.evaluation.spent} de ${r.evaluation.budget} AP usados, priorizando os atributos do gerador.${r.evaluation.validated ? "" : " Ainda não validada: " + r.evaluation.reasons.join(" ")}`);
+  };
   // Opening from the Trainer ("Melhorar minha build") shows the recommended priorities immediately.
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { if (autoGenerate) runGenerator(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -71,12 +93,20 @@ export function BuildEditor({ initial, action, readOnly, defaultPosition, archet
       <input type="hidden" name="playstyles" value={JSON.stringify(b.playstyles)} />
       <input type="hidden" name="focusTopic" value={b.focusTopic ?? ""} />
       <input type="hidden" name="position" value={position} />
+      <input type="hidden" name="costTableId" value={b.costTableId ?? ""} />
+      <input type="hidden" name="purchases" value={JSON.stringify(table ? b.purchases : {})} />
 
       <fieldset disabled={dis} className="card min-w-0 space-y-3 p-4 sm:p-5">
         <legend className="sr-only">Configuração</legend>
         <h2 className="font-display text-[17px] font-bold tracking-[0.08em] text-ink-100 uppercase">Configuração · {GAME_VERSION}</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <label className="col-span-2"><span className="label">Nome da build *</span><input name="name" required maxLength={60} value={b.name} onChange={(e) => set("name", e.target.value)} className="input" placeholder="Ex.: Segundo atacante criativo" /></label>
+          <label className="col-span-2 sm:col-span-4"><span className="label">Tabela de custos (AP)</span>
+            <select value={b.costTableId ?? ""} onChange={(e) => { const t = tables.find((x) => x.id === e.target.value); setB((x) => ({ ...x, costTableId: t?.id ?? null, archetype: t ? t.archetype : x.archetype })); setOptNote(null); setEngineMsg(null); }} className="input">
+              <option value="">Nenhuma — modo planejamento (orçamento não validado)</option>
+              {tables.map((t) => <option key={t.id} value={t.id}>{t.archetype} · {t.season} · rev. {t.revision}{t.status === "verified" ? " · verificada" : t.status === "draft" ? " · RASCUNHO" : " · arquivada"}</option>)}
+            </select>
+            <span className="mt-1 block text-[11px] text-ink-400">{tables.length ? "Com uma tabela verificada, os pontos são calculados incremento a incremento e a build pode ser validada." : "Ainda não há tabela de custos verificada para o FC 27 — a diretoria cadastra em Administração → Custos de builds."}</span></label>
           <label className="col-span-2"><span className="label">Arquétipo</span><input name="archetype" maxLength={60} value={b.archetype ?? ""} onChange={(e) => set("archetype", e.target.value)} className="input" placeholder="Como aparece no jogo" />
             <span className="mt-1 block text-[11px] text-ink-400">{archetypeIdHint != null ? `A EA registrou o arquétipo nº ${archetypeIdHint} nas suas últimas partidas. ` : ""}{ARCHETYPES_VERIFIED.note}</span></label>
           <label><span className="label">Posição</span>
@@ -134,7 +164,11 @@ export function BuildEditor({ initial, action, readOnly, defaultPosition, archet
               <p className="mb-1 flex items-center gap-1 font-semibold"><AlertTriangle className="size-3.5" />Possíveis desvantagens</p>
               <ul className="space-y-0.5">{plan.drawbacks.map((d) => <li key={d}>• {d}</li>)}</ul>
             </div>
-            <ul className="space-y-0.5 text-[11px] text-ink-400">{plan.notes.map((n) => <li key={n}>{n}</li>)}</ul>
+            <ul className="space-y-0.5 text-[11px] text-ink-400">
+              {table
+                ? <li>Tabela de custos selecionada: use “Distribuir pontos automaticamente” (em Orçamento) para a distribuição exata dentro do seu orçamento.</li>
+                : plan.notes.map((n) => <li key={n}>{n}</li>)}
+            </ul>
           </div>
         )}
       </section>
@@ -142,7 +176,7 @@ export function BuildEditor({ initial, action, readOnly, defaultPosition, archet
       <section className="card p-4 sm:p-5">
         <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
           <h2 className="font-display text-[17px] font-bold tracking-[0.08em] text-ink-100 uppercase">Atributos</h2>
-          <p className="text-xs text-ink-400">Inicial = valor atual no jogo · Planejado = onde você quer chegar</p>
+          <p className="text-xs text-ink-400">{table ? "Valor = base do arquétipo + níveis comprados (custo lido da tabela a cada +1)" : "Inicial = valor atual no jogo · Planejado = onde você quer chegar"}</p>
         </div>
         <div data-no-swipe className="-mx-1 mb-3 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist">
           {cats.map((c) => {
@@ -155,6 +189,14 @@ export function BuildEditor({ initial, action, readOnly, defaultPosition, archet
             );
           })}
         </div>
+        {table ? (
+          <>
+            {engineMsg && <p role="alert" className="mb-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-500">{engineMsg}</p>}
+            <EngineAttrList table={table} build={engineBuild} cat={cat} disabled={dis} onError={setEngineMsg}
+              onChange={(nb) => setB((x) => ({ ...x, purchases: nb.purchases }))}
+              tierLabel={(k) => { const t = tierOf.get(k); return t && t.tier !== "low" ? <span className={cn("rounded border px-1 text-[10px] font-semibold", TIER_STYLE[t.tier])}>Prioridade {TIER_LABEL[t.tier]}</span> : null; }} />
+          </>
+        ) : (
         <ul className="divide-y divide-[var(--line)]">
           {ATTRIBUTES.filter((a) => a.cat === cat).map((a) => {
             const v = b.attributes[a.key] ?? { initial: null, planned: null };
@@ -182,10 +224,14 @@ export function BuildEditor({ initial, action, readOnly, defaultPosition, archet
             );
           })}
         </ul>
+        )}
       </section>
 
       <section className="card p-4 sm:p-5">
         <h2 className="mb-2 font-display text-[17px] font-bold tracking-[0.08em] text-ink-100 uppercase">Orçamento</h2>
+        {table && evaluation ? (
+          <EngineBudget table={table} evaluation={evaluation} level={b.level} onOptimize={runOptimizer} optimizeNote={optNote} disabled={dis} />
+        ) : (<>
         <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           <div className="tile px-3 py-2"><dt className="kicker text-[10px]">Disponíveis</dt><dd className="font-display text-xl font-bold">{b.pointsAvailable ?? "—"}</dd></div>
           <div className="tile px-3 py-2"><dt className="kicker text-[10px]">Utilizados</dt><dd className="font-display text-xl font-bold">{totals.budget.used ?? "—"}</dd></div>
@@ -197,6 +243,7 @@ export function BuildEditor({ initial, action, readOnly, defaultPosition, archet
             <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-amber-500" /><span><b className="text-amber-500">Orçamento não validado.</b> {COSTS_STATUS.note} “Aumento planejado” é a soma das diferenças de atributo — não é o custo em pontos.</span>
           </p>
         )}
+        </>)}
       </section>
 
       <fieldset disabled={dis} className="card min-w-0 p-4 sm:p-5">

@@ -11,6 +11,8 @@ import { ATTR_KEYS, ATTR_MAX, ATTR_MIN, GAME_VERSION, PLAYSTYLE_BY_KEY, type Att
 import { isTopic, topicVariant } from "@/lib/lab/trainer";
 import { goalTarget } from "@/lib/lab/progress";
 import type { LabGoal } from "@/db/schema/lab";
+import { evaluateBuild } from "@/lib/lab/ap-engine";
+import { getCostTable, toEngine } from "../services/cost-tables";
 
 /** Only the player edits their own Lab. Staff access is read-only by design. */
 async function ownPlayer(): Promise<{ ctx: AuthContext; playerId: string }> {
@@ -45,6 +47,9 @@ const buildSchema = z.object({
     z.record(z.string(), z.object({ initial: attrValue, planned: attrValue }))),
   playstyles: z.preprocess((v) => { try { return JSON.parse(String(v ?? "[]")); } catch { return null; } },
     z.array(z.object({ key: z.string(), plus: z.boolean() })).max(20)),
+  costTableId: z.string().trim().transform((v) => v || null).refine((v) => v == null || /^[0-9a-f-]{36}$/i.test(v), "Tabela inválida"),
+  purchases: z.preprocess((v) => { try { return JSON.parse(String(v ?? "{}")); } catch { return null; } },
+    z.record(z.string(), z.number().int().min(0).max(98))),
 });
 
 export async function saveBuildAction(buildId: string | null, _prev: ActionResult | null, form: FormData): Promise<ActionResult> {
@@ -54,7 +59,28 @@ export async function saveBuildAction(buildId: string | null, _prev: ActionResul
   const d = parsed.data;
   const attributes = Object.fromEntries(Object.entries(d.attributes).filter(([k, v]) => ATTR_KEYS.includes(k as AttrKey) && (v.initial != null || v.planned != null)));
   const playstyles = d.playstyles.filter((p) => p.key in PLAYSTYLE_BY_KEY);
-  const values = { ...d, attributes, playstyles, gameVersion: GAME_VERSION, updatedAt: new Date() };
+
+  // Calculated mode: the server recomputes everything with the AP engine (the browser is never trusted).
+  let calc: { costTableId: string | null; purchases: Record<string, number>; validation: { spent: number; budget: number | null; validated: boolean; reasons: string[] } | null; attributes?: typeof attributes } =
+    { costTableId: null, purchases: {}, validation: null };
+  if (d.costTableId) {
+    const t = await getCostTable(d.costTableId);
+    if (!t) return { ok: false, error: "Tabela de custos não encontrada." };
+    const [prevBuild] = buildId ? await db.select({ costTableId: schema.labBuilds.costTableId }).from(schema.labBuilds).where(and(eq(schema.labBuilds.id, buildId), eq(schema.labBuilds.playerId, playerId))) : [];
+    if (t.status === "draft") return { ok: false, error: "Esta tabela ainda é um rascunho e não pode ser usada em builds salvas. Escolha uma tabela verificada ou o modo planejamento." };
+    if (t.status === "archived" && prevBuild?.costTableId !== t.id) return { ok: false, error: "Esta revisão da tabela foi arquivada. Escolha a revisão atual." };
+    const purchases = Object.fromEntries(Object.entries(d.purchases).filter(([k, v]) => ATTR_KEYS.includes(k as AttrKey) && v > 0)) as Partial<Record<AttrKey, number>>;
+    const ev = evaluateBuild(toEngine(t), { level: d.level, heightCm: d.heightCm, weightKg: d.weightKg, specializations: (d.specializations ?? "").split(",").map((x) => x.trim()).filter(Boolean), purchases });
+    const blocking = ev.issues.filter((i) => i.level === "error");
+    if (blocking.length) return { ok: false, error: blocking[0].message };
+    calc = {
+      costTableId: t.id, purchases: purchases as Record<string, number>,
+      validation: { spent: ev.spent, budget: ev.budget, validated: ev.validated, reasons: ev.reasons },
+      // Comparable values for history/comparator: base and purchased value (display modifiers excluded on purpose).
+      attributes: Object.fromEntries(ev.lines.map((l) => [l.attr, { initial: l.base, planned: l.value }])),
+    };
+  }
+  const values = { ...d, attributes: calc.attributes ?? attributes, playstyles, gameVersion: GAME_VERSION, updatedAt: new Date(), costTableId: calc.costTableId, purchases: calc.purchases, validation: calc.validation };
   let id = buildId;
   if (!id) {
     const existing = await db.select({ id: schema.labBuilds.id }).from(schema.labBuilds).where(eq(schema.labBuilds.playerId, playerId));

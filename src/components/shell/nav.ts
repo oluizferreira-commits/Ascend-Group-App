@@ -29,6 +29,7 @@ export const NAV: { section: string; items: NavItem[] }[] = [
       { href: "/app/admin/usuarios", label: "Usuários e cargos", icon: "shield", permission: "users.manage" },
       { href: "/app/admin/temporadas", label: "Temporadas", icon: "calendar-range", permission: "seasons.manage" },
       { href: "/app/admin/avaliacao", label: "Critérios de avaliação", icon: "sliders", permission: "ratings.configure" },
+      { href: "/app/admin/custos-builds", label: "Custos de builds (Lab)", icon: "calculator", permission: "gamedata.manage" },
       { href: "/app/admin/auditoria", label: "Auditoria", icon: "scroll", permission: "audit.view" },
     ],
   },

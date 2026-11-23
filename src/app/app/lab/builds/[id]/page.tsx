@@ -14,6 +14,7 @@ import { positionGroup } from "@/lib/domain";
 import { fmtMetric, metricsFor } from "@/lib/lab/metrics";
 import { comparePeriods, splitAt } from "@/lib/lab/progress";
 import { cn } from "@/lib/cn";
+import { editorCostTables, getCostTable, latestRevisionFor } from "@/server/services/cost-tables";
 
 export const metadata: Metadata = { title: "Build · Performance Lab" };
 
@@ -26,7 +27,12 @@ export default async function BuildPage({ params, searchParams }: { params: Prom
   const q = own ? "" : `?jogador=${player.id}`;
   const build = await getBuild(player.id, id);
   if (!build) notFound();
-  const [matches, archetypeId] = await Promise.all([labMatches(ctx.club.id, player.id), latestArchetypeId(player.id)]);
+  const [matches, archetypeId, tables, usedTable] = await Promise.all([
+    labMatches(ctx.club.id, player.id), latestArchetypeId(player.id),
+    editorCostTables({ includeDrafts: own && ctx.permissions.has("gamedata.manage"), keepId: build.costTableId }),
+    build.costTableId ? getCostTable(build.costTableId) : Promise.resolve(null),
+  ]);
+  const newer = usedTable ? await latestRevisionFor(usedTable) : null;
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
   const split = build.startedUsingOn ? splitAt(matches, build.startedUsingOn) : null;
   const rows = split ? comparePeriods(metricsFor(positionGroup(player.primaryPosition)), split.before.slice(-10), split.after) : [];
@@ -46,6 +52,13 @@ export default async function BuildPage({ params, searchParams }: { params: Prom
         {build.name}
         {build.isPrimary && <span className="inline-flex items-center gap-1 rounded-full bg-accent-500/15 px-2 py-0.5 font-sans text-xs font-semibold text-accent-400"><Star className="size-3" />Principal</span>}
       </h2>
+      {usedTable && (
+        <p className="text-xs text-ink-400">
+          Calculada com a tabela <b className="text-ink-200">{usedTable.archetype} · {usedTable.season} · rev. {usedTable.revision}</b> ({usedTable.status === "verified" ? "verificada" : usedTable.status === "archived" ? "arquivada" : "rascunho"})
+          {build.validation && <> · {build.validation.spent} AP{build.validation.budget != null ? ` de ${build.validation.budget}` : ""} · {build.validation.validated ? <span className="text-win">validada</span> : <span className="text-amber-500">não validada</span>}</>}
+          {newer && newer.revision > usedTable.revision && <span className="text-amber-500"> · existe a rev. {newer.revision} verificada; esta build continua com os números da rev. {usedTable.revision}.</span>}
+        </p>
+      )}
       {sp.salvo === "1" && <p role="status" className="rounded-lg border border-win/40 bg-win/10 px-3 py-2 text-sm text-win">Build salva.</p>}
 
       <div className="grid gap-5 lg:grid-cols-2">
@@ -76,7 +89,7 @@ export default async function BuildPage({ params, searchParams }: { params: Prom
       <BuildEditor action={own ? saveBuildAction.bind(null, build.id) : undefined} readOnly={!own} defaultPosition={player.primaryPosition} archetypeIdHint={archetypeId}
         initial={{ name: build.name, archetype: build.archetype, level: build.level, position: build.position, role: build.role, heightCm: build.heightCm, weightKg: build.weightKg,
           pointsAvailable: build.pointsAvailable, specializations: build.specializations, notes: build.notes, brief: build.brief, focusTopic: build.focusTopic,
-          isPrimary: build.isPrimary, attributes: build.attributes, playstyles: build.playstyles }} />
+          isPrimary: build.isPrimary, attributes: build.attributes, playstyles: build.playstyles, costTableId: build.costTableId, purchases: build.purchases }} tables={tables} />
     </div>
   );
 }
